@@ -21,17 +21,17 @@ package sdljava.video;
  *
  *  Ivan Z. Ganza (ivan_ganza@yahoo.com)
  */
-import sdljava.x.swig.*;
-import org.gljava.opengl.GL;
-import org.gljava.opengl.impl.glew.GlewImpl;
-
-import sdljava.SDLMain;
-import sdljava.SDLException;
-
-import java.util.List;
-import java.util.ArrayList;
-
 import java.nio.ByteBuffer;
+
+//import org.gljava.opengl.GL;
+//import org.gljava.opengl.impl.glew.GlewImpl;
+
+import sdljava.SDLException;
+import sdljava.SDLMain;
+import sdljava.x.swig.SDL_Color;
+import sdljava.x.swig.SDL_Rect;
+import sdljava.x.swig.SDL_Surface;
+import sdljava.x.swig.SWIG_SDLVideo;
 /**
  * Graphical Surface Structure
  * <P>
@@ -63,11 +63,11 @@ public class SDLSurface {
 
     //static List<QueuedBlit> blitQueue = new ArrayList<QueuedBlit>();
 
-    /**
-     * Reference to GL context (can be null if GL mode is not being used)
-     *
-     */
-    GL gl;
+//    /**
+//     * Reference to GL context (can be null if GL mode is not being used)
+//     *
+//     */
+//    GL gl;
 
     /**
      * Creates a new <code>SDLSurface</code> instance.
@@ -132,25 +132,25 @@ public class SDLSurface {
 	return swigSurface;
     }
     
-    /**
-     * Get the OPEN GL Context.  Returns an instance of GL suitable for drawing
-     * to if this surface was configured with SDL_OPENGL
-     * <P>
-     * When SDL has implemented multi-window support this method will return
-     * the GL instance properly configured to draw to the surface
-     *
-     * @return a <code>GL</code> value
-     * @exception SDLException if an error occurs
-     */
-    public GL getGL() throws SDLException {
-	if (!isOpenGL()) throw new SDLException("This surface does not have an OPENGL Context");
-
-	if (gl == null) {
-	    gl = new GlewImpl();
-	}
-
-	return gl;
-    }
+//    /**
+//     * Get the OPEN GL Context.  Returns an instance of GL suitable for drawing
+//     * to if this surface was configured with SDL_OPENGL
+//     * <P>
+//     * When SDL has implemented multi-window support this method will return
+//     * the GL instance properly configured to draw to the surface
+//     *
+//     * @return a <code>GL</code> value
+//     * @exception SDLException if an error occurs
+//     */
+//    public GL getGL() throws SDLException {
+//	if (!isOpenGL()) throw new SDLException("This surface does not have an OPENGL Context");
+//
+//	if (gl == null) {
+//	    gl = new GlewImpl();
+//	}
+//
+//	return gl;
+//    }
 
     /**
      * Makes sure the given area is updated on the given screen.
