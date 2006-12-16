@@ -1,0 +1,10 @@
+
+This directory is a temporary placeholder for the SDLJava code which was 
+modified for the need of the MIDPath project. In the future, we hope that 
+the corresponding patches will be included in the SDLJava project.
+
+To compile native code in a standard development environment, just type:
+# cd native
+# make
+
+Modify the includes in the native/Makefile for more complex environements.

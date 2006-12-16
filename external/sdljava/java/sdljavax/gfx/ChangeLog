@@ -1,0 +1,9 @@
+2005-02-18  Ivan Z. Ganza  <ivan_ganza@yahoo.com>
+	* SDLGfx.java (Repository): change all methods which took a short[]
+	to take a ShortBuffer instead.
+
+2005-02-17  Ivan Z. Ganza  <ivan_ganza@yahoo.com>
+
+	* SDLGfx.java (Repository): start changing methods to use NIO
+	buffers instead of (slow) java arrays.
+
