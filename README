@@ -1,0 +1,41 @@
+MIDPath README
+===============
+
+MIDPath is a project to create a free software implementation of 
+the MIDP2 core class libraries.
+
+MIDPath targets free JVMs working with GNU Classpath:
+	* Cacao		(http://www.cacaojvm.org/)
+	* Kaffe		(http://www.kaffe.org/)
+	* JamVM		(http://jamvm.sourceforge.net/)
+	
+The code is based on phoneME, a Sun implementation of MIDP2 which 
+is released under GPL.
+
+MIDPath currently uses the SDL and SDLJava libraries as native backend.
+
+Licensing
+---------
+
+MIDPath is released under the GPL license with a linking exception. 
+See the LICENSE file.
+
+Repository structure:
+-----------------------
+	
+	|-- src: Java sources
+	|-- lib: libraries needed by the MIDPath implementation
+	|-- native: C sources
+	|-- resources: resources that could be loaded by the library 
+	    on the file system
+	|-- resources-embedded: resources embedded in the midpath.jar file
+    . CHANGES
+    . INSTALL
+    . LICENSE
+    . README
+
+    
+
+        
+
+
