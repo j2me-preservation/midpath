@@ -12,7 +12,7 @@ MIDPath targets free JVMs working with GNU Classpath:
 The code is based on phoneME, a Sun implementation of MIDP2 which 
 is released under GPL.
 
-MIDPath currently uses the SDL and SDLJava libraries as native backend.
+MIDPath currently uses the SDL and SDLJava libraries as graphical and audio backends.
 
 Licensing
 ---------
@@ -25,7 +25,7 @@ Repository structure:
 	
 	|-- src: Java sources
 	|-- lib: libraries needed by the MIDPath implementation
-	|-- native: C sources
+	|-- external: sources of external libraries 
 	|-- resources: resources that could be loaded by the library 
 	    on the file system
 	|-- resources-embedded: resources embedded in the midpath.jar file
