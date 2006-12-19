@@ -1,1 +1,76 @@
+Install from the distribution
+==============================
 
+Step 1 : Get the distro
+-----------------------
+
+ # tar -zcf midpath-<VERSION>.tar.gz
+
+We obtain a directory named midpath. We will refer to it below by this environment variable: $MIDPATH_HOME
+
+Step 2: Set the Java environment
+--------------------------------
+
+* Install your favorite JVM
+
+ - JamVM 
+ 	
+ 	# apt-get install jamvm
+
+ - Kaffe 
+
+    # apt-get install kaffe
+
+ - Cacao 
+
+    # apt-get install cacao
+
+* Install Classpath (not needed if you use Kaffe)
+
+    # apt-get install classpath-common
+
+Step 3: SDL installation
+------------------------
+
+# apt-get install libsdl1.2debian-all libsdl-gfx1.2 libsdl-image1.2 libsdl-mixer1.2 libsdl-ttf1.2 libsdl1.2-dev 
+
+Step 4: SDLJava installation
+----------------------------
+
+Compile SDLJava native part:
+
+# cd $MIDPATH_HOME/external/sdljava/native
+# make
+# cp *.so $MIDPATH_HOME/dist
+
+Step 5: Start the test MIDlet
+-----------------------------
+
+# cd $MIDPATH_HOME/bin
+# ./midpath-test.sh
+
+
+Install from the source repository
+==================================
+
+Step A : Grab the sources
+-------------------------
+
+# svn export https://midpath.svn.sourceforge.net/svnroot/midpath/trunk
+# export MIDPATH_HOME=$(pwd)/trunk
+
+Step B : Set the compilation Java environment
+---------------------------------------------
+
+* Complete Step 2
+* Install jikes (or a package which contains javac) 
+
+  # apt-get install jikes
+
+Step C : Build
+--------------
+
+# cd $MIDPATH_HOME
+# ./build.sh
+
+Now complete steps 3 and 5 
