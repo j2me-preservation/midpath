@@ -83,7 +83,7 @@ public class SDLImage extends Image {
 					0x000000ffL, 0xff000000L);
 
 			// TODO Draw rgb field on the surface
-			//tmpSurface.setPixelData32(rgb);
+			tmpSurface.setPixelData32(rgb);
 			
 			// Convert surface format to the display format 
 			if (processAlpha) {
@@ -264,8 +264,8 @@ public class SDLImage extends Image {
 			SDLSurface dstSurface = sdlSurface.convertSurface(fakeARGBSurface.getFormat(), SDLVideo.SDL_SWSURFACE);
 
 			// Get the pixels
-			int[] buf = new int[this.imgWidth * this.imgHeight]; // dstSurface.getPixel32();
-			//int[] buf = dstSurface.getPixelData32();
+			//int[] buf = new int[this.imgWidth * this.imgHeight]; // dstSurface.getPixel32();
+			int[] buf = dstSurface.getPixelData32();
 			
 			for (int b = y; b < y + height; b++) {
 				for (int a = x; a < x + width; a++) {

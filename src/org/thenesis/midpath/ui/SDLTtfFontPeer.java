@@ -240,8 +240,8 @@ public class SDLTtfFontPeer implements FontPeer {
 	}
 	
 	private int getStringWidth(String s) {
-		//return ttfFont.sizeText(s).getWidth();
-		return 8 * s.length();
+		return ttfFont.sizeText(s).getWidth();
+		//return 8 * s.length();
 	}
 
 }
