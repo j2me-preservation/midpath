@@ -144,7 +144,7 @@ public class SDLEventMapper implements EventMapper {
 			return Canvas.KEY_STAR;
 		case SDLKey.SDLK_F12:
 		case SDLKey.SDLK_HASH:
-			return Canvas.KEY_STAR;
+			return Canvas.KEY_POUND;
 		default:
 			return keyCode;
 		}
