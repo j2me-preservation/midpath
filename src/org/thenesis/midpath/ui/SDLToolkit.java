@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.microedition.lcdui.FontPeer;
+import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Toolkit;
 
@@ -46,16 +47,16 @@ public class SDLToolkit extends Toolkit {
 
 	private SDLSurface rootSurface;
 	private SDLGraphics rootPeer;
-	private static SDLToolkit defaultToolkit = new SDLToolkit();
+	//private static SDLToolkit defaultToolkit = new SDLToolkit();
 	private SDLEventPump eventPump;
 	private EventMapper eventMapper = new SDLEventMapper();
 
-	private SDLToolkit() {
+	public SDLToolkit() {
 	}
 
-	public static SDLToolkit getToolkit() {
-		return defaultToolkit;
-	}
+//	public static SDLToolkit getToolkit() {
+//		return defaultToolkit;
+//	}
 
 	public void initialize(int w, int h) {
 
@@ -72,7 +73,7 @@ public class SDLToolkit extends Toolkit {
 		}
 	}
 
-	public SDLGraphics getRootGraphics() {
+	public Graphics getRootGraphics() {
 		return rootPeer;
 	}
 
@@ -86,7 +87,7 @@ public class SDLToolkit extends Toolkit {
 //		}
 //	}
 	
-	public SDLGraphics createGraphics(Image image) {
+	public Graphics createGraphics(Image image) {
 		if (image instanceof SDLImage) {
 			return new SDLGraphics(((SDLImage)image).sdlSurface);
 		} else {

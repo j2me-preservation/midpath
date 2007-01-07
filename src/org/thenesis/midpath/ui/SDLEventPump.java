@@ -21,6 +21,8 @@
  */
 package org.thenesis.midpath.ui;
 
+import javax.microedition.lcdui.Toolkit;
+
 import sdljava.event.SDLEvent;
 import sdljava.event.SDLExposeEvent;
 import sdljava.event.SDLKeyboardEvent;
@@ -156,7 +158,7 @@ public class SDLEventPump implements Runnable {
 			// If it's not an internal event key, test if it's a system key
 			int code = SDLEventMapper.mapToInternalEvent(keyCode);
 			if (code == keyCode) {
-				if (SDLToolkit.getToolkit().getEventMapper().getSystemKey(keyCode) == 0) 
+				if (Toolkit.getToolkit().getEventMapper().getSystemKey(keyCode) == 0) 
 					return;
 			}
 		}

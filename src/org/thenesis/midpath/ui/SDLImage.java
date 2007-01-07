@@ -45,7 +45,7 @@ public class SDLImage extends Image {
 
 	public SDLImage(int w, int h) {
 		try {
-			sdlSurface = SDLToolkit.getToolkit().createSDLSurface(w, h);
+			sdlSurface = ((SDLToolkit)SDLToolkit.getToolkit()).createSDLSurface(w, h);
 			imgWidth = w;
 			imgHeight = h;
 			isMutable = true;

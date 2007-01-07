@@ -19,73 +19,32 @@
  * Clara, CA 95054 or visit www.sun.com if you need additional
  * information or have any questions. 
  */
-package org.thenesis.midpath.ui;
+package org.thenesis.midpath.ui.virtual;
 
 import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
-
-import org.thenesis.midpath.ui.virtual.Rectangle;
-
-import sdljava.SDLException;
-import sdljava.video.SDLRect;
-import sdljava.video.SDLSurface;
-import sdljavax.gfx.SDLGfx;
 
 import com.sun.midp.log.Logging;
 
-public class SDLGraphics extends Graphics {
+public class VirtualGraphics extends Graphics {
+
+	private VirtualSurface surface;
+
+	// Image blending mode. TODO: replace BLEND by ADD and SUB.
+	public static final int REPLACE = 0, BLEND = 1, LOGIC = 2;
+	private int blendMode = REPLACE;
 
 	public static final int MAX_CIRCLE_RADIUS = 16384;
 	public static final int MAX_ELLIPSE_RADIUS = 16384;
-	public static final int REPLACE = 0, BLEND = 1, LOGIC = 2;
-	
-	private SDLSurface surface;
-	private int blendMode = REPLACE;
 
-	long sdlGfxColor;
-	long sdlColor;
-	
 	Rectangle clipRectangle = new Rectangle();
 
-	SDLGraphics(SDLSurface surface) {
+	VirtualGraphics(VirtualSurface surface) {
 		this.surface = surface;
 	}
 
-	public SDLSurface getSurface() {
+	public VirtualSurface getSurface() {
 		return surface;
-	}
-
-	public synchronized void setColor(int red, int green, int blue) {
-		super.setColor(red, green, blue);
-		setInternalColor(red, green, blue);
-	}
-
-	public synchronized void setColor(int RGB) {
-
-		super.setColor(RGB);
-
-		int red = (RGB >> 16) & 0xff;
-		int green = (RGB >> 8) & 0xff;
-		int blue = RGB & 0xff;
-
-		setInternalColor(red, green, blue);
-
-	}
-
-	public synchronized void setGrayScale(int value) {
-		super.setGrayScale(value);
-		setInternalColor(value, value, value);
-	}
-
-	private void setInternalColor(int red, int green, int blue) {
-		// RRGGBBAA format needed by SDL_gfx
-		sdlGfxColor = ((red << 24) | (green << 16) | (blue << 8) | 0xFF) & 0x00000000FFFFFFFFL;
-
-		try {
-			sdlColor = surface.mapRGB(red, green, blue);
-		} catch (SDLException e) {
-		}
 	}
 
 	/**
@@ -98,51 +57,13 @@ public class SDLGraphics extends Graphics {
 	 */
 	protected synchronized int getPixel(int rgb, int gray, boolean isGray) {
 		// TODO 
+		//if (Logging.TRACE_ENABLED)
 		//System.out.println("[DEBUG]SDLGraphics.getPixel : " + Integer.toHexString(rgb));
 		if (isGray) {
 			return (gray << 16) | (gray << 8) | gray;
 		} else {
 			return rgb;
 		}
-	}
-	
-	public synchronized void setClip(int x, int y, int width, int height) {
-		super.setClip(x, y, width, height);
-		clipRectangle.set(clipX1, clipY1, clipX2, clipY2);
-	}
-
-	public synchronized void clipRect(int x, int y, int width, int height) {
-		super.clipRect(x, y, width, height);
-		clipRectangle.set(clipX1, clipY1, clipX2, clipY2);
-	}
-
-	public void drawRect(int x, int y, int width, int height) {
-		x += transX;
-		y += transY;
-		SDLGfx.rectangleColor(surface, x, y, x + width, y + height, sdlGfxColor);
-	}
-
-	/**
-	 * Fills the specified rectangle.
-	 */
-	public synchronized void fillRect(int x, int y, int width, int height) {
-
-		x += transX;
-		y += transY;
-
-		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG]SDLGraphics.fillRect(): x=" + x + " y1=" + y + " width=" + width + " height= "
-					+ height + " color=" + Long.toHexString(sdlColor));
-
-		//System.out.println("[DEBUG]SDLGraphics.fillRect(): " + Long.toHexString(sdlColor));
-
-		// SDLGfx.boxColor(surface, x, y, x + width, x + height, sdlCurrentColor); // doesn't work correctly. Why ?
-		try {
-			surface.fillRect(new SDLRect(x, y, width, height), sdlColor); //sdlColor); 0x0000FF00L
-		} catch (SDLException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	public synchronized void drawString(String str, int x, int y, int anchor) {
@@ -153,168 +74,395 @@ public class SDLGraphics extends Graphics {
 			fontPeer.render(this, str, x, y, anchor);
 		}
 
-		//		x += transX;
-		//		y += transY;
-		//
-		//		Font font = getFont(); // Font.getDefaultFont();
-		//
-		//		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-		//			System.out.println("SDLGraphics.drawString(): BOTTOM");
-		//			y -= font.getHeight() - 1;
-		//		}
-		//
-		//		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-		//			System.out.println("SDLGraphics.drawString(): RIGHT");
-		//			x -= font.stringWidth(str) - 1;
-		//		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-		//			x -= font.stringWidth(str) / 2 - 1;
-		//		}
-		//
-		//		// TODO 
-		//		System.out.println("SDLGraphics.drawString(): " + str + " x=" + x + " y=" + y + " color="
-		//				+ Long.toHexString(sdlColor));
-		//		SDLGfx.stringColor(surface, x, y, str, sdlGfxColor); //0xffff00ffL
 	}
 
-	//	public void drawSubstring(String str, int offset, int len,
-	//            int x, int y, int anchor) {
-	//		
-	//		// Reject bad arguments
-	//		if (str == null) {
-	//			throw new NullPointerException();
-	//		}
-	//		
-	//		int length = str.length();
-	//		if ((offset >= length) || ((offset + len) >= length)) {
-	//			throw new StringIndexOutOfBoundsException();
-	//		}
-	//	
-	//		
-	//		
-	//		
-	//		/*StringIndexOutOfBoundsException if <code>offset</code>
-	//     * and <code>length</code> do not specify
-	//     * a valid range within the <code>String</code> <code>str</code>
-	//     * @throws IllegalArgumentException if <code>anchor</code>
-	//     * is not a legal value
-	//     * @throws NullPointerException if <code>str</code> is <code>null</code>*/
-	//	}
-
-	/**
-	 * Draws a line from point (x1, y1) to point (x2, y2).
-	 */
-	public synchronized void drawLine(int x1, int y1, int x2, int y2) {
-
-		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] SDLGraphics.drawLine() : x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2= " + y2
-					+ " color=" + Long.toHexString(sdlGfxColor));
-
-		x1 += transX;
-		y1 += transY;
-		x2 += transX;
-		y2 += transY;
-
-		if (y1 == y2) {
-			SDLGfx.hlineColor(surface, x1, x2, y1, sdlGfxColor);
-		} else if (x1 == x2) {
-			SDLGfx.vlineColor(surface, x1, y1, y2, sdlGfxColor);
-		} else {
-			SDLGfx.lineColor(surface, x1, y1, x2, y2, sdlGfxColor);
-		}
-
+	public synchronized void setClip(int x, int y, int width, int height) {
+		super.setClip(x, y, width, height);
+		clipRectangle.set(clipX1, clipY1, clipX2, clipY2);
 	}
 
-	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
-			boolean processAlpha) {
-
-		int tx = x + transX;
-		int ty = y + transY;
-
-		int[] buf = new int[width * height];
-
-		for (int b = 0; b < height; b++) {
-			for (int a = 0; a < width; a++) {
-				buf[a + b * scanlength] = rgbData[offset + (a - tx) + (b - ty) * scanlength];
-				//P(a, b) = rgbData[offset + (a - x) + (b - y) * scanlength];
-			}
-		}
-
-		Image image = Image.createRGBImage(buf, width, height, processAlpha);
-		drawImage(image, x, y, Graphics.TOP | Graphics.LEFT);
-
-		if (Logging.TRACE_ENABLED)
-			System.out.println("SDLGraphics.drawRGB()");
+	public synchronized void clipRect(int x, int y, int width, int height) {
+		super.clipRect(x, y, width, height);
+		clipRectangle.set(clipX1, clipY1, clipX2, clipY2);
 	}
-
-	protected void doCopyArea(int x_src, int y_src, int width, int height, int x_dest, int y_dest, int anchor) {
-
-		x_src += transX;
-		y_src += transY;
-		x_dest += transX;
-		y_dest += transY;
-
-		//SDLImage transformedImage = new SDLImage(surface, x_src,y_src, width, height, Sprite.TRANS_NONE);
-
-		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-			y_dest -= height - 1;
-		} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-			y_dest -= height / 2 - 1;
-		}
-
-		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-			x_dest -= width - 1;
-		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-			x_dest -= width / 2 - 1;
-		}
-
-		try {
-			// Copy the source area in an offscreen surface
-			SDLSurface dstSurface = ((SDLToolkit)SDLToolkit.getToolkit()).createSDLSurface(width, height);
-			SDLRect srcRect = new SDLRect(x_src, y_src, width, height);
-			SDLRect dstRect = new SDLRect(0, 0, width, height);
-			surface.blitSurface(srcRect, dstSurface, dstRect);
-
-			// Blit the offscreen surface on the current surface
-			dstSurface.blitSurface(surface, new SDLRect(x_dest, y_dest, width, height));
-
-		} catch (SDLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
-
-		x1 += transX;
-		y1 += transY;
-		x2 += transX;
-		y2 += transY;
-		x3 += transX;
-		y3 += transY;
-
-		SDLGfx.trigonColor(surface, x1, y1, x2, y2, x3, y3, sdlGfxColor);
-	}
-	
-	
 	
 	//--------------------------------------------------------------------------------
 	// Span.
 	//--------------------------------------------------------------------------------	
-	private void drawSpan(int x, int y, int w) {
+	private void drawSpan(int dst[], int dstPosition, int w) {
 
 		//if (Logging.TRACE_ENABLED)
 		//	System.out.println("[DEBUG]VirtualGraphics.drawSpan : surface data size= " + surface.data.length + " dstPosition=" + dstPosition + " w=" + w);
 
 		switch (blendMode) {
 		case REPLACE:
-			drawLine(x, y, x + w, y);
-			
-//			for (int x = dstPosition; x < (dstPosition + w); x++) {
-//				dst[x] = rgbColor;
-//			}
+			for (int x = dstPosition; x < (dstPosition + w); x++) {
+				dst[x] = rgbColor;
+			}
 			break;
 		}
 
+	}
+
+	//	--------------------------------------------------------------------------------
+	// Line.
+	//--------------------------------------------------------------------------------
+	public void drawHLine(int x0, int x1, int y) {
+		// Clip.
+		Rectangle r = clipRectangle;
+		x0 += transX;
+		x1 += transX;
+		y += transY;
+		if (x0 > x1) {
+			int t = x0;
+			x0 = x1;
+			x1 = t;
+		}
+		if ((y < r.ymin) || (y > r.ymax) || (x1 < r.xmin) || (x0 > r.xmax))
+			return;
+		if (x0 < r.xmin)
+			x0 = r.xmin;
+		if (x1 > r.xmax)
+			x1 = r.xmax;
+
+		// Draw.
+		drawSpan(surface.data, y * surface.width + x0, x1 - x0 + 1);
+	}
+
+	public void drawVLine(int y0, int y1, int x) {
+		// Clip.
+		Rectangle r = clipRectangle;
+		y0 += transY;
+		y1 += transY;
+		x += transX;
+		if (y0 > y1) {
+			int t = y0;
+			y0 = y1;
+			y1 = t;
+		}
+		if ((x < r.xmin) || (x > r.xmax) || (y1 < r.ymin) || (y0 > r.ymax))
+			return;
+		if (y0 < r.ymin)
+			y0 = r.ymin;
+		if (y1 > r.ymax)
+			y1 = r.ymax;
+
+		// Draw.
+		int h = y1 - y0 + 1;
+		for (int ry = 0; ry < h; ry++)
+			drawSpan(surface.data, (y0 + ry) * surface.width + x, 1);
+	}
+
+	/**
+	 * Draws a line from point (x0, y0) to point (x1, y1).
+	 */
+	public void drawLine(int x0, int y0, int x1, int y1) {
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] VirtualGraphics.drawLine() : x0=" + x0 + " y0=" + y0 + " x1=" + x1 + " y1= "
+					+ y1 + " color=" + Long.toHexString(rgbColor));
+
+		drawLine(x0, y0, x1, y1, true);
+	}
+
+	private void drawLine(int x0, int y0, int x1, int y1, boolean lastPixelFlag) {
+		if (y0 == y1) {
+			drawHLine(x0, x1, y0);
+			return;
+		}
+		if (x0 == x1) {
+			drawVLine(y0, y1, x0);
+			return;
+		}
+
+		// Clip.
+		Line sl = srcLine, dl = dstLine;
+
+		//sl.x0=x0-translationX; sl.x1=x1-translationX; sl.y0=y0-translationY; sl.y1=y1-translationY;
+		sl.x0 = x0 + transX;
+		sl.x1 = x1 + transX;
+		sl.y0 = y0 + transY;
+		sl.y1 = y1 + transY;
+
+		if (clipLine(clipRectangle, sl, dl))
+			return;
+
+		// Draw.
+		{
+			int x = dl.x0, y = dl.y0, w = dl.x1 - dl.x0, h = dl.y1 - dl.y0;
+			int ex = dl.x0 - sl.x0, ey = dl.y0 - sl.y0;
+			int dx = sl.x1 - sl.x0, dy = sl.y1 - sl.y0;
+			int sx = 1, sy = 1;
+			if (dx < 0) {
+				dx = -dx;
+				sx = -sx;
+				ex = -ex;
+				w = -w;
+			}
+			if (dy < 0) {
+				dy = -dy;
+				sy = -sy;
+				ey = -ey;
+				h = -h;
+			}
+
+			if (dx >= dy) {
+				int decision = (ex + ex + 2) * dy - (ey + ey + 1) * dx;
+				if (sx > 0)
+					decision--; // Modify the decision variable for generating the same pattern from left to right and right to left.
+				dx += dx;
+				dy += dy;
+				if (lastPixelFlag)
+					w++;
+				while (w > 0) {
+					drawSpan(surface.data, y * surface.width + x, 1);
+					if (decision >= 0) {
+						decision -= dx;
+						y += sy;
+					}
+					decision += dy;
+					x += sx;
+					w--;
+				}
+			} else {
+				int decision = (ey + ey + 2) * dx - (ex + ex + 1) * dy;
+				if (sy > 0)
+					decision--; // Modify the decision variable for generating the same pattern from bottom to top and top to bottom.
+				dx += dx;
+				dy += dy;
+				if (lastPixelFlag)
+					h++;
+				while (h > 0) {
+					drawSpan(surface.data, y * surface.width + x, 1);
+					if (decision >= 0) {
+						decision -= dy;
+						x += sx;
+					}
+					decision += dx;
+					y += sy;
+					h--;
+				}
+			}
+		}
+	}
+
+	private class Line {
+		public int x0, y0, x1, y1;
+	}
+
+	private Line srcLine = new Line(), dstLine = new Line();
+
+	// Edge to clip.
+	private static final int CLIP_LEFT = 0x01, CLIP_RIGHT = 0x02, CLIP_BOTTOM = 0x04, CLIP_TOP = 0x08,
+			CLIP_HORIZONTAL = CLIP_LEFT | CLIP_RIGHT, CLIP_VERTICAL = CLIP_BOTTOM | CLIP_TOP;
+
+	// Clip zone.
+	private static final byte CLIP_ZONE_CENTER = 0, CLIP_ZONE_BORDERS = 1, CLIP_ZONE_DIAGONALS = 2;
+
+	// Table of zones.
+	private static final byte CLIP_ZONE_FOR_CODE[] = { CLIP_ZONE_CENTER, CLIP_ZONE_BORDERS, CLIP_ZONE_BORDERS, -1,
+			CLIP_ZONE_BORDERS, CLIP_ZONE_DIAGONALS, CLIP_ZONE_DIAGONALS, -1, CLIP_ZONE_BORDERS, CLIP_ZONE_DIAGONALS,
+			CLIP_ZONE_DIAGONALS, -1, -1, -1, -1, -1 };
+
+	// cf. Steven Eker. Faster "Pixel-Perfect" Line Clipping. Graphics Gems V: 314-322.
+	// - Pixels are not missed at the ends of a clipped segment.
+	// - Visible pixels are the same as if there was no clipping.
+	private boolean clipLine(Rectangle r, final Line sl, Line dl) {
+		int code1 = 0, code2 = 0;
+
+		dl.x0 = sl.x0;
+		dl.y0 = sl.y0;
+		dl.x1 = sl.x1;
+		dl.y1 = sl.y1;
+
+		if (sl.x0 < r.xmin)
+			code1 |= CLIP_LEFT;
+		if (sl.x0 > r.xmax)
+			code1 |= CLIP_RIGHT;
+		if (sl.y0 < r.ymin)
+			code1 |= CLIP_BOTTOM;
+		if (sl.y0 > r.ymax)
+			code1 |= CLIP_TOP;
+
+		if (sl.x1 < r.xmin)
+			code2 |= CLIP_LEFT;
+		if (sl.x1 > r.xmax)
+			code2 |= CLIP_RIGHT;
+		if (sl.y1 < r.ymin)
+			code2 |= CLIP_BOTTOM;
+		if (sl.y1 > r.ymax)
+			code2 |= CLIP_TOP;
+
+		if ((code1 | code2) == 0)
+			return false; // Trivial accept.
+		if ((code1 & code2) != 0)
+			return true; // Trivial reject.
+
+		// Clip first end point.
+		if (code1 != 0)
+			if (clipEndPoint(r, sl, dl, code1, false))
+				return true;
+		// Clip second end point.
+		if (code2 != 0)
+			if (clipEndPoint(r, sl, dl, code2, true))
+				return true;
+
+		return false;
+	}
+
+	private boolean clipEndPoint(Rectangle r, final Line sl, Line dl, int code, boolean swap) {
+		// Rounding mode: 0=round toward 0, 1=round toward +infinity.
+		int x, y, dx, dy, sx = 1, sy = 1, roundX = 0, roundY = 0;
+		if (swap) {
+			x = sl.x1;
+			y = sl.y1;
+			dx = sl.x0 - sl.x1;
+			dy = sl.y0 - sl.y1;
+		} else {
+			x = sl.x0;
+			y = sl.y0;
+			dx = sl.x1 - sl.x0;
+			dy = sl.y1 - sl.y0;
+		}
+		if (dx < 0) {
+			dx = -dx;
+			sx = -1;
+			roundX ^= 1;
+		}
+		if (dy < 0) {
+			dy = -dy;
+			sy = -1;
+			roundY ^= 1;
+		}
+
+		int dx2 = dx << 1, dy2 = dy << 1, t0 = 0, t1 = 0;
+		int xc = x, yc = y;
+
+		if ((code & CLIP_LEFT) != 0) {
+			t0 = dy2 * (r.xmin - x);
+			xc = r.xmin;
+		}
+		if ((code & CLIP_RIGHT) != 0) {
+			t0 = dy2 * (x - r.xmax);
+			xc = r.xmax;
+		}
+		if ((code & CLIP_BOTTOM) != 0) {
+			t1 = dx2 * (r.ymin - y);
+			yc = r.ymin;
+		}
+		if ((code & CLIP_TOP) != 0) {
+			t1 = dx2 * (y - r.ymax);
+			yc = r.ymax;
+		}
+
+		if (CLIP_ZONE_FOR_CODE[code] == CLIP_ZONE_DIAGONALS) {
+			// Find which edge clips the line first and remove a clip flag.
+			if (dx >= dy)
+				code &= ((t0 - t1 + dx - (roundX ^ 1)) < 0) ? ~CLIP_HORIZONTAL : ~CLIP_VERTICAL;
+			else
+				code &= ((t1 - t0 + dy - (roundY ^ 1)) < 0) ? ~CLIP_VERTICAL : ~CLIP_HORIZONTAL;
+		}
+
+		if ((code & CLIP_HORIZONTAL) != 0) {
+			// Clip to left or right edge.
+			t0 = (dx >= dy) ? (t0 + dx - (roundX ^ 1)) / dx2 : (t0 - dy + dx2 - roundY) / dx2;
+			yc = (sy < 0) ? (y - t0) : (y + t0);
+			if ((yc < r.ymin) || (yc > r.ymax))
+				return true;
+		} else {
+			// Clip to bottom or top edge.
+			t1 = (dx >= dy) ? (t1 - dx + dy2 - roundX) / dy2 : (t1 + dy - (roundY ^ 1)) / dy2;
+			xc = (sx < 0) ? (x - t1) : (x + t1);
+			if ((xc < r.xmin) || (xc > r.xmax))
+				return true;
+		}
+
+		if (swap) {
+			dl.x1 = xc;
+			dl.y1 = yc;
+		} else {
+			dl.x0 = xc;
+			dl.y0 = yc;
+		}
+
+		return false;
+	}
+
+	//--------------------------------------------------------------------------------
+	// Rectangle.
+	//--------------------------------------------------------------------------------
+	public void drawRect(int x0, int y0, int width, int height) {
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG]VirtualGraphics.drawRect(): x=" + x0 + " y0=" + y0 + " width=" + width
+					+ " height= " + height + " color=" + Long.toHexString(rgbColor));
+
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if (surface == null)
+			return;
+		int t, w, h;
+		if (x0 > x1) {
+			t = x0;
+			x0 = x1;
+			x1 = t;
+		}
+		if (y0 > y1) {
+			t = y0;
+			y0 = y1;
+			y1 = t;
+		}
+		w = x1 - x0 + 1;
+		h = y1 - y0 + 1;
+		drawHLine(x0, x1, y0);
+		if (h > 1)
+			drawHLine(x0, x1, y1);
+		if (h > 2) {
+			drawVLine(y0 + 1, y1 - 1, x0);
+			if (w > 1)
+				drawVLine(y0 + 1, y1 - 1, x1);
+		}
+	}
+
+	public void fillRect(int x0, int y0, int width, int height) {
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG]VirtualGraphics.fillRect(): x=" + x0 + " y0=" + y0 + " width=" + width
+					+ " height= " + height + " color=" + Long.toHexString(rgbColor));
+
+		if (surface == null)
+			return;
+		x0 += transX;
+		y0 += transY;
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+		int t;
+		if (x0 > x1) {
+			t = x0;
+			x0 = x1;
+			x1 = t;
+		}
+		if (y0 > y1) {
+			t = y0;
+			y0 = y1;
+			y1 = t;
+		}
+		if (x0 < clipRectangle.xmin)
+			x0 = clipRectangle.xmin;
+		if (x1 > clipRectangle.xmax)
+			x1 = clipRectangle.xmax;
+		if (y0 < clipRectangle.ymin)
+			y0 = clipRectangle.ymin;
+		if (y1 > clipRectangle.ymax)
+			y1 = clipRectangle.ymax;
+		//int w = x1 - x0 + 1, h = y1 - y0 + 1;
+		int w = x1 - x0, h = y1 - y0;
+		if ((w <= 0) || (h <= 0))
+			return;
+
+		for (int ry = 0; ry < h; ry++) {
+			drawSpan(surface.data, (y0 + ry) * surface.width + x0, w);
+		}
 	}
 
 	//	--------------------------------------------------------------------------------
@@ -326,15 +474,15 @@ public class SDLGraphics extends Graphics {
 		boolean left = (x0 >= r.xmin) && (x0 <= r.xmax), right = (x1 >= r.xmin) && (x1 <= r.xmax) && (xp != 0);
 		if ((y0 >= r.ymin) && (y0 <= r.ymax)) {
 			if (left)
-				drawSpan(x0, y0, 1);
+				drawSpan(surface.data, y0 * surface.width + x0, 1);
 			if (right)
-				drawSpan(x1, y0, 1);
+				drawSpan(surface.data, y0 * surface.width + x1, 1);
 		}
 		if ((y1 >= r.ymin) && (y1 <= r.ymax) && (yp != 0)) {
 			if (left)
-				drawSpan(x0, y1, 1);
+				drawSpan(surface.data, y1 * surface.width + x0, 1);
 			if (right)
-				drawSpan(x1, y1, 1);
+				drawSpan(surface.data, y1 * surface.width + x1, 1);
 		}
 	}
 
@@ -348,9 +496,9 @@ public class SDLGraphics extends Graphics {
 		int w = x1 - x0 + 1;
 		if (w > 0) {
 			if ((y0 >= r.ymin) && (y0 <= r.ymax))
-				drawSpan(x0, y0, w);
+				drawSpan(surface.data, y0 * surface.width + x0, w);
 			if ((y1 >= r.ymin) && (y1 <= r.ymax) && (yp != 0))
-				drawSpan(x0, y1, w);
+				drawSpan(surface.data, y1 * surface.width + x0, w);
 		}
 	}
 
@@ -421,13 +569,11 @@ public class SDLGraphics extends Graphics {
 			return;
 
 		if (ry == 0) {
-			//drawHLine(x - rx, x + rx, y);
-			drawLine(x - rx, y, x + rx, y);
+			drawHLine(x - rx, x + rx, y);
 			return;
 		}
 		if (rx == 0) {
-			//drawVLine(y - ry, y + ry, x);
-			drawLine(x, y - ry, x, y + ry);
+			drawVLine(y - ry, y + ry, x);
 			return;
 		}
 		if (rx == ry) {
@@ -499,13 +645,11 @@ public class SDLGraphics extends Graphics {
 			return;
 
 		if (ry == 0) {
-			//drawHLine(x - rx, x + rx, y);
-			drawLine(x - rx, y, x + rx, y);
+			drawHLine(x - rx, x + rx, y);
 			return;
 		}
 		if (rx == 0) {
-			//drawVLine(y - ry, y + ry, x);
-			drawLine(x, y - ry, x, y + ry);
+			drawVLine(y - ry, y + ry, x);
 			return;
 		}
 		if (rx == ry) {
@@ -583,14 +727,12 @@ public class SDLGraphics extends Graphics {
 				insideFlag = reflexAngle ? (-xpys - ypxs < 0 || -xpye - ypxe > 0)
 						: (-xpys - ypxs < 0 && -xpye - ypxe > 0);
 				if (insideFlag)
-					drawSpan(x0, y0, 1); // Top left. Second quadrant.
-					//drawSpan(surface.data, y0 * surface.width + x0, 1); // Top left. Second quadrant.
+					drawSpan(surface.data, y0 * surface.width + x0, 1); // Top left. Second quadrant.
 			}
 			if (right) {
 				insideFlag = reflexAngle ? (xpys - ypxs < 0 || xpye - ypxe > 0) : (xpys - ypxs < 0 && xpye - ypxe > 0);
 				if (insideFlag)
-					drawSpan(x1, y0, 1); // Top right. First quadrant.
-					//drawSpan(surface.data, y0 * surface.width + x1, 1); // Top right. First quadrant.
+					drawSpan(surface.data, y0 * surface.width + x1, 1); // Top right. First quadrant.
 			}
 		}
 		if ((y1 >= r.ymin) && (y1 <= r.ymax) && (yp != 0)) {
@@ -598,14 +740,12 @@ public class SDLGraphics extends Graphics {
 				insideFlag = reflexAngle ? (-xpys + ypxs < 0 || -xpye + ypxe > 0)
 						: (-xpys + ypxs < 0 && -xpye + ypxe > 0);
 				if (insideFlag)
-					drawSpan(x0, y1, 1); // Bottom left. Third quadrant.
-					//drawSpan(surface.data, y1 * surface.width + x0, 1); // Bottom left. Third quadrant.
+					drawSpan(surface.data, y1 * surface.width + x0, 1); // Bottom left. Third quadrant.
 			}
 			if (right) {
 				insideFlag = reflexAngle ? (xpys + ypxs < 0 || xpye + ypxe > 0) : (xpys + ypxs < 0 && xpye + ypxe > 0);
 				if (insideFlag)
-					drawSpan(x1, y1, 1); // Bottom right. Fourth quadrant.
-					//drawSpan(surface.data, y1 * surface.width + x1, 1); // Bottom right. Fourth quadrant.
+					drawSpan(surface.data, y1 * surface.width + x1, 1); // Bottom right. Fourth quadrant.
 			}
 		}
 	}
@@ -651,8 +791,7 @@ public class SDLGraphics extends Graphics {
 			int rx0, rx1;
 			rx0 = checkAngle(startAngle, endAngle, 180) ? -rx : 0;
 			rx1 = checkAngle(startAngle, endAngle, 0) ? rx : 0;
-			//drawHLine(x + rx0, x + rx1, y);
-			drawLine(x + rx0, y, x + rx1, y);
+			drawHLine(x + rx0, x + rx1, y);
 			return;
 		}
 
@@ -660,8 +799,7 @@ public class SDLGraphics extends Graphics {
 			int ry0, ry1;
 			ry0 = checkAngle(startAngle, endAngle, 90) ? -ry : 0;
 			ry1 = checkAngle(startAngle, endAngle, 270) ? ry : 0;
-			//drawVLine(y + ry0, y + ry1, x);
-			drawLine(x, y + ry0, x, y + ry1);
+			drawVLine(y + ry0, y + ry1, x);
 			return;
 		}
 
@@ -813,8 +951,7 @@ public class SDLGraphics extends Graphics {
 					x1 = r.xmax;
 				w = x1 - x0 + 1;
 				if (w > 0)
-					drawSpan(x0, y0, w);
-					//drawSpan(surface.data, y0 * surface.width + x0, w);
+					drawSpan(surface.data, y0 * surface.width + x0, w);
 			} else {
 				x0 = -xp;
 				x1 = xp;
@@ -828,8 +965,7 @@ public class SDLGraphics extends Graphics {
 					x1 = r.xmax;
 				w = x1 - x0 + 1;
 				if (w > 0)
-					drawSpan(x0, y0, w);
-					//drawSpan(surface.data, y0 * surface.width + x0, w);
+					drawSpan(surface.data, y0 * surface.width + x0, w);
 
 				x0 = -xp;
 				x1 = xp;
@@ -843,8 +979,7 @@ public class SDLGraphics extends Graphics {
 					x1 = r.xmax;
 				w = x1 - x0 + 1;
 				if (w > 0)
-					drawSpan(x0, y0, w);
-					//drawSpan(surface.data, y0 * surface.width + x0, w);
+					drawSpan(surface.data, y0 * surface.width + x0, w);
 			}
 		}
 	}
@@ -936,6 +1071,77 @@ public class SDLGraphics extends Graphics {
 		}
 	}
 
+	//	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
+	//			boolean processAlpha) {
+	//
+	//		int tx = x + transX;
+	//		int ty = y + transY;
+	//
+	//		int[] buf = new int[width * height];
+	//
+	//		for (int b = 0; b < height; b++) {
+	//			for (int a = 0; a < width; a++) {
+	//				buf[a + b * scanlength] = rgbData[offset + (a - tx) + (b - ty) * scanlength];
+	//				//P(a, b) = rgbData[offset + (a - x) + (b - y) * scanlength];
+	//			}
+	//		}
+	//
+	//		Image image = Image.createRGBImage(buf, width, height, processAlpha);
+	//		drawImage(image, x, y, Graphics.TOP | Graphics.LEFT);
+	//
+	//		if (Logging.TRACE_ENABLED)
+	//			System.out.println("SDLGraphics.drawRGB()");
+	//	}
+	//
+	//	protected void doCopyArea(int x_src, int y_src, int width, int height, int x_dest, int y_dest, int anchor) {
+	//
+	//		x_src += transX;
+	//		y_src += transY;
+	//		x_dest += transX;
+	//		y_dest += transY;
+	//
+	//		//SDLImage transformedImage = new SDLImage(surface, x_src,y_src, width, height, Sprite.TRANS_NONE);
+	//
+	//		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
+	//			y_dest -= height - 1;
+	//		} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
+	//			y_dest -= height / 2 - 1;
+	//		}
+	//
+	//		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
+	//			x_dest -= width - 1;
+	//		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
+	//			x_dest -= width / 2 - 1;
+	//		}
+	//
+	//		try {
+	//			// Copy the source area in an offscreen surface
+	//			SDLSurface dstSurface = SDLToolkit.getToolkit().createSDLSurface(width, height);
+	//			SDLRect srcRect = new SDLRect(x_src, y_src, width, height);
+	//			SDLRect dstRect = new SDLRect(0, 0, width, height);
+	//			surface.blitSurface(srcRect, dstSurface, dstRect);
+	//
+	//			// Blit the offscreen surface on the current surface
+	//			dstSurface.blitSurface(surface, new SDLRect(x_dest, y_dest, width, height));
+	//
+	//		} catch (SDLException e) {
+	//			e.printStackTrace();
+	//		}
+	//
+	//	}
+	//
+	//	public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
+	//
+	//		x1 += transX;
+	//		y1 += transY;
+	//		x2 += transX;
+	//		y2 += transY;
+	//		x3 += transX;
+	//		y3 += transY;
+	//
+	//		SDLGfx.trigonColor(surface, x1, y1, x2, y2, x3, y3, sdlGfxColor);
+	//	}
+
 	public void drawRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
 
 		x += transX;
@@ -961,7 +1167,7 @@ public class SDLGraphics extends Graphics {
 		x += transX;
 		y += transY;
 		
-		fillRect(x, y + arcHeight + 1, w + 1,  h - 2 * arcHeight); // center
+		fillRect(x, y + arcHeight + 1, w,  h - 2 * arcHeight); // center
 		fillRect(x + arcWidth + 1, y, w - 2 * arcWidth, arcHeight + 1); // top middle
 		fillRect(x + arcWidth + 1, y + h - arcHeight, w - 2 * arcWidth, arcHeight); // bottom middle
 

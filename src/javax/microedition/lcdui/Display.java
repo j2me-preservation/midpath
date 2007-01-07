@@ -548,7 +548,7 @@ public class Display {
 
 		okCommand = new Command(Resource.getString(ResourceConstants.OK), Command.OK, 2);
 		
-		SDLToolkit toolkit = SDLToolkit.getToolkit();
+		Toolkit toolkit = SDLToolkit.getToolkit();
 		toolkit.initialize(WIDTH, HEIGHT);
 
 	}
