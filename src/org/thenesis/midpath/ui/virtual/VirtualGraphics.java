@@ -23,6 +23,7 @@ package org.thenesis.midpath.ui.virtual;
 
 import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Toolkit;
 
 import com.sun.midp.log.Logging;
 
@@ -85,7 +86,7 @@ public class VirtualGraphics extends Graphics {
 		super.clipRect(x, y, width, height);
 		clipRectangle.set(clipX1, clipY1, clipX2, clipY2);
 	}
-	
+
 	//--------------------------------------------------------------------------------
 	// Span.
 	//--------------------------------------------------------------------------------	
@@ -1071,64 +1072,101 @@ public class VirtualGraphics extends Graphics {
 		}
 	}
 
-	//	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
-	//			boolean processAlpha) {
-	//
-	//		int tx = x + transX;
-	//		int ty = y + transY;
-	//
-	//		int[] buf = new int[width * height];
-	//
-	//		for (int b = 0; b < height; b++) {
-	//			for (int a = 0; a < width; a++) {
-	//				buf[a + b * scanlength] = rgbData[offset + (a - tx) + (b - ty) * scanlength];
-	//				//P(a, b) = rgbData[offset + (a - x) + (b - y) * scanlength];
-	//			}
-	//		}
-	//
-	//		Image image = Image.createRGBImage(buf, width, height, processAlpha);
-	//		drawImage(image, x, y, Graphics.TOP | Graphics.LEFT);
-	//
-	//		if (Logging.TRACE_ENABLED)
-	//			System.out.println("SDLGraphics.drawRGB()");
-	//	}
-	//
-	//	protected void doCopyArea(int x_src, int y_src, int width, int height, int x_dest, int y_dest, int anchor) {
-	//
-	//		x_src += transX;
-	//		y_src += transY;
-	//		x_dest += transX;
-	//		y_dest += transY;
-	//
-	//		//SDLImage transformedImage = new SDLImage(surface, x_src,y_src, width, height, Sprite.TRANS_NONE);
-	//
-	//		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-	//			y_dest -= height - 1;
-	//		} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-	//			y_dest -= height / 2 - 1;
-	//		}
-	//
-	//		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-	//			x_dest -= width - 1;
-	//		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-	//			x_dest -= width / 2 - 1;
-	//		}
-	//
-	//		try {
-	//			// Copy the source area in an offscreen surface
-	//			SDLSurface dstSurface = SDLToolkit.getToolkit().createSDLSurface(width, height);
-	//			SDLRect srcRect = new SDLRect(x_src, y_src, width, height);
-	//			SDLRect dstRect = new SDLRect(0, 0, width, height);
-	//			surface.blitSurface(srcRect, dstSurface, dstRect);
-	//
-	//			// Blit the offscreen surface on the current surface
-	//			dstSurface.blitSurface(surface, new SDLRect(x_dest, y_dest, width, height));
-	//
-	//		} catch (SDLException e) {
-	//			e.printStackTrace();
-	//		}
-	//
-	//	}
+	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
+			boolean processAlpha) {
+
+		x += transX;
+		y += transY;
+
+		// Clip source rectangle in source image.
+		int sxmin = 0, symin = 0, sxmax = width, symax = height;
+		if (sxmin < 0)
+			sxmin = 0;
+		if (symin < 0)
+			symin = 0;
+		if (sxmax > surface.width - 1)
+			sxmax = surface.width - 1;
+		if (symax > surface.height - 1)
+			symax = surface.height - 1;
+
+		// Clip destination rectangle in destination image.
+		int dxmin = x + sxmin, dymin = y + symin, dxmax = x + sxmax, dymax = y + symax;
+		if (dxmin < clipRectangle.xmin)
+			dxmin = clipRectangle.xmin;
+		if (dymin < clipRectangle.ymin)
+			dymin = clipRectangle.ymin;
+		if (dxmax > clipRectangle.xmax)
+			dxmax = clipRectangle.xmax;
+		if (dymax > clipRectangle.ymax)
+			dymax = clipRectangle.ymax;
+
+		// New source rectangle.
+		sxmin = dxmin - x;
+		symin = dymin - y;
+		sxmax = dxmax - x;
+		symax = dymax - y;
+
+		int w = sxmax - sxmin + 1, h = symax - symin + 1;
+
+		if (processAlpha) {
+			for (int ry = 0; ry < h; ry++) {
+
+				int srcPosition = offset + (symin + ry) * scanlength + sxmin;
+				int dstPosition = (dymin + ry) * surface.width + dxmin;
+				int length = w;
+
+				for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+					if (((rgbData[i + srcPosition]) & 0xFF000000) == 0xFF000000)
+						surface.data[i + dstPosition] = rgbData[i + srcPosition];
+				}
+
+			}
+		} else {
+			for (int ry = 0; ry < h; ry++) {
+
+				int srcPosition = offset + (symin + ry) * scanlength + sxmin;
+				int dstPosition = (dymin + ry) * surface.width + dxmin;
+				int length = w;
+
+				for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+					surface.data[i + dstPosition] = rgbData[i + srcPosition] |  0xFF000000;
+					
+//					if (Logging.TRACE_ENABLED)
+//						System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : dest=" + (i + dstPosition) + " src=" + (i + srcPosition));
+				}
+
+			}
+		}
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("VirtualGraphics.drawRGB()");
+	}
+	
+	protected void doCopyArea(int x_src, int y_src, int width, int height, int x_dest, int y_dest, int anchor) {
+		
+		if (Logging.TRACE_ENABLED)
+			System.out.println("VirtualGraphics.doCopyArea()");
+		
+		x_src += transX;
+		y_src += transY;
+		
+		VirtualImage image = new VirtualImage(width, height);
+		
+		for (int j = 0; j < height; j++) {
+			
+			int srcPosition = (y_src + j) * surface.width + x_src;
+			int dstPosition  = j * width;
+			
+			for (int i = 0; i < width; i++) {
+				image.surface.data[dstPosition + i] = surface.data[srcPosition + i];
+			}
+		}
+		
+		drawImage(image, x_dest, y_dest, anchor);
+		
+		
+	}
+
 	//
 	//	public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
 	//
@@ -1161,13 +1199,13 @@ public class VirtualGraphics extends Graphics {
 		drawArc(x + arcWidth, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom left
 		drawArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom right
 	}
-	
+
 	public void fillRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
 
 		x += transX;
 		y += transY;
-		
-		fillRect(x, y + arcHeight + 1, w,  h - 2 * arcHeight); // center
+
+		fillRect(x, y + arcHeight + 1, w, h - 2 * arcHeight); // center
 		fillRect(x + arcWidth + 1, y, w - 2 * arcWidth, arcHeight + 1); // top middle
 		fillRect(x + arcWidth + 1, y + h - arcHeight, w - 2 * arcWidth, arcHeight); // bottom middle
 

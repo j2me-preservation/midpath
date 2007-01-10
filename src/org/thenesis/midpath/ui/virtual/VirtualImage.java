@@ -31,11 +31,6 @@ import javax.microedition.lcdui.Toolkit;
 import javax.microedition.lcdui.game.Sprite;
 
 import org.thenesis.midpath.image.png.PngImage;
-import org.thenesis.midpath.ui.SDLGraphics;
-
-import sdljava.SDLException;
-import sdljava.video.SDLRect;
-import sdljava.video.SDLSurface;
 
 import com.sun.midp.log.Logging;
 
@@ -50,7 +45,7 @@ public class VirtualImage extends Image {
 		imgHeight = h;
 		isMutable = true;
 	}
-	
+
 	private void setDimensions(int w, int h) {
 		this.imgWidth = w;
 		this.imgHeight = h;
@@ -65,7 +60,7 @@ public class VirtualImage extends Image {
 	}
 
 	public VirtualImage(InputStream is) throws IOException {
-		
+
 		// Read PNG image from file
 		PngImage png = new PngImage(is);
 
@@ -79,39 +74,28 @@ public class VirtualImage extends Image {
 
 		setDimensions(w, h);
 		isMutable = false;
-		
+
 		if (Logging.TRACE_ENABLED) {
-			System.out.println("[DEBUG] VirtualImage.<init>(InputStream stream): " + png.hasErrors());
-		
-//			Enumeration e = png.getProperties();
-//			while(e.hasMoreElements()) {
-//				String property = (String)e.nextElement();
-//				System.out.println(property + "=" + png.getProperty(property));
-//			}
-//		
-//			print(surface.data, w, h);
+			System.out.println("[DEBUG] VirtualImage.<init>(InputStream stream): errors while loading ? " + png.hasErrors());
+
+			//			Enumeration e = png.getProperties();
+			//			while(e.hasMoreElements()) {
+			//				String property = (String)e.nextElement();
+			//				System.out.println(property + "=" + png.getProperty(property));
+			//			}
+			//		
+			//			print(surface.data, w, h);
 		}
-		
-		//		try {
-		//			sdlSurface = sdljava.image.SDLImage.load(stream);
-		//			//System.out.println("[DEBUG] SDLImage.<init>() : " + sdlSurface);
-		//			//System.out.println("[DEBUG] SDLImage.<init>(): ColorKey : " + sdlSurface);
-		//			imgWidth = sdlSurface.getWidth();
-		//			imgHeight = sdlSurface.getHeight();
-		//			isMutable = false;
-		//		} catch (SDLException e) {
-		//			throw new IOException(e.getMessage());
-		//		}
 
 	}
-	
+
 	private void print(int[] buffer, int w, int h) {
-		
-		for (int i = 0; i< buffer.length; i++) {
+
+		for (int i = 0; i < buffer.length; i++) {
 			System.out.print(Integer.toHexString(buffer[i]));
 		}
 		System.out.println();
-		
+
 	}
 
 	public VirtualImage(int[] rgb, int width, int height, boolean processAlpha) { //throws IOException {
@@ -121,117 +105,58 @@ public class VirtualImage extends Image {
 
 		surface = createSurface(width, height);
 
-		// P(a, b) = rgb[a + b * width];    
+		// P(a, b) = rgb[a + b * width];
+		int size = width * height;
 		if (processAlpha) {
-			System.arraycopy(rgb, 0, surface.data, 0, width * height);
+			for (int i = 0; i < size; i++) {
+				if ((rgb[i] & 0xFF000000) != 0xFF000000)
+					surface.data[i] = rgb[i] & 0x00FFFFFF;
+				else {
+					surface.data[i] = rgb[i];
+				}
+			}
 		} else {
-			for (int i = 0; i < width * height; i++) {
-				surface.data[i] = rgb[i] & 0x00ffffff;
+			for (int i = 0; i < size; i++) {
+				surface.data[i] = rgb[i] | 0xFF000000;
 			}
 		}
 
 		isMutable = false;
 
-		//		this.imgWidth = width;
-		//		this.imgHeight = height;
-		//
-		//		SDLSurface tmpSurface;
-		//		try {
-		//			tmpSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, width, height, 32, 0x00ff0000L, 0x0000ff00L,
-		//					0x000000ffL, 0xff000000L);
-		//
-		//			// TODO Draw rgb field on the surface
-		//			tmpSurface.setPixelData32(rgb);
-		//			
-		//			// Convert surface format to the display format 
-		//			if (processAlpha) {
-		//				sdlSurface = tmpSurface.displayFormatAlpha();
-		//			} else {
-		//				sdlSurface = tmpSurface.displayFormat();
-		//			}
-		//			
-		//			isMutable = false;
-		//			
-		//
-		//
-		//		} catch (SDLException e) {
-		//			//throw new IOException(e.getMessage());
-		//		}
-
 	}
 
 	public VirtualImage(VirtualImage srcImage) {
-		
+
 		surface = createSurface(srcImage.getWidth(), srcImage.getHeight());
 
 		int[] srcData = srcImage.surface.data;
 		int[] destData = surface.data;
 
 		System.arraycopy(srcData, 0, destData, 0, srcData.length);
-		
-		setDimensions(srcImage.getWidth(), srcImage.getHeight());
 
-		//		try {
-		//			sdlSurface = srcImage.sdlSurface.displayFormatAlpha();
-		//			this.imgWidth = srcImage.getWidth();
-		//			this.imgHeight = srcImage.getHeight();
-		//			isMutable = false;
-		//		} catch (SDLException e) {
-		//			e.printStackTrace();
-		//		}
+		setDimensions(srcImage.getWidth(), srcImage.getHeight());
+		isMutable = false;
+
+	}
+	
+	/**
+	 * Create a VirtualImage from a pre-existing surface (doesn't copy it)
+	 * @param surface
+	 */
+	VirtualImage(VirtualSurface surface) {
+		this.surface = surface; 
+		setDimensions(surface.getWidth(), surface.getHeight());
+		isMutable = false;
 	}
 
 	VirtualImage(VirtualSurface srcSurface, int x, int y, int width, int height, int transform) {
-		
-		// TODO
-		surface = createSurface(width, height);
-		setDimensions(width, height);
-		
+
+		surface = transform(srcSurface, x, y, width, height, transform);
+		setDimensions(surface.getWidth(), surface.getHeight());
+
 		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] VirtualImage.<init>(Image image, int x, int y, int width, int height, int transform): not implemeneted yet");
-		
-		
-		//		try {
-		//
-		//			SDLSurface croppedSurface = cropSurface(srcSurface, x, y, width, height);
-		//
-		//			switch (transform) {
-		//			case Sprite.TRANS_NONE:
-		//				sdlSurface = croppedSurface;
-		//				break;
-		//			case Sprite.TRANS_ROT90:
-		//				sdlSurface = SDLGfx.rotozoomSurface(croppedSurface, -90, 1, false);
-		//				break;
-		//			case Sprite.TRANS_ROT180:
-		//				sdlSurface = SDLGfx.rotozoomSurface(croppedSurface, -180, 1, false);
-		//				break;
-		//			case Sprite.TRANS_ROT270:
-		//				sdlSurface = SDLGfx.rotozoomSurface(croppedSurface, -270, 1, false);
-		//				break;
-		//			case Sprite.TRANS_MIRROR:
-		//				sdlSurface = SDLGfx.zoomSurface(croppedSurface, -1, 1, false);
-		//				break;
-		//			case Sprite.TRANS_MIRROR_ROT90:
-		//				SDLSurface mirroredSurface = SDLGfx.zoomSurface(croppedSurface, -1, 1, false);
-		//				sdlSurface = SDLGfx.rotozoomSurface(mirroredSurface, -90, 1, false);
-		//				break;
-		//			case Sprite.TRANS_MIRROR_ROT180:
-		//				mirroredSurface = SDLGfx.zoomSurface(croppedSurface, -1, 1, false);
-		//				sdlSurface = SDLGfx.rotozoomSurface(mirroredSurface, -180, 1, false);
-		//				break;
-		//			case Sprite.TRANS_MIRROR_ROT270:
-		//				mirroredSurface = SDLGfx.zoomSurface(croppedSurface, -1, 1, false);
-		//				sdlSurface = SDLGfx.rotozoomSurface(mirroredSurface, -270, 1, false);
-		//				break;
-		//			}
-		//
-		//			this.imgWidth = sdlSurface.getWidth();
-		//			this.imgHeight = sdlSurface.getHeight();
-		//
-		//		} catch (SDLException e) {
-		//			// TODO Auto-generated catch block
-		//			e.printStackTrace();
-		//		}
+			System.out
+					.println("[DEBUG] VirtualImage.<init>(Image image, int x, int y, int width, int height, int transform): not implemented yet");
 
 	}
 
@@ -239,62 +164,6 @@ public class VirtualImage extends Image {
 		this(((VirtualImage) image).surface, x, y, width, height, transform);
 		isMutable = false;
 	}
-
-	//	private SDLSurface cropSurface(SDLSurface srcSurface, int x, int y, int width, int height) throws SDLException {
-	//
-	//		// Create surface compatible with display surface
-	//		long flags = srcSurface.getFlags();
-	//		SDLPixelFormat format = srcSurface.getFormat();
-	//		int pitch = format.getBitsPerPixel();
-	//		long rMask = format.getRMask();
-	//		long gMask = format.getGMask();
-	//		long bMask = format.getBMask();
-	//		long aMask = format.getAMask();
-	//		SDLSurface dstSurface = SDLVideo.createRGBSurface(flags, width, height, pitch, rMask, gMask, bMask, aMask);
-	//
-	//		// Fill the destination with a given transparent color
-	//		long c = dstSurface.mapRGB(0x99, 0x33, 0x99); //#993399
-	//		dstSurface.fillRect(c);
-	//		SDLRect srcRect = new SDLRect(x, y, width, height);
-	//		SDLRect dstRect = new SDLRect(0, 0, width, height);
-	//		srcSurface.blitSurface(srcRect, dstSurface, dstRect);
-	//
-	//		// Set the transparent color
-	//		dstSurface.setColorKey(SDLVideo.SDL_SRCCOLORKEY, c); // rootSurface.mapRGB(0xFF, 0, 0)
-	//
-	//		return dstSurface.displayFormat();
-	//
-	//		//		SDLSurface dstSurface = SDLToolkit.getToolkit().createSDLSurface(width, height);
-	//		//		
-	//		////		//if (srcSurface.isColorKeyBlit()) {
-	//		////			System.out.println("[DEBUG] SDLImage.cropSurface(): ColorKeyBlit");
-	//		////			long c = srcSurface.getFormat().getColorKey();
-	//		////			System.out.println("[DEBUG] SDLImage.cropSurface(): ColorKeyBlit : " + Long.toHexString(c));
-	//		////			//srcSurface.setColorKey(SDLVideo.SDL_SRCCOLORKEY, 0xffffffff);
-	//		////			//srcSurface.setColorKey(SDLVideo.SDL_SRCCOLORKEY, 0xaaaaaaaaL);
-	//		////			//srcSurface.getFormat().setColorKey(arg0)
-	//		////			dstSurface.fillRect(c);
-	//		////		//}
-	//		//		
-	//		//		SDLRect srcRect = new SDLRect(x, y, width, height);
-	//		//		SDLRect dstRect = new SDLRect(0, 0, width, height);
-	//		//		srcSurface.blitSurface(srcRect, dstSurface, dstRect);
-	//		//		
-	//		//		//srcSurface.setColorKey(SDLVideo.SDL_SRCCOLORKEY, c);
-	//		//		
-	//		//		return dstSurface;
-	//
-	//	}
-
-	//	public static void copy(VirtualImage source, VirtualImage dest) {
-	//		try {
-	//			if ((source.sdlSurface != null) && (dest.sdlSurface != null)) {
-	//				source.sdlSurface.blitSurface(dest.sdlSurface);
-	//			}
-	//		} catch (SDLException e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
 
 	public void getRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height) {
 
@@ -318,63 +187,8 @@ public class VirtualImage extends Image {
 			}
 		}
 
-		//		if (Logging.TRACE_ENABLED)
-		//			System.out.println("[DEBUG] SDLImage.getRGB(): rgbData[" + rgbData.length + "] offset=" + offset + " scanlength=" + scanlength+ " x=" + x + " y=" + y + " width=" + width + " height=" + height);
-		//		
-		//		if ((x < 0) || (y < 0) || ((x + width) > imgWidth) || ((y + height) > imgHeight)) {
-		//			throw new IllegalArgumentException();
-		//		}
-		//		
-		//		if ((width <= 0) || (height <= 0)) {
-		//			return;
-		//		}
-		//		
-		//		try {
-		//
-		//			//		// Get the surface for the region
-		//			//		long flags = sdlSurface.getFlags();
-		//			//		SDLPixelFormat format = sdlSurface.getFormat();
-		//			//		int pitch = format.getBitsPerPixel();
-		//			//		long rMask = format.getRMask();
-		//			//		long gMask = format.getGMask();
-		//			//		long bMask = format.getBMask();
-		//			//		long aMask = format.getAMask();
-		//			//		SDLSurface copiedSurface = SDLVideo.createRGBSurface(flags, width, height, pitch, rMask, gMask, bMask, aMask);
-		//			//		
-		//			//		SDLRect srcRect = new SDLRect(x, y, width, height);
-		//			//		SDLRect dstRect = new SDLRect(0, 0, width, height);
-		//			//		sdlSurface.blitSurface(srcRect, copiedSurface, dstRect);
-		//			//		
-		//			//		// convert the cropped surface to ARGB
-		//			//		SDLSurface fakeARGBSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, 2, 2, 32, 0x00ff0000L, 0x0000ff00L,
-		//			//				0x000000ffL, 0xff000000L);
-		//			//		SDLSurface dstSurface = copiedSurface.convertSurface(fakeARGBSurface.getFormat(), SDLVideo.SDL_SWSURFACE);
-		//
-		//			// Convert the surface to ARGB
-		//			SDLSurface fakeARGBSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, 2, 2, 32, 0x00ff0000L,
-		//					0x0000ff00L, 0x000000ffL, 0xff000000L);
-		//			SDLSurface dstSurface = sdlSurface.convertSurface(fakeARGBSurface.getFormat(), SDLVideo.SDL_SWSURFACE);
-		//
-		//			// Get the pixels
-		//			//int[] buf = new int[this.imgWidth * this.imgHeight]; // dstSurface.getPixel32();
-		//			int[] buf = dstSurface.getPixelData32();
-		//			
-		//			for (int b = y; b < y + height; b++) {
-		//				for (int a = x; a < x + width; a++) {
-		//					//System.out.println("[DEBUG]SDLImage.getRGB(): a=" + a + "  b=" + b);
-		//					rgbData[offset + (a - x) + (b - y) * scanlength] = buf[a + b * scanlength];
-		//					//rgbData[offset + (a - x) + (b - y) * scanlength] = P(a, b);
-		//				}
-		//			}
-		//
-		//		} catch (SDLException e) {
-		//			//throw new IOException(e.getMessage());
-		//			e.printStackTrace();
-		//		}
-
 	}
-	
-	
+
 	/**
 	 * Draw the specified region of an Image to the current Image.
 	 * This method assumes that coordinates of the source are already translated.
@@ -383,13 +197,13 @@ public class VirtualImage extends Image {
 	 * @param x 
 	 * @param y
 	 */
-	private boolean render(Graphics g,	int x_src, int y_src, int width, int height, int x, int y, int anchor) {
-		
+	private boolean render(Graphics g, int x_src, int y_src, int width, int height, int x, int y, int anchor) {
+
 		x += g.getTranslateX();
 		y += g.getTranslateY();
-		
-		if (x_src < 0 || y_src < 0 || (x_src + width) > surface.getWidth() || (y_src + height) > surface.getHeight()) 
-			return false; 
+
+		if (x_src < 0 || y_src < 0 || (x_src + width) > surface.getWidth() || (y_src + height) > surface.getHeight())
+			return false;
 
 		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
 			y -= surface.getHeight() - 1;
@@ -402,113 +216,87 @@ public class VirtualImage extends Image {
 		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
 			x -= surface.getWidth() / 2 - 1;
 		}
-		
+
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG]VirtualImage.render2(): x=" + x + " y=" + y + " width=" + surface.getWidth()
 					+ " height=" + surface.getHeight());
-		
-		
+
 		VirtualGraphics vg = (VirtualGraphics) g;
 		Rectangle clipRect = vg.clipRectangle;
 		VirtualSurface destSurface = vg.getSurface();
-		
-		
-//		for (int iy = y_src; iy < (y_src + height); iy++, y++) {
-//			for (int ix = x_src; ix < (x_src + width); ix++, x++) {
-//			//System.out.println("[DEBUG]VirtualImage.render(): " + (i + dstPosition));
-//			destSurface.data[ y * destSurface.getWidth() + x]=  0xFF00FF00; //surface.data[i + srcPosition]; y * destSurface.getWidth() +
-//			}
-//		}
-	
+
+		//		for (int iy = y_src; iy < (y_src + height); iy++, y++) {
+		//			for (int ix = x_src; ix < (x_src + width); ix++, x++) {
+		//			//System.out.println("[DEBUG]VirtualImage.render(): " + (i + dstPosition));
+		//			destSurface.data[ y * destSurface.getWidth() + x]=  0xFF00FF00; //surface.data[i + srcPosition]; y * destSurface.getWidth() +
+		//			}
+		//		}
+
 		// Clip source rectangle in source image.
 		//int sxmin=r.xmin, symin=r.ymin, sxmax=r.xmax, symax=r.ymax;
-		int sxmin=x_src, symin=y_src, sxmax=x_src + width, symax=y_src + height;
-		if (sxmin<0) sxmin=0;
-		if (symin<0) symin=0;
-		if (sxmax> surface.width-1) sxmax=surface.width-1;
-		if (symax> surface.height-1) symax=surface.height-1;
-		
+		int sxmin = x_src, symin = y_src, sxmax = x_src + width, symax = y_src + height;
+		if (sxmin < 0)
+			sxmin = 0;
+		if (symin < 0)
+			symin = 0;
+		if (sxmax > surface.width - 1)
+			sxmax = surface.width - 1;
+		if (symax > surface.height - 1)
+			symax = surface.height - 1;
+
 		// Clip destination rectangle in destination image.
-		int dxmin=x+sxmin-x_src, dymin=y+symin-y_src, dxmax=x+sxmax-x_src, dymax=y+symax-y_src;
-		if (dxmin< clipRect.xmin) dxmin=clipRect.xmin;
-		if (dymin< clipRect.ymin) dymin=clipRect.ymin;
-		if (dxmax> clipRect.xmax) dxmax=clipRect.xmax;
-		if (dymax> clipRect.ymax) dymax=clipRect.ymax;
-		
+		int dxmin = x + sxmin - x_src, dymin = y + symin - y_src, dxmax = x + sxmax - x_src, dymax = y + symax - y_src;
+		if (dxmin < clipRect.xmin)
+			dxmin = clipRect.xmin;
+		if (dymin < clipRect.ymin)
+			dymin = clipRect.ymin;
+		if (dxmax > clipRect.xmax)
+			dxmax = clipRect.xmax;
+		if (dymax > clipRect.ymax)
+			dymax = clipRect.ymax;
+
 		// New source rectangle.
-		sxmin=dxmin-x+x_src; symin=dymin-y+y_src; sxmax=dxmax-x+x_src; symax=dymax-y+y_src;
-		
-		int w=sxmax-sxmin+1, h=symax-symin+1;
-		for (int ry=0; ry<h; ry++) {
-			
-			int srcPosition = (symin+ry)*surface.width+sxmin;
-			int dstPosition = (dymin+ry)*destSurface.width+dxmin;
+		sxmin = dxmin - x + x_src;
+		symin = dymin - y + y_src;
+		sxmax = dxmax - x + x_src;
+		symax = dymax - y + y_src;
+
+		int w = sxmax - sxmin + 1, h = symax - symin + 1;
+		for (int ry = 0; ry < h; ry++) {
+
+			int srcPosition = (symin + ry) * surface.width + sxmin;
+			int dstPosition = (dymin + ry) * destSurface.width + dxmin;
 			int length = w;
-			
-			for (int i=0, sp=srcPosition, dp=dstPosition; i<length; i++, sp+=1, dp+=1) {
+
+			for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
 				// TODO support transparent pixels
 				//System.out.println("[DEBUG]VirtualImage.render(): " + (i + dstPosition));
 				if (((surface.data[i + srcPosition]) & 0xFF000000) == 0xFF000000)
-					destSurface.data[i + dstPosition]=  surface.data[i + srcPosition];
+					destSurface.data[i + dstPosition] = surface.data[i + srcPosition];
 			}
-			
-//			for (int i=0, sp=srcPosition, dp=dstPosition; i<length; i++, sp+=4, dp+=4) {
-//				for (int c=0; c<4; c++) dst[dp+c]=src[sp+c];
-//			}
+
+			//			for (int i=0, sp=srcPosition, dp=dstPosition; i<length; i++, sp+=4, dp+=4) {
+			//				for (int c=0; c<4; c++) dst[dp+c]=src[sp+c];
+			//			}
 			//drawSpan(byte src[], int srcPosition, byte dst[], int dstPosition, int length) {
 			//drawSpan(img.data, (symin+ry)*img.width+sxmin, image.data, (dymin+ry)*image.width+dxmin, w);
 		}
-		
-//		for (int i = 0; i < destSurface.data.length; i++) {
-//			destSurface.data[i] = 0xFF00FF00;
-//		}
-		
+
+		//		for (int i = 0; i < destSurface.data.length; i++) {
+		//			destSurface.data[i] = 0xFF00FF00;
+		//		}
+
 		return true;
 	}
 
 	public boolean render(Graphics g, int x, int y, int anchor) {
-		
-//		if (Logging.TRACE_ENABLED)
-//			System.out.println("[DEBUG]VirtualImage.render(): x=" + x + " y=" + y + " width=" + surface.getWidth()
-//					+ " height=" + surface.getHeight());
-		
+
+		//		if (Logging.TRACE_ENABLED)
+		//			System.out.println("[DEBUG]VirtualImage.render(): x=" + x + " y=" + y + " width=" + surface.getWidth()
+		//					+ " height=" + surface.getHeight());
+
 		return render(g, 0, 0, imgWidth, imgHeight, x, y, anchor);
 
-		
-
-		//		x += g.getTranslateX();
-		//		y += g.getTranslateY();
-		//
-		//		if (Logging.TRACE_ENABLED)
-		//			System.out.println("[DEBUG]SDLImage.render(): x=" + x + " y=" + y + " width=" + sdlSurface.getWidth()
-		//				+ " height=" + sdlSurface.getHeight());
-		//
-		//		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-		//			y -= sdlSurface.getHeight() - 1;
-		//		} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-		//			y -= sdlSurface.getHeight() / 2 - 1;
-		//		}
-		//
-		//		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-		//			x -= sdlSurface.getWidth() - 1;
-		//		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-		//			x -= sdlSurface.getWidth() / 2 - 1;
-		//		}
-		//
-		//		//SDLSurface rootSurface = SDLToolkit.getToolkit().getRootGraphics().getSurface();
-		//		SDLSurface rootSurface = ((SDLGraphics) g).getSurface();
-		//		SDLRect dstRect = new SDLRect(x, y, sdlSurface.getWidth(), sdlSurface.getHeight());
-		//
-		//		try {
-		//			sdlSurface.blitSurface(rootSurface, dstRect);
-		//		} catch (SDLException e) {
-		//			e.printStackTrace();
-		//		}
-		//		
-		//		//System.out.println("[DEBUG]SDLImage.render(): color key : " + sdlSurface.getFormat().getColorKey());
-		//
-		//		// FIXME test if anchor has a correct value
-		//		return true;
 	}
 
 	protected boolean renderRegion(Graphics g, int x_src, int y_src, int width, int height, int transform, int x_dest,
@@ -516,116 +304,156 @@ public class VirtualImage extends Image {
 
 		x_src += g.getTranslateX();
 		y_src += g.getTranslateY();
-		//x_dest += g.getTranslateX();
-		//y_dest += g.getTranslateY();
 
 		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG]VirtualImage.renderRegion(): x_src=" + x_src + " y_src=" + y_src + " width=" + width
-					+ " height= " + height);
-		
+			System.out.println("[DEBUG]VirtualImage.renderRegion(): x_src=" + x_src + " y_src=" + y_src + " width="
+					+ width + " height= " + height);
+
 		if (transform == Sprite.TRANS_NONE) {
-					
-					render(g, x_src, y_src, width, height, x_dest, y_dest, anchor);
-		
+			render(g, x_src, y_src, width, height, x_dest, y_dest, anchor);
+		} else {
+			VirtualSurface transformedSurface = transform(this.surface, x_src, y_src, width, height, transform);
+			VirtualImage transformedImage = new VirtualImage(transformedSurface);
+			g.drawImage(transformedImage, x_dest, y_dest, anchor);
+		}
 
-				} else {
+		// FIXME Returns false if something goes wrong
+		return true;
+
+	}
+	
+	private void copy(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, VirtualSurface destSurface, int x_dest, int y_dest) {
 		
-//					//System.out.println("[DEBUG] SDLImage.renderRegion(): ColorKeyBlit : " + Long.toHexString(sdlSurface.getFormat().getColorKey()));
-//					//System.out.println("[DEBUG] SDLImage.renderRegion(): ColorKeyBlit : " + sdlSurface.isColorKeyBlit());
-//		
-//					VirtualImage transformedImage = new VirtualImage(this, x_src, y_src, width, height, transform);
-//		
-//					if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-//						y_dest -= transformedImage.getHeight() - 1;
-//					} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-//						y_dest -= transformedImage.getHeight() / 2 - 1;
-//					}
-//		
-//					if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-//						x_dest -= transformedImage.getWidth() - 1;
-//					} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-//						x_dest -= transformedImage.getWidth() / 2 - 1;
-//					}
-//		
-//					//SDLSurface destSurface = SDLToolkit.getToolkit().getRootGraphics().getSurface();
-//					SDLSurface destSurface = ((SDLGraphics) g).getSurface();
-//					SDLRect dstRect = new SDLRect(x_dest, y_dest, transformedImage.getWidth(), transformedImage.getHeight());
-//		
-//					try {
-//						transformedImage.sdlSurface.blitSurface(destSurface, dstRect);
-//					} catch (SDLException e) {
-//						e.printStackTrace();
-//					}
+		int srcOffset = y_src * srcSurface.width + x_src;
+		int destOffset = y_dest * destSurface.width + x_dest;
+		
+		for (int y = 0; y < height; y++) {
+			
+			int srcPosition = srcOffset +  y * srcSurface.width;
+			int destPosition = destOffset + y * destSurface.width;
+			
+			for (int x = 0; x < width; x++) {
+				destSurface.data[destPosition + x] = srcSurface.data[srcPosition + x];
+			}
+		}
+	}
+
+	public VirtualSurface transform(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform) {
+
+		switch (transform) {
+
+		case Sprite.TRANS_ROT90:
+		case Sprite.TRANS_ROT180:
+		case Sprite.TRANS_ROT270:
+			return rotate(srcSurface, x_src, y_src, width, height, transform);
+		case Sprite.TRANS_MIRROR:
+			VirtualSurface destSurface = createSurface(width, height);
+			copy(srcSurface, x_src, y_src, width, height, destSurface, 0, 0);
+			mirror(destSurface, 0, 0, width, height);
+			return destSurface;
+		case Sprite.TRANS_MIRROR_ROT90:
+		case Sprite.TRANS_MIRROR_ROT180:
+		case Sprite.TRANS_MIRROR_ROT270:
+			destSurface = createSurface(width, height);
+			copy(srcSurface, x_src, y_src, width, height, destSurface, 0, 0);
+			mirror(destSurface, 0, 0, width, height);
+			return rotate(destSurface, 0, 0, width, height, transform);
+		}
+
+		return null;
+	}
+
+	public VirtualSurface rotate(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform) {
+		switch (transform) {
+		case Sprite.TRANS_MIRROR_ROT90:
+		case Sprite.TRANS_ROT90:
+
+			VirtualSurface destSurface = createSurface(height, width);
+			int[] destData = destSurface.data;
+
+			int srcOffset = y_src * srcSurface.width + x_src;
+
+			for (int y = 0; y < height; y++) {
+
+				int srcPosition = srcOffset + y * srcSurface.width;
+				int destPosition = height - y - 1;
+
+				for (int x = 0; x < width; x++) {
+					destData[destPosition + x * height] = srcSurface.data[srcPosition + x];
 				}
-		
-				// FIXME test if anchor has a correct value
-				return true;
 
-		
+			}
 
-		//		x_src += g.getTranslateX();
-		//		y_src += g.getTranslateY();
-		//		x_dest += g.getTranslateX();
-		//		y_dest += g.getTranslateY();
-		//
-		//		if (Logging.TRACE_ENABLED)
-		//			System.out.println("[DEBUG]SDLImage.renderRegion(): x_src=" + x_src + " y_src=" + y_src + " width=" + width
-		//				+ " height= " + height);
-		//
-		//		if (transform == Sprite.TRANS_NONE) {
-		//			if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-		//				y_dest -= height - 1;
-		//			} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-		//				y_dest -= height / 2 - 1;
-		//			}
-		//
-		//			if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-		//				x_dest -= width - 1;
-		//			} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-		//				x_dest -= width / 2 - 1;
-		//			}
-		//
-		//			SDLSurface destSurface = ((SDLGraphics) g).getSurface();
-		//			SDLRect srcRect = new SDLRect(x_src, y_src, width, height);
-		//			SDLRect dstRect = new SDLRect(x_dest, y_dest, width, height);
-		//
-		//			try {
-		//				sdlSurface.blitSurface(srcRect, destSurface, dstRect);
-		//			} catch (SDLException e) {
-		//				e.printStackTrace();
-		//			}
-		//		} else {
-		//
-		//			//System.out.println("[DEBUG] SDLImage.renderRegion(): ColorKeyBlit : " + Long.toHexString(sdlSurface.getFormat().getColorKey()));
-		//			//System.out.println("[DEBUG] SDLImage.renderRegion(): ColorKeyBlit : " + sdlSurface.isColorKeyBlit());
-		//
-		//			VirtualImage transformedImage = new VirtualImage(this, x_src, y_src, width, height, transform);
-		//
-		//			if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-		//				y_dest -= transformedImage.getHeight() - 1;
-		//			} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-		//				y_dest -= transformedImage.getHeight() / 2 - 1;
-		//			}
-		//
-		//			if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-		//				x_dest -= transformedImage.getWidth() - 1;
-		//			} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-		//				x_dest -= transformedImage.getWidth() / 2 - 1;
-		//			}
-		//
-		//			//SDLSurface destSurface = SDLToolkit.getToolkit().getRootGraphics().getSurface();
-		//			SDLSurface destSurface = ((SDLGraphics) g).getSurface();
-		//			SDLRect dstRect = new SDLRect(x_dest, y_dest, transformedImage.getWidth(), transformedImage.getHeight());
-		//
-		//			try {
-		//				transformedImage.sdlSurface.blitSurface(destSurface, dstRect);
-		//			} catch (SDLException e) {
-		//				e.printStackTrace();
-		//			}
-		//		}
-		//
-		//		// FIXME test if anchor has a correct value
-		//		return true;
+			return destSurface;
+		
+		case Sprite.TRANS_MIRROR_ROT180:
+		case Sprite.TRANS_ROT180:
+
+			destSurface = createSurface(width, height);
+			destData = destSurface.data;
+
+			srcOffset = y_src * srcSurface.width + x_src;
+			int destOffset = width * height - 1;
+
+			for (int y = 0; y < height; y++) {
+
+				int srcPosition = srcOffset + y * srcSurface.width;
+				int destPosition = destOffset - y  * width;
+
+				for (int x = 0; x < width; x++) {
+					destData[destPosition - x] = srcSurface.data[srcPosition + x];
+				}
+
+			}
+
+			return destSurface;
+		
+		case Sprite.TRANS_MIRROR_ROT270:
+		case Sprite.TRANS_ROT270:
+
+			destSurface = createSurface(height, width);
+			destData = destSurface.data;
+
+			srcOffset = y_src * srcSurface.width + x_src;
+			destOffset = (width - 1) * height;
+
+			for (int y = 0; y < height; y++) {
+
+				int srcPosition = srcOffset + y * srcSurface.width;
+				int destPosition = destOffset + y;
+
+				for (int x = 0; x < width; x++) {
+					destData[destPosition - x * height] = srcSurface.data[srcPosition + x];
+				}
+
+			}
+
+			return destSurface;
+
+		}
+		return null;
+	}
+
+	/**
+	 * In place mirror transformation.
+	 * @param srcImage
+	 */
+	public void mirror(VirtualSurface srcSurface, int x_src, int y_src, int width, int height) {
+
+		int[] buffer = srcSurface.data;
+		int offset = y_src * srcSurface.width + x_src;
+
+		for (int y = 0; y < height; y++) {
+			
+			offset = y * srcSurface.width;
+			
+			for (int x = 0; x < width / 2; x++) {
+				int tmp = buffer[offset + x];
+				buffer[offset + x] = buffer[offset + width - 1 - x];
+				buffer[offset + width - 1 - x] = tmp;
+			}
+		}
+
 	}
 
 	public boolean isMutable() {
