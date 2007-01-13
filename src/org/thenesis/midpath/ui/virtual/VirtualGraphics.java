@@ -23,7 +23,8 @@ package org.thenesis.midpath.ui.virtual;
 
 import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Toolkit;
+
+import sdljava.SDLException;
 
 import com.sun.midp.log.Logging;
 
@@ -40,12 +41,36 @@ public class VirtualGraphics extends Graphics {
 
 	Rectangle clipRectangle = new Rectangle();
 
+	private int internalColor;
+
 	VirtualGraphics(VirtualSurface surface) {
 		this.surface = surface;
 	}
 
 	public VirtualSurface getSurface() {
 		return surface;
+	}
+	
+	public synchronized void setColor(int red, int green, int blue) {
+		super.setColor(red, green, blue);
+		setInternalColor();
+	}
+
+	public synchronized void setColor(int RGB) {
+		super.setColor(RGB);
+		setInternalColor();
+	}
+
+	public synchronized void setGrayScale(int value) {
+		super.setGrayScale(value);
+		setInternalColor();
+	}
+
+	/**
+	 * Convert MIDP color (0x00RRGGBB) to internal format (0xFFRRGGBB).
+	 */
+	private void setInternalColor() {
+		internalColor = (rgbColor | 0xFF000000);
 	}
 
 	/**
@@ -94,11 +119,11 @@ public class VirtualGraphics extends Graphics {
 
 		//if (Logging.TRACE_ENABLED)
 		//	System.out.println("[DEBUG]VirtualGraphics.drawSpan : surface data size= " + surface.data.length + " dstPosition=" + dstPosition + " w=" + w);
-
+		
 		switch (blendMode) {
 		case REPLACE:
 			for (int x = dstPosition; x < (dstPosition + w); x++) {
-				dst[x] = rgbColor;
+				dst[x] = internalColor;
 			}
 			break;
 		}
