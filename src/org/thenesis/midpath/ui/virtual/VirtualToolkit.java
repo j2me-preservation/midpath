@@ -136,6 +136,7 @@ public class VirtualToolkit extends Toolkit {
 			System.out.println("[DEBUG]VirtualToolkit.createFontPeer(): size=" + size);
 
 		return new RawFontPeer(face, style, size);
+		//return new BDFFontPeer(face, style, size);
 		//return null;
 	}
 
