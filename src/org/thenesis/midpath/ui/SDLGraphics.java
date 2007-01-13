@@ -227,19 +227,16 @@ public class SDLGraphics extends Graphics {
 	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
 			boolean processAlpha) {
 
-		int tx = x + transX;
-		int ty = y + transY;
-
+		// Create a new Image
 		int[] buf = new int[width * height];
-
 		for (int b = 0; b < height; b++) {
 			for (int a = 0; a < width; a++) {
-				buf[a + b * scanlength] = rgbData[offset + (a - tx) + (b - ty) * scanlength];
-				//P(a, b) = rgbData[offset + (a - x) + (b - y) * scanlength];
+				buf[a + b * width] = rgbData[offset + a + b * scanlength];
 			}
 		}
-
 		Image image = Image.createRGBImage(buf, width, height, processAlpha);
+		
+		// Draw the created image
 		drawImage(image, x, y, Graphics.TOP | Graphics.LEFT);
 
 		if (Logging.TRACE_ENABLED)
