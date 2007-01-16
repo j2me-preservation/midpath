@@ -200,7 +200,7 @@ public class BDFFontPeer implements FontPeer {
 				int[] fData = glyph.getData();
 				int scan = fData.length / fHeight;
 
-				// FIXME Improve clipping (currentX + scan) > r.xmax || ||  y < r.ymin || y > r.ymax || (y + fHeight) > r.ymax
+				// FIXME Improve clipping
 				int currentX = x + offset;
 				if (currentX > r.xmax || (currentX + scan) > r.xmax || y < r.ymin || y > r.ymax
 						|| (y + fHeight) > r.ymax)
@@ -210,28 +210,33 @@ public class BDFFontPeer implements FontPeer {
 					for (int j = 0; j < scan; j++) {
 						int fPixel = fData[(k * scan) + j];
 						if (fPixel != 0) {
+							
+							int destPosition = (y + (container.getBoundingBox().height + base - fHeight) + k - glyph
+									.getBbx().y)
+									* surface.getWidth() + (x + offset + j);
 
 							if (container.getDepth() == 8) {
 
-								//	int red = (((color & 0x00FF0000) >> 16) * fPixel) / 255;
-								//	int green = (((color & 0x0000FF00) >> 8)* fPixel) / 255;
-								//	int blue = (((color & 0x000000FF))* fPixel) / 255;
-								//	fPixel = (((red << 16) + (green << 8) + blue) | 0xFF000000);
+								// Source.
+								int sr = (color & 0x00FF0000) >> 16;
+								int sg = (color & 0x0000FF00) >> 8;
+								int sb = color & 0x000000FF;
+								
+								// Destination.
+								int dr = (surface.data[destPosition] & 0x00FF0000) >> 16;
+								int dg = (surface.data[destPosition] & 0x0000FF00) >> 8;
+								int db = surface.data[destPosition] & 0x000000FF;
+								
+								// Alpha blending
+								int a = fPixel;
+								int factor = 0x00010000/255;
+								dr=((a*sr+(0xff-a)*dr)*factor)>>16;
+								dg=((a*sg+(0xff-a)*dg)*factor)>>16;
+								db=((a*sb+(0xff-a)*db)*factor)>>16;
 
-								// TODO Add alpha-blending
-								fPixel = 255 - fPixel;
-								fPixel = (((fPixel << 16) | (fPixel << 8) | fPixel) | 0xFF000000);
-
-								//								int red = ((color & 0x00FF0000) >> 16) * fPixel / 255;
-								//								int green = ((color & 0x0000FF00) >> 8)* fPixel / 255;
-								//								int blue = ((color & 0x000000FF))* fPixel / 255;
-								//								fPixel = ((red*76 + green*150 + blue*29) >> 8);
-
-								//								int red = (color & 0x00FF0000) >> 16;
-								//								int green = (color & 0x0000FF00) >> 8;
-								//								int blue = (color & 0x000000FF);
-								//								//fPixel = (red*76 + green*150 + blue*29) >> 8;
-								//								fPixel = ((((255 - fPixel) << 24) + (red << 16) + (green << 8) + blue));
+								fPixel = (((dr << 16) + (dg << 8) + db) | 0xFF000000);
+								
+								
 							} else {
 								int red = (color & 0x00FF0000) >> 16;
 								int green = (color & 0x0000FF00) >> 8;
@@ -244,10 +249,6 @@ public class BDFFontPeer implements FontPeer {
 								fPixel = (((red << 16) + (green << 8) + blue) | 0xFF000000);
 							}
 
-							int destPosition = (y + (container.getBoundingBox().height + base - fHeight) + k - glyph
-									.getBbx().y)
-									* surface.getWidth() + (x + offset + j);
-
 							surface.data[destPosition] = fPixel;
 
 							//rgbColor = (value << 16) | (value << 8) | value;
@@ -256,7 +257,7 @@ public class BDFFontPeer implements FontPeer {
 							//									- glyph.getBbx().y);
 						}
 					}
-					//System.out.println();
+					
 				}
 
 				//offset += fm.charWidth(chars[i]);
