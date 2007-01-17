@@ -35,8 +35,7 @@ import org.thenesis.midpath.font.bdf.BDFParser;
 import com.sun.midp.log.Logging;
 
 /**
- * 
- * @author Guillaume
+ * A BDF font renderer which supports 1bpp and 8bpp fonts.
  */
 public class BDFFontPeer implements FontPeer {
 
@@ -46,7 +45,7 @@ public class BDFFontPeer implements FontPeer {
 	private int size;
 
 	static {
-		//InputStreamReader reader = new InputStreamReader(uk.co.tangency.odonata.font.bdf.parser.BDFFontContainer.class.getResourceAsStream("Vera-12.bdf"));
+		//InputStreamReader reader = new InputStreamReader(BDFFontContainer.class.getResourceAsStream("Vera-12.bdf"));
 		InputStreamReader reader = new InputStreamReader(BDFFontContainer.class
 				.getResourceAsStream("VeraMono-12-8.bdf"));
 		try {
@@ -176,10 +175,8 @@ public class BDFFontPeer implements FontPeer {
 					+ Long.toHexString(g.getColor()));
 
 		int color = g.getColor();
-		int pw = surface.getWidth();
+		//int pw = surface.getWidth();
 		Rectangle r = vg.clipRectangle;
-
-		// TODO Add clipping
 
 		char[] chars = str.toCharArray();
 		int charsCount = chars.length;
@@ -190,11 +187,14 @@ public class BDFFontPeer implements FontPeer {
 			BDFMetrics fm = (BDFMetrics) container.getFontMetrics();
 
 			for (int i = 0; i < charsCount; i++) {
-				int base = fm.getDescent();
+
 				BDFGlyph glyph = container.getGlyph(chars[i]);
 				if (glyph == null) {
 					continue;
 				}
+
+				int base = fm.getDescent();
+				int charWidth = fm.charWidth(chars[i]);
 
 				int fHeight = glyph.getBbx().height;
 				int[] fData = glyph.getData();
@@ -206,38 +206,48 @@ public class BDFFontPeer implements FontPeer {
 						|| (y + fHeight) > r.ymax)
 					break;
 
-				for (int k = 0; k < fHeight; k++) {
-					for (int j = 0; j < scan; j++) {
-						int fPixel = fData[(k * scan) + j];
-						if (fPixel != 0) {
-							
-							int destPosition = (y + (container.getBoundingBox().height + base - fHeight) + k - glyph
-									.getBbx().y)
-									* surface.getWidth() + (x + offset + j);
+				if (container.getDepth() == 8) {
+					for (int k = 0; k < fHeight; k++) {
+						for (int j = 0; j < scan; j++) {
+							int fPixel = fData[(k * scan) + j];
+							if (fPixel != 0) {
 
-							if (container.getDepth() == 8) {
+								int destPosition = (y + (container.getBoundingBox().height + base - fHeight) + k - glyph
+										.getBbx().y)
+										* surface.getWidth() + (x + offset + j);
 
 								// Source.
 								int sr = (color & 0x00FF0000) >> 16;
 								int sg = (color & 0x0000FF00) >> 8;
 								int sb = color & 0x000000FF;
-								
+
 								// Destination.
 								int dr = (surface.data[destPosition] & 0x00FF0000) >> 16;
 								int dg = (surface.data[destPosition] & 0x0000FF00) >> 8;
 								int db = surface.data[destPosition] & 0x000000FF;
-								
+
 								// Alpha blending
 								int a = fPixel;
-								int factor = 0x00010000/255;
-								dr=((a*sr+(0xff-a)*dr)*factor)>>16;
-								dg=((a*sg+(0xff-a)*dg)*factor)>>16;
-								db=((a*sb+(0xff-a)*db)*factor)>>16;
+								int factor = 0x00010000 / 255;
+								dr = ((a * sr + (0xff - a) * dr) * factor) >> 16;
+								dg = ((a * sg + (0xff - a) * dg) * factor) >> 16;
+								db = ((a * sb + (0xff - a) * db) * factor) >> 16;
 
-								fPixel = (((dr << 16) + (dg << 8) + db) | 0xFF000000);
-								
-								
-							} else {
+								surface.data[destPosition] = (((dr << 16) + (dg << 8) + db) | 0xFF000000);
+							}
+						}
+					}
+				} else {
+
+					for (int k = 0; k < fHeight; k++) {
+						for (int j = 0; j < scan; j++) {
+							int fPixel = fData[(k * scan) + j];
+							if (fPixel != 0) {
+
+								int destPosition = (y + (container.getBoundingBox().height + base - fHeight) + k - glyph
+										.getBbx().y)
+										* surface.getWidth() + (x + offset + j);
+
 								int red = (color & 0x00FF0000) >> 16;
 								int green = (color & 0x0000FF00) >> 8;
 								int blue = (color & 0x000000FF);
@@ -246,22 +256,13 @@ public class BDFFontPeer implements FontPeer {
 								green = ((green * fPixel) >> container.getDepth()) & 0xFF;
 								blue = ((blue * fPixel) >> container.getDepth()) & 0xFF;
 
-								fPixel = (((red << 16) + (green << 8) + blue) | 0xFF000000);
+								surface.data[destPosition] = (((red << 16) + (green << 8) + blue) | 0xFF000000);
 							}
-
-							surface.data[destPosition] = fPixel;
-
-							//rgbColor = (value << 16) | (value << 8) | value;
-							//							image.setColor(fPixel);
-							//							image.setPoint(x + offset + j, y + (container.getBoundingBox().height + base - fHeight) + k
-							//									- glyph.getBbx().y);
 						}
 					}
-					
 				}
 
-				//offset += fm.charWidth(chars[i]);
-				offset += glyph.getDWidth().width - glyph.getBbx().x;
+				offset += charWidth;
 
 			}
 		}
