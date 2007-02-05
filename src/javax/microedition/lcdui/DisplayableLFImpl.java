@@ -870,7 +870,7 @@ class DisplayableLFImpl implements DisplayableLF {
      */
     private void setKeyMask(int keyCode) {
 
-    	int gameActionCode = SDLToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+    	int gameActionCode = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
     	
         // set the mask of keys pressed 
         switch (gameActionCode) {
@@ -923,7 +923,7 @@ class DisplayableLFImpl implements DisplayableLF {
      */
     private void releaseKeyMask(int keyCode) {
 
-    	int gameActionCode = SDLToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+    	int gameActionCode = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
     	
         // set the mask of keys pressed 
         switch (gameActionCode) {

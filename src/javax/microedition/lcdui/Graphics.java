@@ -1802,7 +1802,7 @@ public class Graphics {
 
         //Graphics g = new Graphics();
         //Graphics g = SDLToolkit.getToolkit().createGraphics(img.getWidth(), img.getHeight());
-        Graphics g = SDLToolkit.getToolkit().createGraphics(img);
+        Graphics g = Toolkit.getToolkit().createGraphics(img);
         g.img = img;
         g.setDimensions(img.getWidth(), img.getHeight());
         g.reset();
@@ -1826,7 +1826,7 @@ public class Graphics {
     static Graphics getScreenGraphics(int displayId, int width, int height) {
 
         //Graphics g = new Graphics();
-    	Graphics g =  SDLToolkit.getToolkit().getRootGraphics();
+    	Graphics g =  Toolkit.getToolkit().getRootGraphics();
         g.displayId = displayId;
         
         g.img = null;

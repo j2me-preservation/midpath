@@ -292,7 +292,7 @@ public class Image {
 			throw new IllegalArgumentException();
 		}
 
-		return SDLToolkit.getToolkit().createImage(width, height);
+		return Toolkit.getToolkit().createImage(width, height);
 
 		// SYNC NOTE: Not accessing any shared data, no locking necessary
 		//return new Image(ImageDataFactory.getImageDataFactory().
@@ -338,7 +338,7 @@ public class Image {
 		}
 		
 		if (source.isMutable()) {
-			return SDLToolkit.getToolkit().createImage(source);
+			return Toolkit.getToolkit().createImage(source);
 		} else {
 			return source;
 		}
@@ -370,7 +370,7 @@ public class Image {
 			throw new java.lang.NullPointerException();
 		}
 		
-		return SDLToolkit.getToolkit().createImage(name);
+		return Toolkit.getToolkit().createImage(name);
 	}
 
 	/**
@@ -423,7 +423,7 @@ public class Image {
 		}
 
 		try {
-			return SDLToolkit.getToolkit().createImage(imageData, imageOffset, imageLength);
+			return Toolkit.getToolkit().createImage(imageData, imageOffset, imageLength);
 		} catch (IOException e) {
 			throw new IllegalArgumentException(e.getMessage());
 		}
@@ -523,7 +523,7 @@ public class Image {
 
 		if (x == 0 && y == 0 && width == image.getWidth() && height == image.getHeight()
 				&& transform == Sprite.TRANS_NONE) {
-			return SDLToolkit.getToolkit().createImage(image);
+			return Toolkit.getToolkit().createImage(image);
 			//return createImage(image);
 		} else {
 			//            return 
@@ -535,7 +535,7 @@ public class Image {
 			// TODO
 			//return null;
 			try {
-				return SDLToolkit.getToolkit().createImage(image, x, y, width, height, transform);
+				return Toolkit.getToolkit().createImage(image, x, y, width, height, transform);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;
@@ -565,7 +565,7 @@ public class Image {
 			throw new java.lang.NullPointerException();
 		}
 
-		return SDLToolkit.getToolkit().createImage(stream);
+		return Toolkit.getToolkit().createImage(stream);
 
 		//        try {
 		//            return new Image(ImageDataFactory.getImageDataFactory().
@@ -647,7 +647,7 @@ public class Image {
 			throw new ArrayIndexOutOfBoundsException();
 		}
 
-		return SDLToolkit.getToolkit().createImage(rgb, width, height, processAlpha);
+		return Toolkit.getToolkit().createImage(rgb, width, height, processAlpha);
 
 		//        return new Image(ImageDataFactory.getImageDataFactory().
 		//                         createImmutableImageData(rgb, 

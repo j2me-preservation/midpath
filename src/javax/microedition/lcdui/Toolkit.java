@@ -31,8 +31,8 @@ import com.sun.midp.events.EventMapper;
 
 public abstract class Toolkit {
 
-	private static Toolkit toolkit = new SDLToolkit();
-	//private static Toolkit toolkit = new VirtualToolkit();
+	//private static Toolkit toolkit = new SDLToolkit();
+	private static Toolkit toolkit = new VirtualToolkit();
 	
 	public static void setToolkit(Toolkit toolkit) {
 		Toolkit.toolkit = toolkit;

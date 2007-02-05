@@ -435,7 +435,7 @@ class ChoiceGroupPopupLFImpl extends ChoiceGroupLFImpl {
                 if (code == Constants.KEYCODE_UP
                     || code == Constants.KEYCODE_DOWN) 
                 {
-                	int gameActionCode = SDLToolkit.getToolkit().getEventMapper().getGameAction(code);
+                	int gameActionCode = Toolkit.getToolkit().getEventMapper().getGameAction(code);
                     if (lf.traverseInPopup(gameActionCode,
                                            viewport[WIDTH], 
                                            viewport[HEIGHT])) 

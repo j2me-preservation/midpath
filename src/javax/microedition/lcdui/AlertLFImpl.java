@@ -439,7 +439,7 @@ class AlertLFImpl extends ScreenLFImpl implements AlertLF {
      */
     void uCallKeyPressed(int keyCode) {
         //int gameAction = KeyConverter.getGameAction(keyCode);
-    	int gameActionCode = SDLToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+    	int gameActionCode = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
 
         synchronized (Display.LCDUILock) {
             switch (gameActionCode) {

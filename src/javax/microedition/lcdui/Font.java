@@ -541,7 +541,7 @@ public final class Font { //implements FontPeer {
 	 * @param inp_size The point size to initialize the native Font
 	 */
 	private void init(int inp_face, int inp_style, int inp_size) {
-		fontPeer = SDLToolkit.getToolkit().createFontPeer(inp_face, inp_style, inp_size);
+		fontPeer = Toolkit.getToolkit().createFontPeer(inp_face, inp_style, inp_size);
 		//System.out.println("[DEBUG]Font.init(): not yet implemented");
 	}
 

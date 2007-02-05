@@ -401,7 +401,7 @@ class CanvasLFImpl extends DisplayableLFImpl implements CanvasLF {
             return true;
         }
 
-        int gameActionCode = SDLToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+        int gameActionCode = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
         
         //switch (KeyConverter.getGameAction(keyCode)) {
         switch (gameActionCode) {

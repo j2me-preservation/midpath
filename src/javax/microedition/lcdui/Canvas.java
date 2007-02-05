@@ -559,7 +559,7 @@ public abstract class Canvas extends Displayable {
 		// SYNC NOTE: no locking necessary as we are doing a static
 		// table lookup and getKeyCode() is implemented natively
 
-		int n = SDLToolkit.getToolkit().getEventMapper().getKeyCode(gameAction);
+		int n = Toolkit.getToolkit().getEventMapper().getKeyCode(gameAction);
 		//int n = KeyConverter.getKeyCode(gameAction);
 
 		if (n == 0) {
@@ -604,7 +604,7 @@ public abstract class Canvas extends Displayable {
 		// SYNC NOTE: no locking necessary as we are doing a static
 		// table lookup and getKeyName() is implemented natively
 
-		String s = SDLToolkit.getToolkit().getEventMapper().getKeyName(keyCode);
+		String s = Toolkit.getToolkit().getEventMapper().getKeyName(keyCode);
 		//    	String s = KeyConverter.getKeyName(keyCode);
 
 		if (s == null) {
@@ -634,7 +634,7 @@ public abstract class Canvas extends Displayable {
 		// table lookup and getGameAction() is implemented natively
 
 		//int n = KeyConverter.getGameAction(keyCode);
-		int n = SDLToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+		int n = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
 
 		if (n == -1) {
 			throw new IllegalArgumentException();
