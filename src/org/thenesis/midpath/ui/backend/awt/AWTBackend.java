@@ -1,8 +1,9 @@
 package org.thenesis.midpath.ui.backend.awt;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.Insets;
+import java.awt.Panel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -20,36 +21,47 @@ import com.sun.midp.log.Logging;
 public class AWTBackend implements UIBackend {
 
 	private VirtualSurface rootVirtualSurface;
+	private Panel panel;
 	private Frame frame;
 	private BufferedImage screenImage;
+	private AWTEventMapper eventMapper = new AWTEventMapper();
 
 	public AWTBackend(int w, int h) {
 
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-
-		frame = new Frame() {
-
+		
+		final Dimension dimension = new Dimension(w, h);
+		panel = new Panel() {
+			
 			public void update(Graphics g) {
 				paint(g);
 			}
-
-			public void paint(Graphics g) {
-				g.drawImage(screenImage, getInsets().left, getInsets().top, null);
+			
+			public Dimension getMinimumSize() {
+				return dimension;
+			}
+			public Dimension getPreferredSize() {
+				return dimension;
 			}
 
+			public void paint(Graphics g) {
+				if (screenImage != null) {
+					g.drawImage(screenImage, 0, 0, null);
+				}
+			}
 		};
 
 		AWTEventConverter listener = new AWTEventConverter();
+		
+		frame = new Frame();
 		frame.addKeyListener(listener);
-
-		Insets insets = frame.getInsets();
-		frame.setSize(w + insets.left + insets.right, h + insets.top + insets.bottom);
+		frame.add(panel);
+		frame.pack();
 		frame.setVisible(true);
 	}
 
 	public EventMapper getEventMapper() {
-		//return toolkit.getEventMapper();
-		return null;
+		return eventMapper;
 	}
 
 	public VirtualSurface createSurface(int w, int h) {
@@ -70,17 +82,7 @@ public class AWTBackend implements UIBackend {
 		}
 
 		screenImage.setRGB(0, 0, w, h, rootVirtualSurface.data, 0, w);
-		frame.repaint();
-
-		//SDLSurface sdlSurface = ((SDLGraphics)toolkit.getRootGraphics()).getSurface();
-
-		// Draw rgb field on the surface
-		//		sdlSurface.setPixelData32(rootVirtualSurface.data);
-		//		try {
-		//			sdlSurface.updateRect(x, y, width, heigth);
-		//		} catch (SDLException e) {
-		//			e.printStackTrace();
-		//		}
+		panel.repaint();
 
 	}
 
@@ -101,8 +103,6 @@ public class AWTBackend implements UIBackend {
 			if (Logging.TRACE_ENABLED)
 				System.out.println("[DEBUG] AWTBackend.keyPressed(): key code: " + e.getKeyCode() + " char: "
 						+ e.getKeyChar());
-				
-			//System.out.println(KeyEvent.VK_DOWN);
 
 			char c = e.getKeyChar();
 			
@@ -110,10 +110,12 @@ public class AWTBackend implements UIBackend {
 			// Set event type (intParam1)
 			nativeEvent.intParam1 = EventConstants.PRESSED;
 			// Set event key code (intParam2)
-			if (c != KeyEvent.VK_UNDEFINED) {
-				nativeEvent.intParam2 = c;
-			} else {
+			if (c == KeyEvent.CHAR_UNDEFINED || Character.isISOControl(c)) {
+				//System.out.println("CHAR_UNDEFINED");
 				nativeEvent.intParam2 = AWTEventMapper.mapToInternalEvent(e.getKeyCode());
+			} else {
+				nativeEvent.intParam2 = c;
+				//System.out.println("Known VK");
 			}
 			// Set event source (intParam4). Fake display with id=1
 			nativeEvent.intParam4 = 1;
@@ -134,10 +136,12 @@ public class AWTBackend implements UIBackend {
 			// Set event type (intParam1)
 			nativeEvent.intParam1 = EventConstants.RELEASED;
 			// Set event key code (intParam2)
-			if (c != KeyEvent.VK_UNDEFINED) {
-				nativeEvent.intParam2 = c;
-			} else {
+			if (c == KeyEvent.CHAR_UNDEFINED || Character.isISOControl(c)) {
+				//System.out.println("CHAR_UNDEFINED2");
 				nativeEvent.intParam2 = AWTEventMapper.mapToInternalEvent(e.getKeyCode());
+			} else {
+				nativeEvent.intParam2 = c;
+				//System.out.println("Known VK2");
 			}
 			// Set event source (intParam4). Fake display with id=1
 			nativeEvent.intParam4 = 1;
@@ -146,8 +150,7 @@ public class AWTBackend implements UIBackend {
 		}
 
 		public void keyTyped(KeyEvent e) {
-			// TODO Auto-generated method stub
-
+			// Not used
 		}
 
 	}
