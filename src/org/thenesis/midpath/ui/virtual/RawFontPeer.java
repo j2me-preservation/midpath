@@ -34,7 +34,7 @@ public class RawFontPeer implements FontPeer {
 	private static final int FONT_DEFAULT = FONT_8X16;
 	private int font = FONT_DEFAULT;
 
-	private int inset = 0;
+	private int inset = 1;
 	private int size;
 
 	RawFontPeer(int face, int style, int size) {
@@ -124,7 +124,6 @@ public class RawFontPeer implements FontPeer {
 
 		VirtualGraphics vg = ((VirtualGraphics) g);
 		VirtualSurface surface = vg.getSurface();
-		//SDLGfx.stringColor(sdlg.getSurface(), x, y, str, sdlg.sdlGfxColor); //0xffff00ffL
 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("SDLGraphics.drawString(): " + str + " x=" + x + " y=" + y + " color="
@@ -136,44 +135,49 @@ public class RawFontPeer implements FontPeer {
 
 		int color = g.getColor();
 		int pw = surface.getWidth();
-		
-		Rectangle r = vg.clipRectangle;
 
-		// TODO Add clipping
-		
+		Rectangle r = vg.clipRectangle;
+		//System.out.println("clip rectangle : " + r + " fw=" + fw + " fh=" + fh);
+
 		char[] chars = str.toCharArray();
 
 		for (int i = 0; i < chars.length; i++) {
 
 			int currentX = x + i * fw;
-			
+
 			// Set the destination offset to the next character
 			int pk = y * surface.getWidth() + currentX;
 			int dk = chars[i] * fh;
-			
-			// FIXME Add better clipping
-			// Character-based clipping
-			if (currentX > r.xmax || (currentX + fw) > r.xmax || y <  r.ymin || y > r.ymax  || (y  + fh) > r.ymax)
+
+			// Trivial clipping
+			if (currentX > r.xmax || y > r.ymax)
 				break;
-			if (currentX < r.xmin) {
-				continue;
+
+			// Pixel clipping
+			int cxmin = 0, cxmax = fw;
+			if (currentX < r.xmin)
+				cxmin = r.xmin - currentX;
+			if ((currentX + fw) > r.xmax) {
+				cxmax = r.xmax - currentX;
+				if (cxmax > fw)
+					cxmax = fw;
 			}
-			
-//			int xmin = currentX, xmax = currentX + fw;
-//			if (currentX < g.getClipX()) 
-//				xmin = g.getClipX();
-//			if ((currentX + fw) > g.getClipX()) 
-//				xmax = g.getClipX();
-//			int ymin = y, ymax = y + fh;
-//			if (y < g.getClipY()) 
-//				ymin = g.getClipY();
-//			if ((y + fh) > g.getClipY()) 
-//				ymax = g.getClipY();
-			
-			for (int cy = 0; cy < fh; cy++, pk += pw) {
+			int cymin = 0, cymax = fh;
+			if (y < r.ymin)
+				cymin = r.ymin - y;
+			if ((y + fh) > r.ymax) {
+				cymax = r.ymax - y;
+				if (cymax > fh)
+					cymax = fh;
+			}
+
+			//System.out.println(chars[i] + "  currentX=" + currentX + " cxmin=" + cxmin + " cxmax=" + cxmax + " cymin=" + cymin + " cymax=" + cymax);
+
+			pk += pw * cymin;
+			for (int cy = cymin; cy < cymax; cy++, pk += pw) {
 				int d = data[dk + cy];
-				int bit = 1 << 15;
-				for (int cx = 0; cx < fw; cx++, bit >>= 1) {
+				int bit = 1 << (15 - cxmin);
+				for (int cx = cxmin; cx < cxmax; cx++, bit >>= 1) {
 					if ((d & bit) != 0) {
 						surface.data[pk + cx] = color;
 					}
@@ -184,29 +188,6 @@ public class RawFontPeer implements FontPeer {
 
 	}
 
-	/**
-	 * Draw the screen in a buffer.
-	 * @param screen
-	 * @param w
-	 * @param h
-	 */
-	//    public void drawScreen(int screen[], int w, int h, int palette[]) {
-	//        if (screenChar==null) return;
-	//        int fw=FONTS_WIDTH[font], fh=FONTS_HEIGHT[font], pw=screenWidth*fw;
-	//        char data[]=FONTS_DATA[font];
-	//        
-	//        w/=fw; h/=fh;
-	//        for (int y=0; y<h; y++) {
-	//            for (int x=0; x<w; x++) {
-	//                int sk=y*screenWidth+x, dk=screenChar[sk]*fh, pk=(y*screenWidth*fh+x)*fw;
-	//                int fc=palette[screenForegroundColor[sk]&0xff], bc=palette[screenBackgroundColor[sk]&0xff];
-	//                for (int cy=0; cy<fh; cy++, pk+=pw) {
-	//                    int d=data[dk+cy], bit=1<<15;
-	//                    for (int cx=0; cx<fw; cx++, bit>>=1) screen[pk+cx]=((d&bit)!=0) ? fc : bc;
-	//                }
-	//            }
-	//        }
-	//    }
 	private final static char font8x8[] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x7E00,
 			0x8100, 0xA500, 0x8100, 0xBD00, 0x9900, 0x8100, 0x7E00, 0x7E00, 0xFF00, 0xDB00, 0xFF00, 0xC300, 0xE700,
 			0xFF00, 0x7E00, 0x6C00, 0xFE00, 0xFE00, 0xFE00, 0x7C00, 0x3800, 0x1000, 0x0000, 0x1000, 0x3800, 0x7C00,

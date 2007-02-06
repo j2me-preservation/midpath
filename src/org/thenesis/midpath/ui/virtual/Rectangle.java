@@ -63,4 +63,8 @@ public class Rectangle {
 	public boolean isInside(int x, int y) {
 		return (x>=xmin) && (x<=xmax) && (y>=ymin) && (y<=ymax);
 	}
+	
+	public String toString() {
+		return "xmin=" + xmin + " xmax=" + xmax + " ymin=" + ymin + " ymax=" + ymax;
+	}
 }
