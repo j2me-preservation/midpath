@@ -148,6 +148,11 @@ public class RawFontPeer implements FontPeer {
 			// Set the destination offset to the next character
 			int pk = y * surface.getWidth() + currentX;
 			int dk = chars[i] * fh;
+			
+			// Check if character exists
+			if (dk >= data.length) {
+				continue;
+			}
 
 			// Trivial clipping
 			if (currentX > r.xmax || y > r.ymax)
