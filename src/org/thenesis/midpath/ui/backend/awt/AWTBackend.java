@@ -29,17 +29,18 @@ public class AWTBackend implements UIBackend {
 	public AWTBackend(int w, int h) {
 
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-		
+
 		final Dimension dimension = new Dimension(w, h);
 		panel = new Panel() {
-			
+
 			public void update(Graphics g) {
 				paint(g);
 			}
-			
+
 			public Dimension getMinimumSize() {
 				return dimension;
 			}
+
 			public Dimension getPreferredSize() {
 				return dimension;
 			}
@@ -52,7 +53,7 @@ public class AWTBackend implements UIBackend {
 		};
 
 		AWTEventConverter listener = new AWTEventConverter();
-		
+
 		frame = new Frame();
 		frame.addKeyListener(listener);
 		frame.add(panel);
@@ -99,23 +100,24 @@ public class AWTBackend implements UIBackend {
 	private class AWTEventConverter implements KeyListener {
 
 		public void keyPressed(KeyEvent e) {
-			
+
 			if (Logging.TRACE_ENABLED)
 				System.out.println("[DEBUG] AWTBackend.keyPressed(): key code: " + e.getKeyCode() + " char: "
 						+ e.getKeyChar());
 
 			char c = e.getKeyChar();
-			
+
 			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
 			// Set event type (intParam1)
 			nativeEvent.intParam1 = EventConstants.PRESSED;
 			// Set event key code (intParam2)
-			if (c == KeyEvent.CHAR_UNDEFINED || Character.isISOControl(c)) {
-				//System.out.println("CHAR_UNDEFINED");
-				nativeEvent.intParam2 = AWTEventMapper.mapToInternalEvent(e.getKeyCode());
-			} else {
+			int internalCode = AWTEventMapper.mapToInternalEvent(e.getKeyCode(), c);
+			if (internalCode != 0) {
+				nativeEvent.intParam2 = internalCode;
+			} else if ((c != KeyEvent.CHAR_UNDEFINED) && (e.getKeyCode() != KeyEvent.VK_SHIFT)) {
 				nativeEvent.intParam2 = c;
-				//System.out.println("Known VK");
+			} else {
+				return;
 			}
 			// Set event source (intParam4). Fake display with id=1
 			nativeEvent.intParam4 = 1;
@@ -125,23 +127,24 @@ public class AWTBackend implements UIBackend {
 		}
 
 		public void keyReleased(KeyEvent e) {
-			
+
 			if (Logging.TRACE_ENABLED)
 				System.out.println("[DEBUG] AWTBackend.keyReleased(): key code: " + e.getKeyCode() + " char: "
 						+ e.getKeyChar());
-			
+
 			char c = e.getKeyChar();
 
 			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
 			// Set event type (intParam1)
 			nativeEvent.intParam1 = EventConstants.RELEASED;
 			// Set event key code (intParam2)
-			if (c == KeyEvent.CHAR_UNDEFINED || Character.isISOControl(c)) {
-				//System.out.println("CHAR_UNDEFINED2");
-				nativeEvent.intParam2 = AWTEventMapper.mapToInternalEvent(e.getKeyCode());
-			} else {
+			int internalCode = AWTEventMapper.mapToInternalEvent(e.getKeyCode(), c);
+			if (internalCode != 0) {
+				nativeEvent.intParam2 = internalCode;
+			} else if ((c != KeyEvent.CHAR_UNDEFINED) && (e.getKeyCode() != KeyEvent.VK_SHIFT)) {
 				nativeEvent.intParam2 = c;
-				//System.out.println("Known VK2");
+			} else {
+				return;
 			}
 			// Set event source (intParam4). Fake display with id=1
 			nativeEvent.intParam4 = 1;
