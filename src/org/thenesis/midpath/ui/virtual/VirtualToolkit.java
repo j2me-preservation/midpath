@@ -29,8 +29,11 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Toolkit;
 
+import org.thenesis.midpath.ui.backend.awt.AWTBackend;
+
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 
 public class VirtualToolkit extends Toolkit {
 
@@ -45,7 +48,16 @@ public class VirtualToolkit extends Toolkit {
 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] VirtualToolkit.initialize(): VideoSurface: " + rootSurface);
-		backend = new SDLBackend(w, h);
+		
+		String backendName = Configuration.getPropertyDefault("org.thenesis.midpath.ui.backend", "null");
+		if (backendName.equalsIgnoreCase("SDL")) {
+			backend = new SDLBackend(w, h);
+		} else if (backendName.equalsIgnoreCase("AWT")) {
+			backend = new AWTBackend(w, h);
+		} else {
+			backend = new NullBackend(w, h);
+		}
+		
 		rootSurface = backend.getRootSurface();
 		rootPeer = new VirtualGraphics(rootSurface);
 	}
@@ -135,9 +147,15 @@ public class VirtualToolkit extends Toolkit {
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG]VirtualToolkit.createFontPeer(): size=" + size);
 
-		return new RawFontPeer(face, style, size);
+		String fontRendererName = Configuration.getPropertyDefault("org.thenesis.midpath.ui.fontRenderer", "raw");
+		if (fontRendererName.equalsIgnoreCase("BDF")) {
+			return new BDFFontPeer(face, style, size);
+		} else {
+			return new RawFontPeer(face, style, size);
+		}
+		
+		//return new RawFontPeer(face, style, size);
 		//return new BDFFontPeer(face, style, size);
-		//return null;
 	}
 
 	public Image createImage(int[] rgb, int width, int height, boolean processAlpha) {

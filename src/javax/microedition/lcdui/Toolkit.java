@@ -28,11 +28,22 @@ import org.thenesis.midpath.ui.SDLToolkit;
 import org.thenesis.midpath.ui.virtual.VirtualToolkit;
 
 import com.sun.midp.events.EventMapper;
+import com.sun.midp.main.Configuration;
 
 public abstract class Toolkit {
 
 	//private static Toolkit toolkit = new SDLToolkit();
-	private static Toolkit toolkit = new VirtualToolkit();
+	//private static Toolkit toolkit = new VirtualToolkit();
+	private static Toolkit toolkit;
+	
+	static {
+		String toolkitName = Configuration.getPropertyDefault("javax.microedition.lcdui.toolkit", "virtual");
+		if (toolkitName.equalsIgnoreCase("SDL")) {
+			toolkit = new SDLToolkit();
+		} else {
+			toolkit = new VirtualToolkit();
+		}
+	}
 	
 	public static void setToolkit(Toolkit toolkit) {
 		Toolkit.toolkit = toolkit;

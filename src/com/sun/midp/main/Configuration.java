@@ -25,10 +25,28 @@
 
 package com.sun.midp.main;
 
+import com.sun.midp.log.LogChannels;
 import com.sun.midp.log.Logging;
 
 /** access the implementation configuration file parameters. */
 public class Configuration {
+	
+	private static ConfigurationProperties fileProperties = new ConfigurationProperties();
+	
+	static {
+		
+		try {
+			fileProperties.load(Configuration.class.getResourceAsStream("/com/sun/midp/configuration/configuration.cfg"));
+		} catch (Exception e) {
+			if (Logging.REPORT_LEVEL <= Logging.WARNING)
+				Logging.report(Logging.WARNING, LogChannels.LC_CORE, "Can't load configuration file");
+			if (Logging.TRACE_ENABLED)
+				Logging.trace(e, "Can't load configuration file. Default values will be used.");
+		}
+		
+	}
+	
+	
     /** Don't let anyone instantiate this class */
     private Configuration() {
     }
@@ -49,7 +67,13 @@ public class Configuration {
         if (key.length() ==  0) {
             throw new IllegalArgumentException("key can't be empty");
         }
-        return getProperty0(key);
+        
+        String property = System.getProperty(key);
+        if (property == null) {
+        	property = fileProperties.getProperty(key);
+        }
+        
+        return property;
     }
 
     /**
@@ -163,18 +187,19 @@ public class Configuration {
 
         return def;
     }
-    /**
-     * native interface to the configuration parameter storage.
-     *
-     * @param      key   the name of the implementation property.
-     * @return     the string value of the implementation property,
-     *             or <code>null</code> if there is no property with that key.
-     */
-    private static String getProperty0(String key) {
-    	// TODO
-    	if (Logging.TRACE_ENABLED)
-    		System.out.println("[DEBUG] Configuration.getProperty0(): not yet implemented");
-    	
-    	return null;
-    }
+    
+//    /**
+//     * native interface to the configuration parameter storage.
+//     *
+//     * @param      key   the name of the implementation property.
+//     * @return     the string value of the implementation property,
+//     *             or <code>null</code> if there is no property with that key.
+//     */
+//    private static String getProperty0(String key) {
+//    	// TODO
+//    	if (Logging.TRACE_ENABLED)
+//    		System.out.println("[DEBUG] Configuration.getProperty0(): not yet implemented");
+//    	
+//    	return null;
+//    }
 }

@@ -33,6 +33,7 @@ import org.thenesis.midpath.font.bdf.BDFMetrics;
 import org.thenesis.midpath.font.bdf.BDFParser;
 
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 
 /**
  * A BDF font renderer which supports 1bpp and 8bpp fonts.
@@ -45,9 +46,12 @@ public class BDFFontPeer implements FontPeer {
 	private int size;
 
 	static {
-		//InputStreamReader reader = new InputStreamReader(BDFFontContainer.class.getResourceAsStream("Vera-12.bdf"));
+		
+		String fontFilename = Configuration.getPropertyDefault("org.thenesis.midpath.font.bdf.filename", "VeraMono-12-8.bdf");
+		
 		InputStreamReader reader = new InputStreamReader(BDFFontContainer.class
-				.getResourceAsStream("VeraMono-12-8.bdf"));
+				.getResourceAsStream(fontFilename));
+		
 		try {
 			container = new BDFParser(reader).createFont();
 		} catch (Exception e) {
@@ -80,6 +84,7 @@ public class BDFFontPeer implements FontPeer {
 		//			//inset = 0;
 		//			font = FONT_8X16;
 		//		}
+		
 	}
 
 	public int charWidth(char ch) {

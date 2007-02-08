@@ -10,7 +10,7 @@
  */
 package com.sun.midp.configurator;
 
-import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 
 public class Constants {
 
@@ -561,25 +561,12 @@ public class Constants {
 	 */
 	public final static int IMAGE_IMMUT_SUITE_LIMIT = (IMAGE_IMMUT_GLOBAL_LIMIT - IMAGE_IMMUT_AMS_RESERVED);
 
-	// TODO Use com.sun.midp.main.Configuration instead of System.getProperty ?
 	// Must be at the end of the Constants class in order to be started last
 	static {
-		
-		int width = 176;
-		int height = 210;
 
-		String w = System.getProperty("javax.microedition.lcdui.screen.width");
-		String h = System.getProperty("javax.microedition.lcdui.screen.height");
-		try {
-			if (w != null) {
-				width = Integer.parseInt(w);
-			}
-			if (w != null) {
-				height = Integer.parseInt(h);
-			}
-		} catch (NumberFormatException e) {
-			Logging.trace(e, "Screen size is not valid");
-		}
+		// Default values: w=176, h=210
+		int width = Configuration.getPositiveIntProperty("javax.microedition.lcdui.screenWidth", 176);
+		int height = Configuration.getPositiveIntProperty("javax.microedition.lcdui.screenHeight", 210);
 		
 		GAMECANVAS_FULLWIDTH = width;
 		GAMECANVAS_FULLHEIGHT = height;
