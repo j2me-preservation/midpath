@@ -24,8 +24,6 @@ package org.thenesis.midpath.ui.virtual;
 import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
 
-import sdljava.SDLException;
-
 import com.sun.midp.log.Logging;
 
 public class VirtualGraphics extends Graphics {
@@ -1099,6 +1097,8 @@ public class VirtualGraphics extends Graphics {
 
 	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
 			boolean processAlpha) {
+		
+		//System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : rgbData.length=" + rgbData.length + "  surface.data.length=" + surface.data.length);
 
 		x += transX;
 		y += transY;
@@ -1109,10 +1109,10 @@ public class VirtualGraphics extends Graphics {
 			sxmin = 0;
 		if (symin < 0)
 			symin = 0;
-		if (sxmax > surface.width - 1)
-			sxmax = surface.width - 1;
-		if (symax > surface.height - 1)
-			symax = surface.height - 1;
+		if (sxmax > width - 1)
+			sxmax = width - 1;
+		if (symax > height - 1)
+			symax = height - 1;
 
 		// Clip destination rectangle in destination image.
 		int dxmin = x + sxmin, dymin = y + symin, dxmax = x + sxmax, dymax = y + symax;
@@ -1154,10 +1154,8 @@ public class VirtualGraphics extends Graphics {
 				int length = w;
 
 				for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+						//System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : dest=" + (i + dstPosition) + " src=" + (i + srcPosition));
 					surface.data[i + dstPosition] = rgbData[i + srcPosition] |  0xFF000000;
-					
-//					if (Logging.TRACE_ENABLED)
-//						System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : dest=" + (i + dstPosition) + " src=" + (i + srcPosition));
 				}
 
 			}
