@@ -179,7 +179,7 @@ public class BDFFontPeer implements FontPeer {
 			System.out.println("SDLGraphics.drawString(): " + str + " x=" + x + " y=" + y + " color="
 					+ Long.toHexString(g.getColor()));
 
-		int color = g.getColor();
+		int color = vg.getInternalColor();
 		//int pw = surface.getWidth();
 		Rectangle r = vg.clipRectangle;
 
