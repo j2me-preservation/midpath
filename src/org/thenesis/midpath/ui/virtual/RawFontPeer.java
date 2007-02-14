@@ -133,7 +133,7 @@ public class RawFontPeer implements FontPeer {
 		int fh = FONTS_HEIGHT[font];
 		char data[] = FONTS_DATA[font];
 
-		int color = g.getColor();
+		int color = vg.getInternalColor();
 		int pw = surface.getWidth();
 
 		Rectangle r = vg.clipRectangle;

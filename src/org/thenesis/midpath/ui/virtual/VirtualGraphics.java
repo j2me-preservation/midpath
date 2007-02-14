@@ -38,7 +38,6 @@ public class VirtualGraphics extends Graphics {
 	public static final int MAX_ELLIPSE_RADIUS = 16384;
 
 	Rectangle clipRectangle = new Rectangle();
-
 	private int internalColor;
 
 	VirtualGraphics(VirtualSurface surface) {
@@ -69,6 +68,10 @@ public class VirtualGraphics extends Graphics {
 	 */
 	private void setInternalColor() {
 		internalColor = (rgbColor | 0xFF000000);
+	}
+	
+	public int getInternalColor() {
+		return internalColor;
 	}
 
 	/**
