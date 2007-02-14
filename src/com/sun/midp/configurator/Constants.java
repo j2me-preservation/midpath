@@ -151,7 +151,8 @@ public class Constants {
 	 * a pointer (press and release). Set to true when pointer is supported; 
 	 * set to false when pointer is not supported.
 	 */
-	public final static boolean POINTER_SUPPORTED = false;
+	public static boolean POINTER_SUPPORTED = true;
+	//public final static boolean POINTER_SUPPORTED = false;
 
 	/**
 	 * If your platform supports pointer motion and you want MIDP 
@@ -159,7 +160,8 @@ public class Constants {
 	 * otherwise, set it to false so that MIDP runtime can provide this 
 	 * information to MIDlet.
 	 */
-	public final static boolean MOTION_SUPPORTED = false;
+	public static boolean MOTION_SUPPORTED = true;
+	//public final static boolean MOTION_SUPPORTED = false;
 
 	/**
 	 * If your platform support key repeat and you want MIDP implementation 
@@ -575,7 +577,16 @@ public class Constants {
 		CHAM_FULLHEIGHT = height;
 		FULLWIDTH = width;
 		FULLHEIGHT = height;
-
+		
+		String pointerSupported = Configuration.getPropertyDefault("javax.microedition.lcdui.pointerSupported", "false");
+		String pointerMotionSupported = Configuration.getPropertyDefault("javax.microedition.lcdui.pointerMotionSupported", "false");
+		if (pointerSupported.equalsIgnoreCase("true")) {
+			POINTER_SUPPORTED = true;
+		}
+		if (pointerMotionSupported.equalsIgnoreCase("true")) {
+			 MOTION_SUPPORTED = true;
+		}
+		
 	}
 
 	

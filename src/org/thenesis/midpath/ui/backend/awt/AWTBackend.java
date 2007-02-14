@@ -6,6 +6,9 @@ import java.awt.Graphics;
 import java.awt.Panel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import org.thenesis.midpath.ui.virtual.UIBackend;
@@ -56,6 +59,8 @@ public class AWTBackend implements UIBackend {
 
 		frame = new Frame();
 		frame.addKeyListener(listener);
+		panel.addMouseListener(listener);
+		panel.addMouseMotionListener(listener);
 		frame.add(panel);
 		frame.pack();
 		frame.setVisible(true);
@@ -97,7 +102,7 @@ public class AWTBackend implements UIBackend {
 
 	}
 
-	private class AWTEventConverter implements KeyListener {
+	private class AWTEventConverter implements KeyListener, MouseListener, MouseMotionListener {
 
 		public void keyPressed(KeyEvent e) {
 
@@ -153,6 +158,71 @@ public class AWTBackend implements UIBackend {
 		}
 
 		public void keyTyped(KeyEvent e) {
+			// Not used
+		}
+
+		public void mouseClicked(MouseEvent e) {
+			// Not used
+		}
+
+		public void mouseEntered(MouseEvent e) {
+			// Not used
+		}
+
+		public void mouseExited(MouseEvent e) {
+			// Not used
+
+		}
+
+		public void mousePressed(MouseEvent e) {
+			
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] AWTBackend.mousePressed()");
+			
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+			nativeEvent.intParam1 = EventConstants.PRESSED; // Event type
+			nativeEvent.intParam2 = e.getX(); // x
+			nativeEvent.intParam3 = e.getY(); // y
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
+
+			EventQueue.getEventQueue().post(nativeEvent);
+
+		}
+
+		public void mouseReleased(MouseEvent e) {
+			
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] AWTBackend.mouseReleased()");
+
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+			nativeEvent.intParam1 = EventConstants.RELEASED; // Event type
+			nativeEvent.intParam2 = e.getX(); // x
+			nativeEvent.intParam3 = e.getY(); // y
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
+
+			EventQueue.getEventQueue().post(nativeEvent);
+
+		}
+
+		public void mouseDragged(MouseEvent e) {
+			
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] AWTBackend.mouseDragged()");
+			
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+			nativeEvent.intParam1 = EventConstants.DRAGGED; // Event type
+			nativeEvent.intParam2 = e.getX(); // x
+			nativeEvent.intParam3 = e.getY(); // y
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
+
+			EventQueue.getEventQueue().post(nativeEvent);
+
+		}
+
+		public void mouseMoved(MouseEvent e) {
 			// Not used
 		}
 

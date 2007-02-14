@@ -121,6 +121,8 @@ public class SDLEventPump implements Runnable {
 		
 		nativeEvent.intParam2 = event.getX(); // x
 		nativeEvent.intParam3 = event.getY(); // y
+		// Set event source (intParam4). Fake display with id=1
+		nativeEvent.intParam4 = 1;
 		
 		EventQueue.getEventQueue().post(nativeEvent);
 		
@@ -134,6 +136,8 @@ public class SDLEventPump implements Runnable {
 			nativeEvent.intParam1 = EventConstants.DRAGGED; // Event type
 			nativeEvent.intParam2 = event.getX(); // x
 			nativeEvent.intParam3 = event.getY(); // y
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
 		}
 		
 		EventQueue.getEventQueue().post(nativeEvent);
@@ -176,7 +180,6 @@ public class SDLEventPump implements Runnable {
 		
 		// Set event key code (intParam2)
 		nativeEvent.intParam2 = SDLEventMapper.mapToInternalEvent(keyCode);
-		
 		// Set event source (intParam4). Fake display with id=1
 		nativeEvent.intParam4 = 1;
 		
