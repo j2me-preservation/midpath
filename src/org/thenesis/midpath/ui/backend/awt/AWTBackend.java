@@ -58,10 +58,11 @@ public class AWTBackend implements UIBackend {
 		AWTEventConverter listener = new AWTEventConverter();
 
 		frame = new Frame();
-		frame.addKeyListener(listener);
+		panel.addKeyListener(listener);
 		panel.addMouseListener(listener);
 		panel.addMouseMotionListener(listener);
 		frame.add(panel);
+		frame.setResizable(false);
 		frame.pack();
 		frame.setVisible(true);
 	}
