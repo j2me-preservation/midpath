@@ -26,7 +26,7 @@ public class AWTBackend implements UIBackend {
 	private VirtualSurface rootVirtualSurface;
 	private Panel panel;
 	private Frame frame;
-	private BufferedImage screenImage;
+	protected BufferedImage screenImage;
 	private AWTEventMapper eventMapper = new AWTEventMapper();
 
 	public AWTBackend(int w, int h) {
