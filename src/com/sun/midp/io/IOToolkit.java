@@ -1,8 +1,8 @@
 package com.sun.midp.io;
 
-import org.thenesis.midpath.io.FileHandlerImpl;
-import org.thenesis.midpath.io.ServerSocketPeerImpl;
-import org.thenesis.midpath.io.SocketPeerImpl;
+import org.thenesis.midpath.io.backend.j2se.FileHandlerImpl;
+import org.thenesis.midpath.io.backend.j2se.ServerSocketPeerImpl;
+import org.thenesis.midpath.io.backend.j2se.SocketPeerImpl;
 
 import com.sun.midp.io.j2me.file.BaseFileHandler;
 import com.sun.midp.io.j2me.serversocket.ServerSocketPeer;
