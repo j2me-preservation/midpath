@@ -25,6 +25,8 @@ import java.awt.event.KeyEvent;
 
 import javax.microedition.lcdui.Canvas;
 
+import org.eclipse.swt.SWT;
+
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.lcdui.EventConstants;
@@ -33,18 +35,18 @@ public class SWTEventMapper implements EventMapper {
 
 	public int getGameAction(int keyCode) {
 		switch (keyCode) {
-		case Constants.KEYCODE_DOWN:
-			return Canvas.DOWN;
+		case SWT.F3:
+			return Canvas.GAME_A;
+		case SWT.F4:
+			return Canvas.GAME_B;
+		case SWT.F5:
+			return Canvas.GAME_C;
+		case SWT.F6:
+			return Canvas.GAME_D;
 		case Constants.KEYCODE_SELECT:
 			return Canvas.FIRE;
-		case KeyEvent.VK_A:
-			return Canvas.GAME_A;
-		case KeyEvent.VK_B:
-			return Canvas.GAME_B;
-		case KeyEvent.VK_C:
-			return Canvas.GAME_C;
-		case KeyEvent.VK_D:
-			return Canvas.GAME_D;
+		case Constants.KEYCODE_DOWN:
+			return Canvas.DOWN;
 		case Constants.KEYCODE_LEFT:
 			return Canvas.LEFT;
 		case Constants.KEYCODE_RIGHT:
@@ -58,18 +60,18 @@ public class SWTEventMapper implements EventMapper {
 
 	public int getKeyCode(int gameAction) {
 		switch (gameAction) {
-		case Canvas.DOWN:
-			return Constants.KEYCODE_DOWN;
+		case Canvas.GAME_A:
+			return SWT.F3;
+		case Canvas.GAME_B:
+			return SWT.F4;
+		case Canvas.GAME_C:
+			return SWT.F5;
+		case Canvas.GAME_D:
+			return SWT.F6;
 		case Canvas.FIRE:
 			return Constants.KEYCODE_SELECT;
-		case Canvas.GAME_A:
-			return KeyEvent.VK_A;
-		case Canvas.GAME_B:
-			return KeyEvent.VK_B;
-		case Canvas.GAME_C:
-			return KeyEvent.VK_C;
-		case Canvas.GAME_D:
-			return KeyEvent.VK_D;
+		case Canvas.DOWN:
+			return Constants.KEYCODE_DOWN;
 		case Canvas.LEFT:
 			return Constants.KEYCODE_LEFT;
 		case Canvas.RIGHT:
@@ -87,14 +89,14 @@ public class SWTEventMapper implements EventMapper {
 
 	public int getSystemKey(int keyCode) {
 		switch (keyCode) {
-		case KeyEvent.VK_BACK_SPACE:
-		case KeyEvent.VK_DELETE:
+		case SWT.BS:
+		case SWT.DEL:
 			return EventConstants.SYSTEM_KEY_CLEAR;
-		case KeyEvent.VK_END:
+		case SWT.END:
 			return EventConstants.SYSTEM_KEY_END;
-		case KeyEvent.VK_F12:
+		case SWT.F12:
 			return EventConstants.SYSTEM_KEY_POWER;
-		case KeyEvent.VK_ENTER:
+		case SWT.CR:
 			return EventConstants.SYSTEM_KEY_SEND;
 		default:
 			return 0;
@@ -103,87 +105,82 @@ public class SWTEventMapper implements EventMapper {
 
 	static int mapToInternalEvent(int keyCode, char c) {
 		switch (keyCode) {
-		case KeyEvent.VK_DOWN:
+		case SWT.ARROW_DOWN:
+			System.out.println("down !!");
 			return Constants.KEYCODE_DOWN;
-		case KeyEvent.VK_LEFT:
+		case SWT.ARROW_LEFT:
 			return Constants.KEYCODE_LEFT;
-		case KeyEvent.VK_RIGHT:
+		case SWT.ARROW_RIGHT:
 			return Constants.KEYCODE_RIGHT;
-		case KeyEvent.VK_ENTER:
-			return Constants.KEYCODE_SELECT;
-		case KeyEvent.VK_UP:
+		case SWT.ARROW_UP:
 			return Constants.KEYCODE_UP;
-		case KeyEvent.VK_F1:
+		case SWT.CR:
+			return Constants.KEYCODE_SELECT;
+		case SWT.F1:
 			return EventConstants.SOFT_BUTTON1;
-		case KeyEvent.VK_F2:
+		case SWT.F2:
 			return EventConstants.SOFT_BUTTON2;
-
-		case KeyEvent.VK_1:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM1;
-			}
-			return 0;
-		case KeyEvent.VK_2:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM2;
-			}
-			return 0;
-		case KeyEvent.VK_3:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM3;
-			}
-			return 0;
-		case KeyEvent.VK_4:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM4;
-			}
-			return 0;
-		case KeyEvent.VK_5:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM5;
-			}
-			return 0;
-		case KeyEvent.VK_6:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM6;
-			}
-			return 0;
-		case KeyEvent.VK_7:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM7;
-			}
-			return 0;
-		case KeyEvent.VK_8:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM8;
-			}
-			return 0;
-		case KeyEvent.VK_9:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM9;
-			}
-			return 0;
-		case KeyEvent.VK_0:
-			if (Character.isDigit(c)) {
-				return Canvas.KEY_NUM0;
-			}
-			return 0;
-		case KeyEvent.VK_MULTIPLY:
-		case KeyEvent.VK_ASTERISK:
+		case SWT.KEYPAD_1:
+			return Canvas.KEY_NUM1;
+		case SWT.KEYPAD_2:
+			return Canvas.KEY_NUM2;
+		case SWT.KEYPAD_3:
+			return Canvas.KEY_NUM3;
+		case SWT.KEYPAD_4:
+			return Canvas.KEY_NUM4;
+		case SWT.KEYPAD_5:
+			return Canvas.KEY_NUM5;
+		case SWT.KEYPAD_6:
+			return Canvas.KEY_NUM6;
+		case SWT.KEYPAD_7:
+			return Canvas.KEY_NUM7;
+		case SWT.KEYPAD_8:
+			return Canvas.KEY_NUM8;
+		case SWT.KEYPAD_9:
+			return Canvas.KEY_NUM9;
+		case SWT.KEYPAD_0:
+			return Canvas.KEY_NUM0;
+		case SWT.KEYPAD_MULTIPLY:
 			return Canvas.KEY_STAR;
-		case KeyEvent.VK_NUMBER_SIGN:
+		case SWT.BS:
+		case SWT.DEL:
+			return SWT.DEL;
+		case SWT.END:
+			return SWT.END;
+		case SWT.F12:
+			return SWT.F12;
+		}
+
+		switch (c) {
+		case '1':
+			return Canvas.KEY_NUM1;
+		case '2':
+			return Canvas.KEY_NUM2;
+		case '3':
+			return Canvas.KEY_NUM3;
+		case '4':
+			return Canvas.KEY_NUM4;
+		case '5':
+			return Canvas.KEY_NUM5;
+		case '6':
+			return Canvas.KEY_NUM6;
+		case '7':
+			return Canvas.KEY_NUM7;
+		case '8':
+			return Canvas.KEY_NUM8;
+		case '9':
+			return Canvas.KEY_NUM9;
+		case '0':
+			return Canvas.KEY_NUM0;
+		case '*':
+			return Canvas.KEY_STAR;
+		case '#':
 			return Canvas.KEY_POUND;
-		case KeyEvent.VK_BACK_SPACE:
-		case KeyEvent.VK_DELETE:
-			return KeyEvent.VK_DELETE;
-		case KeyEvent.VK_END:
-			return KeyEvent.VK_END;
-		case KeyEvent.VK_F12:
-			return KeyEvent.VK_F12;
 		default:
 			return 0;
-			//return keyCode;
 		}
+		
+
 	}
 
 }
