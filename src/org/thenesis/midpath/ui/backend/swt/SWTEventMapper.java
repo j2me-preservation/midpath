@@ -106,7 +106,6 @@ public class SWTEventMapper implements EventMapper {
 	static int mapToInternalEvent(int keyCode, char c) {
 		switch (keyCode) {
 		case SWT.ARROW_DOWN:
-			System.out.println("down !!");
 			return Constants.KEYCODE_DOWN;
 		case SWT.ARROW_LEFT:
 			return Constants.KEYCODE_LEFT;

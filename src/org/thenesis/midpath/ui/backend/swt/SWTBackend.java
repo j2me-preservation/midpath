@@ -3,6 +3,9 @@ package org.thenesis.midpath.ui.backend.swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -20,34 +23,25 @@ import com.sun.midp.events.NativeEvent;
 import com.sun.midp.lcdui.EventConstants;
 import com.sun.midp.log.Logging;
 
-public class SWTBackend implements UIBackend {
+public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListener, MouseMoveListener {
 
 	private VirtualSurface rootVirtualSurface;
-
 	private SWTEventMapper eventMapper = new SWTEventMapper();
+
 	private ImageData imageData;
 	private Image image;
 	private GC gc;
 	private Runnable painterRunnable;
 	private Display display;
 	private Shell shell;
-	SWTThread swtThread;
+	private Thread swtThread;
+	private boolean dragEnabled = false;
+
+	private volatile boolean initialized = false;
 
 	public SWTBackend(int w, int h) {
-
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-
-		swtThread = new SWTThread();
-		swtThread.start();
-
-		try {
-			while (!swtThread.initialized) {
-				Thread.sleep(1);
-			}
-		} catch (InterruptedException e) {
-			// Do nothing
-		}
-
+		start();
 	}
 
 	public EventMapper getEventMapper() {
@@ -92,105 +86,176 @@ public class SWTBackend implements UIBackend {
 		}
 
 	}
+	
+	/*
+	 * SWT thread
+	 */
 
-	private class SWTThread extends Thread implements KeyListener {
+	private void start() {
 
-		public volatile boolean initialized = false;
+		swtThread = new Thread(this);
+		swtThread.start();
 
-		public void keyPressed(KeyEvent e) {
-
-			if (Logging.TRACE_ENABLED)
-				System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + e.character);
-
-			char c = e.character;
-
-			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
-			// Set event type (intParam1)
-			nativeEvent.intParam1 = EventConstants.PRESSED;
-			// Set event key code (intParam2)
-			int internalCode = SWTEventMapper.mapToInternalEvent(e.keyCode, c);
-			if (internalCode != 0) {
-				nativeEvent.intParam2 = internalCode;
-			} //else if ((c != KeyEvent.CHAR_UNDEFINED) && (e.keyCode != KeyEvent.VK_SHIFT)) {
-			//	nativeEvent.intParam2 = c;
-			else {
-				return;
+		// FIXME Ugly
+		try {
+			while (!initialized) {
+				Thread.sleep(1);
 			}
+		} catch (InterruptedException e) {
+			// Do nothing
+		}
+
+	}
+
+	public void run() {
+
+		int w = rootVirtualSurface.width;
+		int h = rootVirtualSurface.height;
+
+		display = new Display();
+		shell = new Shell(display);
+		shell.setText("");
+
+		Canvas canvas = new Canvas(shell, SWT.NONE);
+		canvas.setSize(w, h);
+		PaletteData palette = new PaletteData(0x00FF0000, 0x0000FF00, 0x000000FF);
+		imageData = new ImageData(w, h, 32, palette);
+		gc = new GC(canvas);
+
+		painterRunnable = new Runnable() {
+
+			public void run() {
+				image = new Image(display, imageData);
+				gc.drawImage(image, 0, 0);
+				image.dispose();
+			}
+		};
+
+		canvas.addKeyListener(this);
+		canvas.addMouseListener(this);
+		canvas.addMouseMoveListener(this);
+		canvas.forceFocus();
+		shell.pack();
+		shell.open();
+
+		initialized = true;
+
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
+		gc.dispose();
+		display.dispose();
+
+	}
+
+	public void keyPressed(KeyEvent e) {
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + e.character);
+
+		char c = e.character;
+
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
+		// Set event type (intParam1)
+		nativeEvent.intParam1 = EventConstants.PRESSED;
+		// Set event key code (intParam2)
+		int internalCode = SWTEventMapper.mapToInternalEvent(e.keyCode, c);
+		if (internalCode != 0) {
+			nativeEvent.intParam2 = internalCode;
+		} else if ((e.keyCode != SWT.SHIFT) && (e.keyCode != SWT.CONTROL)) {
+			nativeEvent.intParam2 = c;
+		} else {
+			return;
+		}
+		// Set event source (intParam4). Fake display with id=1
+		nativeEvent.intParam4 = 1;
+
+		EventQueue.getEventQueue().post(nativeEvent);
+
+	}
+
+	public void keyReleased(KeyEvent e) {
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] SWTBackend.keyReleased(): key code: " + e.keyCode + " char: " + e.character);
+
+		char c = e.character;
+
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
+		// Set event type (intParam1)
+		nativeEvent.intParam1 = EventConstants.RELEASED;
+		// Set event key code (intParam2)
+		int internalCode = SWTEventMapper.mapToInternalEvent(e.keyCode, c);
+		if (internalCode != 0) {
+			nativeEvent.intParam2 = internalCode;
+		} else if ((e.keyCode != SWT.SHIFT) && (e.keyCode != SWT.CONTROL)) {
+			nativeEvent.intParam2 = c;
+		} else {
+			return;
+		}
+		// Set event source (intParam4). Fake display with id=1
+		nativeEvent.intParam4 = 1;
+
+		EventQueue.getEventQueue().post(nativeEvent);
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// Not used
+	}
+
+	public void mouseDoubleClick(MouseEvent arg0) {
+		// Not used
+	}
+
+	public void mouseDown(MouseEvent e) {
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] SWTBackend.mouseDown()");
+
+		dragEnabled = true;
+
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+		nativeEvent.intParam1 = EventConstants.PRESSED; // Event type
+		nativeEvent.intParam2 = e.x; // x
+		nativeEvent.intParam3 = e.y; // y
+		// Set event source (intParam4). Fake display with id=1
+		nativeEvent.intParam4 = 1;
+
+		EventQueue.getEventQueue().post(nativeEvent);
+
+	}
+
+	public void mouseUp(MouseEvent e) {
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] SWTBackend.mouseUp()");
+
+		dragEnabled = false;
+
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+		nativeEvent.intParam1 = EventConstants.RELEASED; // Event type
+		nativeEvent.intParam2 = e.x; // x
+		nativeEvent.intParam3 = e.y; // y
+		// Set event source (intParam4). Fake display with id=1
+		nativeEvent.intParam4 = 1;
+
+		EventQueue.getEventQueue().post(nativeEvent);
+
+	}
+
+	public void mouseMove(MouseEvent e) {
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] SWTBackend.mouseDragged(): " + dragEnabled);
+
+		if (dragEnabled) {
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+			nativeEvent.intParam1 = EventConstants.DRAGGED; // Event type
+			nativeEvent.intParam2 = e.x; // x
+			nativeEvent.intParam3 = e.y; // y
 			// Set event source (intParam4). Fake display with id=1
 			nativeEvent.intParam4 = 1;
 
 			EventQueue.getEventQueue().post(nativeEvent);
-
-		}
-
-		public void keyReleased(KeyEvent e) {
-
-			if (Logging.TRACE_ENABLED)
-				System.out
-						.println("[DEBUG] SWTBackend.keyReleased(): key code: " + e.keyCode + " char: " + e.character);
-
-			char c = e.character;
-
-			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
-			// Set event type (intParam1)
-			nativeEvent.intParam1 = EventConstants.RELEASED;
-			// Set event key code (intParam2)
-			int internalCode = SWTEventMapper.mapToInternalEvent(e.keyCode, c);
-			if (internalCode != 0) {
-				nativeEvent.intParam2 = internalCode;
-			} //else if ((c != KeyEvent.CHAR_UNDEFINED) && (e.keyCode != KeyEvent.VK_SHIFT)) {
-			//	nativeEvent.intParam2 = c;
-			else {
-				return;
-			}
-			// Set event source (intParam4). Fake display with id=1
-			nativeEvent.intParam4 = 1;
-
-			EventQueue.getEventQueue().post(nativeEvent);
-		}
-
-		public void keyTyped(KeyEvent e) {
-			// Not used
-		}
-
-		public void run() {
-
-			int w = rootVirtualSurface.width;
-			int h = rootVirtualSurface.height;
-
-			display = new Display();
-			shell = new Shell(display);
-			shell.setText("");
-			shell.forceFocus();
-
-			Canvas canvas = new Canvas(shell, SWT.NONE);
-			canvas.setSize(w, h);
-			PaletteData palette = new PaletteData(0x00FF0000, 0x0000FF00, 0x000000FF);
-			imageData = new ImageData(w, h, 32, palette);
-			gc = new GC(canvas);
-
-			painterRunnable = new Runnable() {
-
-				public void run() {
-					image = new Image(display, imageData);
-					gc.drawImage(image, 0, 0);
-					image.dispose();
-				}
-			};
-
-			shell.addKeyListener(this);
-			shell.pack();
-			shell.open();
-
-			initialized = true;
-
-			while (!shell.isDisposed()) {
-				if (!display.readAndDispatch())
-					display.sleep();
-			}
-			gc.dispose();
-			display.dispose();
-
 		}
 
 	}
