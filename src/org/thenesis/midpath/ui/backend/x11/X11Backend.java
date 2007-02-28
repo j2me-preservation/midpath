@@ -25,12 +25,19 @@ import gnu.x11.event.ClientMessage;
 import gnu.x11.event.Event;
 import gnu.x11.event.Expose;
 import gnu.x11.event.KeyPress;
+import gnu.x11.event.KeyRelease;
 import gnu.x11.image.ZPixmap;
+import gnu.x11.keysym.Misc;
 
 import org.thenesis.midpath.ui.virtual.UIBackend;
 import org.thenesis.midpath.ui.virtual.VirtualSurface;
 
 import com.sun.midp.events.EventMapper;
+import com.sun.midp.events.EventQueue;
+import com.sun.midp.events.EventTypes;
+import com.sun.midp.events.NativeEvent;
+import com.sun.midp.lcdui.EventConstants;
+import com.sun.midp.log.Logging;
 
 public class X11Backend implements UIBackend {
 
@@ -91,7 +98,7 @@ public class X11Backend implements UIBackend {
 
 		private Thread thread;
 		private volatile boolean running = true;
-		
+
 		public Event event;
 		public boolean leave_display_open;
 		public Window window;
@@ -104,7 +111,7 @@ public class X11Backend implements UIBackend {
 		private int height;
 
 		public void start() {
-			
+
 			option = new Option(args);
 			String env = gnu.util.Environment.value("DISPLAY");
 			Display.Name display_name = option.display_name("display", "X server to connect to", new Display.Name(env));
@@ -120,18 +127,19 @@ public class X11Backend implements UIBackend {
 			Window.Attributes win_attr = new Window.Attributes();
 			win_attr.set_background(display.default_white);
 			win_attr.set_border(display.default_black);
-			win_attr.set_event_mask(Event.BUTTON_PRESS_MASK | Event.EXPOSURE_MASK | Event.KEY_PRESS_MASK);
+			win_attr.set_event_mask(Event.BUTTON_PRESS_MASK | Event.BUTTON_RELEASE_MASK | Event.EXPOSURE_MASK
+					| Event.KEY_PRESS_MASK | Event.KEY_RELEASE_MASK | Event.POINTER_MOTION_MASK);
 			window = new Window(display.default_root, 10, 10, width, height, 5, win_attr);
 
 			window.set_wm(this, "main");
 			window.set_wm_delete_window();
 			window.map();
-			
+
 			// Wait while the window is not shown
 			while (!exposed) {
 				dispatch_event();
 			}
-			
+
 			// Start event thread
 			thread = new Thread(this);
 			thread.start();
@@ -148,9 +156,10 @@ public class X11Backend implements UIBackend {
 		}
 
 		public void dispatch_event() {
-			System.out.println("blocking-read event");
 			event = display.next_event();
-			System.out.println("got event " + event);
+
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] X11Backend.dispatch_event(): " + event);
 
 			switch (event.code()) {
 			case gnu.x11.event.ButtonPress.CODE:
@@ -163,21 +172,33 @@ public class X11Backend implements UIBackend {
 
 			case Expose.CODE:
 				exposed = true;
+				paint();
 				break;
 
-			case KeyPress.CODE: {
+			case KeyPress.CODE: 
+			{
 				KeyPress e = (KeyPress) event;
-
 				int keycode = e.detail();
 				int keystate = e.state();
 				int keysym = display.input.keycode_to_keysym(keycode, keystate);
+				processKeyEvent(keycode, keystate, (char)keysym, true);
 
 				//		      if (keysym == 'q' || keysym == 'Q' 
 				//		        || keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();
-				break;
-
 			}
+			break;
+			
+			case KeyRelease.CODE:
+			{
+				KeyRelease e = (KeyRelease) event;
+				int keycode = e.detail();
+				int keystate = e.state();
+				int keysym = display.input.keycode_to_keysym(keycode, keystate);
+				processKeyEvent(keycode, keystate, (char)keysym, false);
 			}
+			break;
+			}
+			
 		}
 
 		public void setPixels(int startX, int startY, int w, int h, int[] rgbArray, int offset, int scansize) {
@@ -194,12 +215,32 @@ public class X11Backend implements UIBackend {
 
 		public void run() {
 
-			
 			while (running)
 				dispatch_event();
 
 			if (!leave_display_open)
 				display.close();
+		}
+		
+		public void processKeyEvent(int keycode, int keystate, char c, boolean pressed) {
+			
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
+			// Set event type (intParam1)
+			nativeEvent.intParam1 = pressed ? EventConstants.PRESSED : EventConstants.RELEASED;
+			// Set event key code (intParam2)
+			int internalCode = X11EventMapper.mapToInternalEvent(keycode, c);
+			if (internalCode != 0) {
+				nativeEvent.intParam2 = internalCode;
+			} else if ((c != Misc.SHIFT_L) && (c != Misc.SHIFT_R) && (c != Misc.ALT_L) && (c != Misc.ALT_R) ) {
+				nativeEvent.intParam2 = c;
+			} else {
+				return;
+			}
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
+
+			EventQueue.getEventQueue().post(nativeEvent);
+			
 		}
 
 		//		public void keyPressed(KeyEvent e) {

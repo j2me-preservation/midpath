@@ -100,7 +100,7 @@ public class X11EventMapper implements EventMapper {
 	}
 
 	static int mapToInternalEvent(int keyCode, char c) {
-		switch (keyCode) {
+		switch (c) {
 		case Misc.DOWN:
 			return Constants.KEYCODE_DOWN;
 		case Misc.LEFT:
