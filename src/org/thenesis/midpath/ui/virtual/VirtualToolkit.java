@@ -32,6 +32,7 @@ import javax.microedition.lcdui.Toolkit;
 import org.thenesis.midpath.ui.backend.awt.AWTBackend;
 import org.thenesis.midpath.ui.backend.awt.AWTGrabberBackend;
 import org.thenesis.midpath.ui.backend.swt.SWTBackend;
+import org.thenesis.midpath.ui.backend.x11.X11Backend;
 
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.log.Logging;
@@ -60,6 +61,8 @@ public class VirtualToolkit extends Toolkit {
 			backend = new AWTGrabberBackend(w, h);
 		} else if (backendName.equalsIgnoreCase("SWT")) {
 			backend = new SWTBackend(w, h);
+		} else if (backendName.equalsIgnoreCase("X11")) {
+			backend = new X11Backend(w, h);
 		} else {
 			backend = new NullBackend(w, h);
 		}
