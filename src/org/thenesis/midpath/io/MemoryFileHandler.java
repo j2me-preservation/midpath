@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -15,17 +15,11 @@
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
- * 
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 or visit www.sun.com if you need additional
- * information or have any questions. 
  */
 package org.thenesis.midpath.io;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -37,17 +31,17 @@ import com.sun.midp.log.Logging;
 public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 	
 	private static Hashtable fileSystem = new Hashtable();
+	private static String DEFAULT_ROOT_NAME = "/";
 	
-	private File file;
 	private String rootName;
 	private String absFile;
-	private RandomAccessFile randomAccessFile;
 	private boolean canRead = true;
 	private boolean canWrite = true;
 	private RandomAccessArray randomAccessArray;
 	private boolean isDirectory = false;
 	private boolean isClosed = false;
 	private boolean isHidden = false;
+	private long timeStamp;
 	
 	public MemoryFileHandler() {}
 
@@ -82,14 +76,20 @@ public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 
 	public void create() throws IOException {
 		
+		if (!rootName.equals(DEFAULT_ROOT_NAME)) {
+			throw new IOException("Unknown file system root");
+		}
+		
 		fileSystem.put(rootName+ absFile, this);
 		randomAccessArray = new RandomAccessArray();
 		
-//		if (!file.createNewFile()) {
-//			throw new IOException("Can't create file");
-//		}
+		setTimeStamp();
 		
 		// TODO Check if out of memory
+	}
+	
+	public void setTimeStamp() {
+		timeStamp = System.currentTimeMillis();
 	}
 
 	public void createPrivateDir(String rootName) throws IOException {
@@ -111,7 +111,6 @@ public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 	}
 
 	public String illegalFileNameChars() {
-		// TODO
 		return "";
 	}
 
@@ -124,54 +123,38 @@ public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 	}
 
 	public long lastModified() {
-		return file.lastModified();
+		return timeStamp;
 	}
 
 	public Vector list(final String filter, boolean includeHidden) throws IOException {
 		
-		if(!file.isDirectory()) {
+		if(!isDirectory) {
 			new IOException("File is not a directory");
 		}
 		
-		FilenameFilter fileFilter = new FilenameFilter() {
-			public boolean accept(File dir, String filename) {
-				return filterAccept(filter, filename);
+		Vector filteredList = new Vector();
+		String directoryPath = rootName+ absFile;
+		
+		Enumeration e = fileSystem.keys();
+		while(e.hasMoreElements()) {
+			String node = (String)e.nextElement();
+			MemoryFileHandler fileHandler = (MemoryFileHandler)fileSystem.get(node);
+			
+			if (!fileHandler.isDirectory()) {
+				String filename = node.substring(directoryPath.length());
+				if (filterAccept(filter, filename))
+					filteredList.add(filename);
 			}
-		};
-		
-		String[] filenames;
-		if(filter == null) {
-			filenames = file.list();
-		} else {
-			// TODO Doesn't work yet
-			filenames = file.list(fileFilter);
 		}
 		
-		Vector v = new Vector();
-		for (int i = 0; i < filenames.length; i++) {
-			v.add(filenames[i]);
-		}
-		
-		return v;
+		return filteredList;
 	}
 	
 
 	public Vector listRoots() {
-		
-		File[] files = File.listRoots();
 		Vector v = new Vector();
-		for (int i = 0; i < files.length; i++) {
-			// Add a path separator to the end of the file root if needed
-			String rootFilename = files[i].getAbsolutePath();
-			rootFilename = rootFilename.replace('\\', '/');
-			if (!rootFilename.endsWith("/")) {
-				rootFilename += "/";
-			}
-			v.add(rootFilename);
-		}
-		
+		v.add(DEFAULT_ROOT_NAME);
 		return v;
-		
 	}
 
 	public void mkdir() throws IOException {
@@ -224,7 +207,7 @@ public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 	}
 
 	public void truncate(long byteOffset) throws IOException {
-		if (randomAccessFile == null) {
+		if (randomAccessArray == null) {
 			throw new IOException();
 		}
 		setLength((int)byteOffset);
