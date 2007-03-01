@@ -21,11 +21,14 @@ import gnu.x11.Connection;
 import gnu.x11.Display;
 import gnu.x11.Option;
 import gnu.x11.Window;
+import gnu.x11.event.ButtonPress;
+import gnu.x11.event.ButtonRelease;
 import gnu.x11.event.ClientMessage;
 import gnu.x11.event.Event;
 import gnu.x11.event.Expose;
 import gnu.x11.event.KeyPress;
 import gnu.x11.event.KeyRelease;
+import gnu.x11.event.MotionNotify;
 import gnu.x11.image.ZPixmap;
 import gnu.x11.keysym.Misc;
 
@@ -46,20 +49,9 @@ public class X11Backend implements UIBackend {
 	private X11EventMapper eventMapper = new X11EventMapper();
 
 	public X11Backend(int w, int h) {
-
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-
 		x11App = new X11Application(new String[] { "" }, w, h);
 		x11App.start();
-
-		//		frame = new Frame();
-		//		panel.addKeyListener(listener);
-		//		panel.addMouseListener(listener);
-		//		panel.addMouseMotionListener(listener);
-		//		frame.add(panel);
-		//		frame.setResizable(false);
-		//		frame.pack();
-		//		frame.setVisible(true);
 	}
 
 	public EventMapper getEventMapper() {
@@ -75,23 +67,16 @@ public class X11Backend implements UIBackend {
 	}
 
 	public void updateSurfacePixels(int x, int y, long width, long height) {
-
 		x11App.setPixels(x, y, (int) width, (int) height, rootVirtualSurface.data, 0, rootVirtualSurface.width);
 		x11App.paint();
-
-		//screenImage.setRGB(0, 0, w, h, rootVirtualSurface.data, 0, w);
-		//panel.repaint();
-
 	}
 
 	private class VirtualSurfaceImpl extends VirtualSurface {
-
 		public VirtualSurfaceImpl(int w, int h) {
 			data = new int[w * h];
 			this.width = w;
 			this.height = h;
 		}
-
 	}
 
 	private class X11Application implements Runnable {
@@ -109,6 +94,7 @@ public class X11Backend implements UIBackend {
 		private String[] args;
 		private int width;
 		private int height;
+		private boolean dragEnabled;
 
 		public void start() {
 
@@ -154,53 +140,7 @@ public class X11Backend implements UIBackend {
 			this.width = width;
 			this.height = height;
 		}
-
-		public void dispatch_event() {
-			event = display.next_event();
-
-			if (Logging.TRACE_ENABLED)
-				System.out.println("[DEBUG] X11Backend.dispatch_event(): " + event);
-
-			switch (event.code()) {
-			case gnu.x11.event.ButtonPress.CODE:
-
-				break;
-
-			case ClientMessage.CODE:
-				//if (((ClientMessage) event).delete_window ())
-				break;
-
-			case Expose.CODE:
-				exposed = true;
-				paint();
-				break;
-
-			case KeyPress.CODE: 
-			{
-				KeyPress e = (KeyPress) event;
-				int keycode = e.detail();
-				int keystate = e.state();
-				int keysym = display.input.keycode_to_keysym(keycode, keystate);
-				processKeyEvent(keycode, keystate, (char)keysym, true);
-
-				//		      if (keysym == 'q' || keysym == 'Q' 
-				//		        || keysym == gnu.x11.keysym.Misc.ESCAPE) exit ();
-			}
-			break;
-			
-			case KeyRelease.CODE:
-			{
-				KeyRelease e = (KeyRelease) event;
-				int keycode = e.detail();
-				int keystate = e.state();
-				int keysym = display.input.keycode_to_keysym(keycode, keystate);
-				processKeyEvent(keycode, keystate, (char)keysym, false);
-			}
-			break;
-			}
-			
-		}
-
+		
 		public void setPixels(int startX, int startY, int w, int h, int[] rgbArray, int offset, int scansize) {
 			for (int y = startX; y < startY + h; y++) {
 				for (int x = startX; x < startX + w; x++) {
@@ -221,9 +161,65 @@ public class X11Backend implements UIBackend {
 			if (!leave_display_open)
 				display.close();
 		}
-		
-		public void processKeyEvent(int keycode, int keystate, char c, boolean pressed) {
-			
+
+		public void dispatch_event() {
+			event = display.next_event();
+
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] X11Backend.dispatch_event(): " + event);
+
+			switch (event.code()) {
+			case ClientMessage.CODE:
+				//if (((ClientMessage) event).delete_window ())
+				break;
+			case Expose.CODE:
+				exposed = true;
+				paint();
+				break;
+			case KeyPress.CODE: {
+				KeyPress e = (KeyPress) event;
+				int keycode = e.detail();
+				int keystate = e.state();
+				int keysym = display.input.keycode_to_keysym(keycode, keystate);
+				fireKeyEvent(keycode, keystate, (char) keysym, true);
+			}
+				break;
+			case KeyRelease.CODE: {
+				KeyRelease e = (KeyRelease) event;
+				int keycode = e.detail();
+				int keystate = e.state();
+				int keysym = display.input.keycode_to_keysym(keycode, keystate);
+				fireKeyEvent(keycode, keystate, (char) keysym, false);
+			}
+				break;
+			case ButtonPress.CODE: {
+				dragEnabled = true;
+				ButtonPress e = (ButtonPress) event;
+				firePointerPressureEvent(e.event_x(), e.event_y(), true);
+			}
+				break;
+			case ButtonRelease.CODE: {
+				dragEnabled = false;
+				ButtonRelease e = (ButtonRelease) event;
+				firePointerPressureEvent(e.event_x(), e.event_y(), false);
+			}
+				break;
+			case MotionNotify.CODE: {
+				if (dragEnabled) {
+					MotionNotify e = (MotionNotify) event;
+					firePointerDraggedEvent(e.event_x(), e.event_y());
+				}
+			}
+				break;
+			}
+
+		}
+
+		public void fireKeyEvent(int keycode, int keystate, char c, boolean pressed) {
+
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] SWTBackend.processKeyEvent()");
+
 			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
 			// Set event type (intParam1)
 			nativeEvent.intParam1 = pressed ? EventConstants.PRESSED : EventConstants.RELEASED;
@@ -231,7 +227,7 @@ public class X11Backend implements UIBackend {
 			int internalCode = X11EventMapper.mapToInternalEvent(keycode, c);
 			if (internalCode != 0) {
 				nativeEvent.intParam2 = internalCode;
-			} else if ((c != Misc.SHIFT_L) && (c != Misc.SHIFT_R) && (c != Misc.ALT_L) && (c != Misc.ALT_R) ) {
+			} else if ((c != Misc.SHIFT_L) && (c != Misc.SHIFT_R) && (c != Misc.ALT_L) && (c != Misc.ALT_R)) {
 				nativeEvent.intParam2 = c;
 			} else {
 				return;
@@ -240,130 +236,39 @@ public class X11Backend implements UIBackend {
 			nativeEvent.intParam4 = 1;
 
 			EventQueue.getEventQueue().post(nativeEvent);
-			
+
 		}
 
-		//		public void keyPressed(KeyEvent e) {
-		//
-		//			if (Logging.TRACE_ENABLED)
-		//				System.out.println("[DEBUG] AWTBackend.keyPressed(): key code: " + e.getKeyCode() + " char: "
-		//						+ e.getKeyChar());
-		//
-		//			char c = e.getKeyChar();
-		//
-		//			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
-		//			// Set event type (intParam1)
-		//			nativeEvent.intParam1 = EventConstants.PRESSED;
-		//			// Set event key code (intParam2)
-		//			int internalCode = X11EventMapper.mapToInternalEvent(e.getKeyCode(), c);
-		//			if (internalCode != 0) {
-		//				nativeEvent.intParam2 = internalCode;
-		//			} else if ((c != KeyEvent.CHAR_UNDEFINED) && (e.getKeyCode() != KeyEvent.VK_SHIFT)) {
-		//				nativeEvent.intParam2 = c;
-		//			} else {
-		//				return;
-		//			}
-		//			// Set event source (intParam4). Fake display with id=1
-		//			nativeEvent.intParam4 = 1;
-		//
-		//			EventQueue.getEventQueue().post(nativeEvent);
-		//
-		//		}
-		//
-		//		public void keyReleased(KeyEvent e) {
-		//
-		//			if (Logging.TRACE_ENABLED)
-		//				System.out.println("[DEBUG] AWTBackend.keyReleased(): key code: " + e.getKeyCode() + " char: "
-		//						+ e.getKeyChar());
-		//
-		//			char c = e.getKeyChar();
-		//
-		//			NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
-		//			// Set event type (intParam1)
-		//			nativeEvent.intParam1 = EventConstants.RELEASED;
-		//			// Set event key code (intParam2)
-		//			int internalCode = X11EventMapper.mapToInternalEvent(e.getKeyCode(), c);
-		//			if (internalCode != 0) {
-		//				nativeEvent.intParam2 = internalCode;
-		//			} else if ((c != KeyEvent.CHAR_UNDEFINED) && (e.getKeyCode() != KeyEvent.VK_SHIFT)) {
-		//				nativeEvent.intParam2 = c;
-		//			} else {
-		//				return;
-		//			}
-		//			// Set event source (intParam4). Fake display with id=1
-		//			nativeEvent.intParam4 = 1;
-		//
-		//			EventQueue.getEventQueue().post(nativeEvent);
-		//		}
-		//
-		//		public void keyTyped(KeyEvent e) {
-		//			// Not used
-		//		}
-		//
-		//		public void mouseClicked(MouseEvent e) {
-		//			// Not used
-		//		}
-		//
-		//		public void mouseEntered(MouseEvent e) {
-		//			// Not used
-		//		}
-		//
-		//		public void mouseExited(MouseEvent e) {
-		//			// Not used
-		//
-		//		}
-		//
-		//		public void mousePressed(MouseEvent e) {
-		//
-		//			if (Logging.TRACE_ENABLED)
-		//				System.out.println("[DEBUG] AWTBackend.mousePressed()");
-		//
-		//			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
-		//			nativeEvent.intParam1 = EventConstants.PRESSED; // Event type
-		//			nativeEvent.intParam2 = e.getX(); // x
-		//			nativeEvent.intParam3 = e.getY(); // y
-		//			// Set event source (intParam4). Fake display with id=1
-		//			nativeEvent.intParam4 = 1;
-		//
-		//			EventQueue.getEventQueue().post(nativeEvent);
-		//
-		//		}
-		//
-		//		public void mouseReleased(MouseEvent e) {
-		//
-		//			if (Logging.TRACE_ENABLED)
-		//				System.out.println("[DEBUG] AWTBackend.mouseReleased()");
-		//
-		//			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
-		//			nativeEvent.intParam1 = EventConstants.RELEASED; // Event type
-		//			nativeEvent.intParam2 = e.getX(); // x
-		//			nativeEvent.intParam3 = e.getY(); // y
-		//			// Set event source (intParam4). Fake display with id=1
-		//			nativeEvent.intParam4 = 1;
-		//
-		//			EventQueue.getEventQueue().post(nativeEvent);
-		//
-		//		}
-		//
-		//		public void mouseDragged(MouseEvent e) {
-		//
-		//			if (Logging.TRACE_ENABLED)
-		//				System.out.println("[DEBUG] AWTBackend.mouseDragged()");
-		//
-		//			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
-		//			nativeEvent.intParam1 = EventConstants.DRAGGED; // Event type
-		//			nativeEvent.intParam2 = e.getX(); // x
-		//			nativeEvent.intParam3 = e.getY(); // y
-		//			// Set event source (intParam4). Fake display with id=1
-		//			nativeEvent.intParam4 = 1;
-		//
-		//			EventQueue.getEventQueue().post(nativeEvent);
-		//
-		//		}
-		//
-		//		public void mouseMoved(MouseEvent e) {
-		//			// Not used
-		//		}
+		private void firePointerPressureEvent(int x, int y, boolean pressed) {
+
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] SWTBackend.processPointerPressedEvent()");
+
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+			nativeEvent.intParam1 = pressed ? EventConstants.PRESSED : EventConstants.RELEASED; // Event type
+			nativeEvent.intParam2 = x; // x
+			nativeEvent.intParam3 = y; // y
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
+
+			EventQueue.getEventQueue().post(nativeEvent);
+
+		}
+
+		private void firePointerDraggedEvent(int x, int y) {
+
+			if (Logging.TRACE_ENABLED)
+				System.out.println("[DEBUG] SWTBackend.processPointerDraggedEvent()");
+
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
+			nativeEvent.intParam1 = EventConstants.DRAGGED; // Event type
+			nativeEvent.intParam2 = x; // x
+			nativeEvent.intParam3 = y; // y
+			// Set event source (intParam4). Fake display with id=1
+			nativeEvent.intParam4 = 1;
+
+			EventQueue.getEventQueue().post(nativeEvent);
+		}
 
 	}
 
