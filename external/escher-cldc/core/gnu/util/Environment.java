@@ -1,5 +1,7 @@
 package gnu.util;
 
+import java.util.Hashtable;
+
 
 
 /** Unix environment. */
@@ -9,6 +11,8 @@ public class Environment {
    * <code>"\n"</code> to aid searching.
    */
   public static String ALL;
+  
+  private static Hashtable envVariables = new Hashtable();
 
 
 //  static {
@@ -32,7 +36,7 @@ public class Environment {
 
 
   /** Get the value of an environment variable. */
-  public static String value (String name) {
+  public static String getValue (String name) {
     /* A search key is prefixed with "\n" to avoid partial matching such as
      * matching `HOSTDISPLAY=canning-home:0.0' instead of `DISPLAY=:0.0'. 
      */
@@ -44,11 +48,17 @@ public class Environment {
 //    int value_end = ALL.indexOf ('\n', value_start);
 //    return ALL.substring (value_start, value_end);
 	  
-	  String value = System.getProperty(name);
-	  if (name.equalsIgnoreCase("DISPLAY") && value == null) {
-		  return ":2.0";
-	  }
+	  String value = (String)envVariables.get(name);
+//	  if (name.equalsIgnoreCase("DISPLAY") && value == null) {
+//		  return "192.168.1.1:1.0";
+//	  }
 	  return value;
 	  
   }
+  
+  public static void setValue(String name, String value) {
+	  envVariables.put(name, value);
+  }
+  
+  
 }

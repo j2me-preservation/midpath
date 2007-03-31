@@ -39,7 +39,7 @@ public class Application extends gnu.app.Application {
 
     // cast `gnu.util.Option option' to `gnu.x11.Option'
     option = (Option) super.option;
-    String env = gnu.util.Environment.value ("DISPLAY");
+    String env = gnu.util.Environment.getValue ("DISPLAY");
     Display.Name display_name = option.display_name ("display",
       "X server to connect to", new Display.Name (env));
 

@@ -17,6 +17,7 @@
  */
 package org.thenesis.midpath.ui.backend.x11;
 
+import gnu.util.Environment;
 import gnu.x11.Connection;
 import gnu.x11.Display;
 import gnu.x11.Option;
@@ -41,6 +42,7 @@ import com.sun.midp.events.EventTypes;
 import com.sun.midp.events.NativeEvent;
 import com.sun.midp.lcdui.EventConstants;
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 
 public class X11Backend implements UIBackend {
 
@@ -49,7 +51,12 @@ public class X11Backend implements UIBackend {
 	private X11EventMapper eventMapper = new X11EventMapper();
 
 	public X11Backend(int w, int h) {
+		
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
+		
+		String display = Configuration.getPropertyDefault("org.thenesis.midpath.ui.backend.x11.Display", ":0.0");
+		Environment.setValue("DISPLAY", display);
+		
 		x11App = new X11Application(new String[] { "" }, w, h);
 		x11App.start();
 	}
@@ -99,7 +106,7 @@ public class X11Backend implements UIBackend {
 		public void start() {
 
 			option = new Option(args);
-			String env = gnu.util.Environment.value("DISPLAY");
+			String env = gnu.util.Environment.getValue("DISPLAY");
 			Display.Name display_name = option.display_name("display", "X server to connect to", new Display.Name(env));
 
 			int send_mode = option.enum("send-mode", "request sending mode", Connection.SEND_MODE_STRINGS,
