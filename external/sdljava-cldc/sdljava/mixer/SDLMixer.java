@@ -27,19 +27,19 @@ import sdljava.SDLException;
 import sdljava.SDLVersion;
 import sdljava.audio.SDLAudio;
 
-import sdljava.util.BufferUtil;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-
-import java.net.URL;
-import java.net.MalformedURLException;
+//import sdljava.util.BufferUtil;
+//
+//import java.io.File;
+//import java.io.InputStream;
+//import java.io.IOException;
+//import java.io.BufferedOutputStream;
+//import java.io.FileOutputStream;
+//
+//import java.nio.Buffer;
+//import java.nio.ByteBuffer;
+//
+//import java.net.URL;
+//import java.net.MalformedURLException;
 
 /**
  * Binding to the SDL_mixer library.
@@ -200,78 +200,78 @@ public class SDLMixer {
 	return new MixChunk(chunk);
     }
 
-    /**
-     * Load file for use as a sample. This can load
-     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
-     * SDL_OpenAudio before this. It must know the output
-     * characteristics so it can convert the sample for playback, it
-     * does this conversion at load time.
-     *
-     * @param buf a <I>DIRECT</I> <code>Buffer</code> with the Sample data
-     * @return The MixChunk
-     * @exception SDLException if an error occurs
-     */
-    public static MixChunk loadWAV(Buffer buf) throws SDLException {
-	Mix_Chunk chunk = SWIG_SDLMixer.SWIG_Mix_LoadWAV_Buffer(buf, buf.capacity());
-	if (chunk == null) {
-	    throw new SDLException(SDLMain.getError());
-	}
-	return new MixChunk(chunk);
-    }
+//    /**
+//     * Load file for use as a sample. This can load
+//     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
+//     * SDL_OpenAudio before this. It must know the output
+//     * characteristics so it can convert the sample for playback, it
+//     * does this conversion at load time.
+//     *
+//     * @param buf a <I>DIRECT</I> <code>Buffer</code> with the Sample data
+//     * @return The MixChunk
+//     * @exception SDLException if an error occurs
+//     */
+//    public static MixChunk loadWAV(Buffer buf) throws SDLException {
+//	Mix_Chunk chunk = SWIG_SDLMixer.SWIG_Mix_LoadWAV_Buffer(buf, buf.capacity());
+//	if (chunk == null) {
+//	    throw new SDLException(SDLMain.getError());
+//	}
+//	return new MixChunk(chunk);
+//    }
+//
+//    /**
+//     * Load file for use as a sample. This can load
+//     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
+//     * SDL_OpenAudio before this. It must know the output
+//     * characteristics so it can convert the sample for playback, it
+//     * does this conversion at load time.
+//     * <P>
+//     * This method automatically creates the NIO Direct Buffer from the given byte array
+//     *
+//     * @param data a <code>byte[]</code> value
+//     * @return The MixChunk
+//     * @exception SDLException if an error occurs
+//     */
+//    public static MixChunk loadWAV(byte[] data) throws SDLException {
+//	ByteBuffer buf = ByteBuffer.allocateDirect(data.length);
+//	buf.put(data);
+//	
+//	return loadWAV(buf);
+//    }
 
-    /**
-     * Load file for use as a sample. This can load
-     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
-     * SDL_OpenAudio before this. It must know the output
-     * characteristics so it can convert the sample for playback, it
-     * does this conversion at load time.
-     * <P>
-     * This method automatically creates the NIO Direct Buffer from the given byte array
-     *
-     * @param data a <code>byte[]</code> value
-     * @return The MixChunk
-     * @exception SDLException if an error occurs
-     */
-    public static MixChunk loadWAV(byte[] data) throws SDLException {
-	ByteBuffer buf = ByteBuffer.allocateDirect(data.length);
-	buf.put(data);
-	
-	return loadWAV(buf);
-    }
-
-    /**
-     * Load file for use as a sample. This can load
-     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
-     * SDL_OpenAudio before this. It must know the output
-     * characteristics so it can convert the sample for playback, it
-     * does this conversion at load time.
-     * <P>
-     * This method automatically creates the NIO Direct Buffer from the given byte array
-     *
-     * @param url The URL to fetch the data from
-     * @return The MixChunk
-     * @exception SDLException if an error occurs
-     */
-    public static MixChunk loadWAV(URL url) throws SDLException, IOException, MalformedURLException {
-	return loadWAV( BufferUtil.readURL(url));
-    }
-
-    /**
-     * Load file for use as a sample. This can load
-     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
-     * SDL_OpenAudio before this. It must know the output
-     * characteristics so it can convert the sample for playback, it
-     * does this conversion at load time.
-     * <P>
-     * This method automatically creates the NIO Direct Buffer
-     *
-     * @param url The URL to fetch the data from
-     * @return The MixChunk
-     * @exception SDLException if an error occurs
-     */
-    public static MixChunk loadWAV(InputStream in) throws SDLException, IOException{
-	return loadWAV( BufferUtil.readInputStream(in));
-    }
+//    /**
+//     * Load file for use as a sample. This can load
+//     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
+//     * SDL_OpenAudio before this. It must know the output
+//     * characteristics so it can convert the sample for playback, it
+//     * does this conversion at load time.
+//     * <P>
+//     * This method automatically creates the NIO Direct Buffer from the given byte array
+//     *
+//     * @param url The URL to fetch the data from
+//     * @return The MixChunk
+//     * @exception SDLException if an error occurs
+//     */
+//    public static MixChunk loadWAV(URL url) throws SDLException, IOException, MalformedURLException {
+//	return loadWAV( BufferUtil.readURL(url));
+//    }
+//
+//    /**
+//     * Load file for use as a sample. This can load
+//     * WAVE, AIFF, RIFF, OGG, and VOC files.  Note: You must call
+//     * SDL_OpenAudio before this. It must know the output
+//     * characteristics so it can convert the sample for playback, it
+//     * does this conversion at load time.
+//     * <P>
+//     * This method automatically creates the NIO Direct Buffer
+//     *
+//     * @param url The URL to fetch the data from
+//     * @return The MixChunk
+//     * @exception SDLException if an error occurs
+//     */
+//    public static MixChunk loadWAV(InputStream in) throws SDLException, IOException{
+//	return loadWAV( BufferUtil.readInputStream(in));
+//    }
 
     /**
      * Set chunk->volume to volume.  The volume setting will take
@@ -751,127 +751,127 @@ public class SDLMixer {
 	return new MixMusic(mixMusic);
     }
 
-    /**
-     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
-     * MP3, and any file that you use a command to play with.  If you
-     * are using an external command to play the music, you must call
-     * Mix_SetMusicCMD before this, otherwise the internal players
-     * will be used. Alternatively, if you have set an external
-     * command up and don't want to use it, you must call
-     * Mix_SetMusicCMD(NULL) to use the built-in players again.
-     *
-     * @param buf a <I>DIRECT</I> <code>Buffer</code> value
-     * @return A MixMusic instance
-     * @exception SDLException if an error occurs
-     */
-    public static MixMusic loadMUS(ByteBuffer buf) throws SDLException, IOException {
-	//SWIGTYPE_p__Mix_Music mixMusic = SWIG_SDLMixer.SWIG_Mix_LoadMUS_Buffer(buf, buf.capacity());
-	//if (mixMusic == null) {
-	//    throw new SDLException(SDLMain.getError());
-	//}
-	//return new MixMusic(mixMusic);
-
-	byte[] data = new byte[buf.capacity()];
-	buf.get(data);
-
-	return loadMUS(data);
-    }
-
-    /**
-     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
-     * MP3, and any file that you use a command to play with.  If you
-     * are using an external command to play the music, you must call
-     * Mix_SetMusicCMD before this, otherwise the internal players
-     * will be used. Alternatively, if you have set an external
-     * command up and don't want to use it, you must call
-     * Mix_SetMusicCMD(NULL) to use the built-in players again.
-     *
-     * @param data a <code>byte[]</code> value
-     * @return A MixMusic instance
-     * @exception SDLException if an error occurs
-     * <P>
-     * This method automatically creates the NIO Direct Buffer from the given byte array
-     */
-    public static MixMusic loadMUS(byte[] data) throws SDLException, IOException {
-//	ByteBuffer buf = ByteBuffer.allocateDirect(data.length);
-//	buf.put(data);
+//    /**
+//     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
+//     * MP3, and any file that you use a command to play with.  If you
+//     * are using an external command to play the music, you must call
+//     * Mix_SetMusicCMD before this, otherwise the internal players
+//     * will be used. Alternatively, if you have set an external
+//     * command up and don't want to use it, you must call
+//     * Mix_SetMusicCMD(NULL) to use the built-in players again.
+//     *
+//     * @param buf a <I>DIRECT</I> <code>Buffer</code> value
+//     * @return A MixMusic instance
+//     * @exception SDLException if an error occurs
+//     */
+//    public static MixMusic loadMUS(ByteBuffer buf) throws SDLException, IOException {
+//	//SWIGTYPE_p__Mix_Music mixMusic = SWIG_SDLMixer.SWIG_Mix_LoadMUS_Buffer(buf, buf.capacity());
+//	//if (mixMusic == null) {
+//	//    throw new SDLException(SDLMain.getError());
+//	//}
+//	//return new MixMusic(mixMusic);
+//
+//	byte[] data = new byte[buf.capacity()];
+//	buf.get(data);
+//
+//	return loadMUS(data);
+//    }
+//
+//    /**
+//     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
+//     * MP3, and any file that you use a command to play with.  If you
+//     * are using an external command to play the music, you must call
+//     * Mix_SetMusicCMD before this, otherwise the internal players
+//     * will be used. Alternatively, if you have set an external
+//     * command up and don't want to use it, you must call
+//     * Mix_SetMusicCMD(NULL) to use the built-in players again.
+//     *
+//     * @param data a <code>byte[]</code> value
+//     * @return A MixMusic instance
+//     * @exception SDLException if an error occurs
+//     * <P>
+//     * This method automatically creates the NIO Direct Buffer from the given byte array
+//     */
+//    public static MixMusic loadMUS(byte[] data) throws SDLException, IOException {
+////	ByteBuffer buf = ByteBuffer.allocateDirect(data.length);
+////	buf.put(data);
+////	
+////	return loadMUS(buf);
+//
+//	synchronized (SDLMixer.class) {
+//	    // open temp file and write data to it
+//	    String tmpDir = System.getProperty("java.io.tmpdir");
+//
+//	    BufferedOutputStream out = null;
+//	    try {
+//		out = new BufferedOutputStream(new FileOutputStream(tmpDir + java.io.File. separator + ".SDLMixer-loadMUS.tmp"));
+//
+//		out.write(data, 0, data.length);
+//		out.flush();
+//		out.close();
+//
+//		MixMusic music = loadMUS(tmpDir + java.io.File.separator + ".SDLMixer-loadMUS.tmp");
+//		
+//		return music;
+//	    } catch (IOException e) {
+//		throw new SDLException(e);
+//	    }
+//	    finally {
+//		if (out != null) out.close();
+//
+//		File f = new File(tmpDir + java.io.File.separator + ".SDLMixer-loadMUS.tmp");
+//		if (f.exists()) f.delete();
+//	    }
+//	}
+//    }
+//
+//    /**
+//     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
+//     * MP3, and any file that you use a command to play with.  If you
+//     * are using an external command to play the music, you must call
+//     * Mix_SetMusicCMD before this, otherwise the internal players
+//     * will be used. Alternatively, if you have set an external
+//     * command up and don't want to use it, you must call
+//     * Mix_SetMusicCMD(NULL) to use the built-in players again.
+//     *
+//     * @param url an <code>URL</code> value
+//     * @return A MixMusic instance
+//     * @exception SDLException if an error occurs
+//     * @exception IOException if an error occurs
+//     * @exception MalformedURLException if an error occurs
+//     * <P>
+//     * This method automatically creates the NIO Direct Buffer from the given byte array
+//     * <P>
+//     * NOTE:  for now this method downloads the url and saves the data in a temporary file
+//     *        then invokes the standard loadMUS(String path) method to load it, deleting
+//     *        the file afterwards.  Once we move to Mixer 1.2.6 this will not longer be necessary.
+//     */
+//    public static MixMusic loadMUS(URL url) throws SDLException, IOException, MalformedURLException {
+//	// read into buffer
+//	ByteBuffer buffer = BufferUtil.readURL(url);
 //	
-//	return loadMUS(buf);
-
-	synchronized (SDLMixer.class) {
-	    // open temp file and write data to it
-	    String tmpDir = System.getProperty("java.io.tmpdir");
-
-	    BufferedOutputStream out = null;
-	    try {
-		out = new BufferedOutputStream(new FileOutputStream(tmpDir + java.io.File. separator + ".SDLMixer-loadMUS.tmp"));
-
-		out.write(data, 0, data.length);
-		out.flush();
-		out.close();
-
-		MixMusic music = loadMUS(tmpDir + java.io.File.separator + ".SDLMixer-loadMUS.tmp");
-		
-		return music;
-	    } catch (IOException e) {
-		throw new SDLException(e);
-	    }
-	    finally {
-		if (out != null) out.close();
-
-		File f = new File(tmpDir + java.io.File.separator + ".SDLMixer-loadMUS.tmp");
-		if (f.exists()) f.delete();
-	    }
-	}
-    }
-
-    /**
-     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
-     * MP3, and any file that you use a command to play with.  If you
-     * are using an external command to play the music, you must call
-     * Mix_SetMusicCMD before this, otherwise the internal players
-     * will be used. Alternatively, if you have set an external
-     * command up and don't want to use it, you must call
-     * Mix_SetMusicCMD(NULL) to use the built-in players again.
-     *
-     * @param url an <code>URL</code> value
-     * @return A MixMusic instance
-     * @exception SDLException if an error occurs
-     * @exception IOException if an error occurs
-     * @exception MalformedURLException if an error occurs
-     * <P>
-     * This method automatically creates the NIO Direct Buffer from the given byte array
-     * <P>
-     * NOTE:  for now this method downloads the url and saves the data in a temporary file
-     *        then invokes the standard loadMUS(String path) method to load it, deleting
-     *        the file afterwards.  Once we move to Mixer 1.2.6 this will not longer be necessary.
-     */
-    public static MixMusic loadMUS(URL url) throws SDLException, IOException, MalformedURLException {
-	// read into buffer
-	ByteBuffer buffer = BufferUtil.readURL(url);
-	
-	return loadMUS(buffer);
-    }
-
-    /**
-     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
-     * MP3, and any file that you use a command to play with.  If you
-     * are using an external command to play the music, you must call
-     * Mix_SetMusicCMD before this, otherwise the internal players
-     * will be used. Alternatively, if you have set an external
-     * command up and don't want to use it, you must call
-     * Mix_SetMusicCMD(NULL) to use the built-in players again.
-     *
-     * @param in an <code>InputStream</code> value
-     * @return A MixMusic instance
-     * @exception SDLException if an error occurs
-     * @exception IOException if an error occurs
-     * <P>
-     * This method automatically creates the NIO Direct Buffer
-     */
-    public static MixMusic loadMUS(InputStream in) throws SDLException, IOException {
-	return loadMUS( BufferUtil.readInputStream(in));
-    }
+//	return loadMUS(buffer);
+//    }
+//
+//    /**
+//     * Load music file to use. This can load WAVE, MOD, MIDI, OGG,
+//     * MP3, and any file that you use a command to play with.  If you
+//     * are using an external command to play the music, you must call
+//     * Mix_SetMusicCMD before this, otherwise the internal players
+//     * will be used. Alternatively, if you have set an external
+//     * command up and don't want to use it, you must call
+//     * Mix_SetMusicCMD(NULL) to use the built-in players again.
+//     *
+//     * @param in an <code>InputStream</code> value
+//     * @return A MixMusic instance
+//     * @exception SDLException if an error occurs
+//     * @exception IOException if an error occurs
+//     * <P>
+//     * This method automatically creates the NIO Direct Buffer
+//     */
+//    public static MixMusic loadMUS(InputStream in) throws SDLException, IOException {
+//	return loadMUS( BufferUtil.readInputStream(in));
+//    }
     
     /**
      * Free the loaded music. If music is playing it will be
