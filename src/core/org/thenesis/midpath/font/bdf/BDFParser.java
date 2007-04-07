@@ -349,7 +349,7 @@ public class BDFParser implements BDFParserConstants {
 		for (int i = 0; i < template.length; i++) {
 			template[i] = "";
 		}
-		System.out.println("AAAAAAAAAAAa:" + string.image.trim());
+		//System.out.println("Font name:" + string.image.trim());
 		String[] split = split(string.image.trim(), "-");
 		
 		
@@ -372,8 +372,11 @@ public class BDFParser implements BDFParserConstants {
 		}
 		
 		while((index = s.indexOf(separator, lastIndex)) != -1) {
-			v.addElement(s.substring(lastIndex, index));
-			System.out.println(s.substring(lastIndex, index));
+			String subString = s.substring(lastIndex, index);
+			if (subString.length() > 0) {
+				v.addElement(subString);
+				//System.out.println(subString + ": " + subString.length()); 
+			}
 			lastIndex = index + 1;
 		}
 		
