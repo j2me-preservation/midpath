@@ -1,5 +1,5 @@
 #
-# Makefile created at Sat Apr  7 19:36:08 2007, by mmake
+# Makefile created at Sat Apr  7 21:02:32 2007, by mmake
 #
 
 # Programs (with common options):
@@ -112,6 +112,7 @@ PACKAGES = \
 	gnu.x11.extension.render \
 	gnu.x11 \
 	gnu.util \
+	gnu.app \
 	gnu.x11.extension.glx
 
 
@@ -416,5 +417,6 @@ gnu.x11.keysym : $(call PACKAGE_OBJS,gnu.x11.keysym)
 gnu.x11.extension.render : $(call PACKAGE_OBJS,gnu.x11.extension.render)
 gnu.x11 : $(call PACKAGE_OBJS,gnu.x11)
 gnu.util : $(call PACKAGE_OBJS,gnu.util)
+gnu.app : $(call PACKAGE_OBJS,gnu.app)
 gnu.x11.extension.glx : $(call PACKAGE_OBJS,gnu.x11.extension.glx)
 
