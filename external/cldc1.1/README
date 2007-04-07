@@ -14,8 +14,8 @@ How to sync from the phoneME SVN trunk:
 
 # cd $MIDPATH_HOME/src/external/cldc1.1
 # svn export https://phoneme.dev.java.net/svn/phoneme/components/cldc/trunk cldc-phoneme
-# cp -rf cldc-phoneme/* src
-# cp -rf cacao-cldc-patch/ResourceInputStream.java src/javaapi/share/com/sun/cldc/io/
+# cp -rf cldc-phoneme/src/javaapi/share/*  cldc-phoneme/src/javaapi/cldc1.1/* src
+# cp -rf cacao-cldc-patch/ResourceInputStream.java src/com/sun/cldc/io/
 # rm -rf cldc-phoneme
 
 Revision
