@@ -8,7 +8,7 @@ if [ "$MIDPATH_HOME" = "" ]; then
 fi
 
 # Set the classpath
-CP=$MIDPATH_HOME/dist/midpath.jar:$MIDPATH_HOME/dist/sdljava-core.jar:$MIDPATH_HOME/lib/kxml2-2.3.0.jar
+CP=$MIDPATH_HOME/dist/midpath.jar:$MIDPATH_HOME/resources-embedded:$MIDPATH_HOME/dist/sdljava-j2se.jar:$MIDPATH_HOME/dist/escher-x11-cldc.jar:$MIDPATH_HOME/lib/kxml2-2.3.0.jar
 # Add the  MIDlet jar to the classpath  (must be loaded by the main 
 # classloader yet)
 CP=$CP:$MIDPATH_HOME/dist/midpath-tests.jar
