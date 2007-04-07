@@ -26,12 +26,12 @@ import sdljava.SDLMain;
 import sdljava.SDLException;
 import sdljava.SDLVersion;
 import sdljava.audio.SDLAudio;
+import java.io.IOException;
 
 //import sdljava.util.BufferUtil;
 //
 //import java.io.File;
 //import java.io.InputStream;
-//import java.io.IOException;
 //import java.io.BufferedOutputStream;
 //import java.io.FileOutputStream;
 //
@@ -199,6 +199,17 @@ public class SDLMixer {
 	}
 	return new MixChunk(chunk);
     }
+    
+  /* -----------------------------
+   * TODO Remove me. Need for compilation only */
+  public static MixChunk loadWAV(byte[] data) throws SDLException {
+	return null;
+  }
+  public static MixMusic loadMUS(byte[] data) throws SDLException, IOException {
+	  return null;
+  }
+  /* -------------------------  */
+  
 
 //    /**
 //     * Load file for use as a sample. This can load
