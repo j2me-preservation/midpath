@@ -110,14 +110,14 @@ public class MidletSuiteLauncher {
              */
            
             midletInfo = new MIDletInfo(midlet);
-            infoList.add(midletInfo);
+            infoList.addElement(midletInfo);
                 //verifyMIDlet(midletInfo.classname);
            
         }
 		
 		MIDletInfo[] infos = new MIDletInfo[infoList.size()];
 		for (int j = 0; j < infoList.size(); j++) {
-			infos[j] = (MIDletInfo)infoList.get(j);
+			infos[j] = (MIDletInfo)infoList.elementAt(j);
 		}
 		
 		return infos;

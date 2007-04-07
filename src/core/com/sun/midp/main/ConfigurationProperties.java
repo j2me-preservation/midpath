@@ -233,8 +233,8 @@ public class ConfigurationProperties extends Properties {
 	 * @exception  InvalidConfigurationException if the JAD is not formatted correctly.
 	 */
 	public synchronized void load(InputStream inStream) throws IOException {
-		load(inStream, "ISO-8859-1");
-		//load(inStream, null);
+		//load(inStream, "ISO-8859-1");
+		load(inStream, null);
 	}
 
 	/**

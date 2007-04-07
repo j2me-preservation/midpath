@@ -142,7 +142,7 @@ public class FileHandlerImpl implements BaseFileHandler, RandomAccessStream {
 		
 		Vector v = new Vector();
 		for (int i = 0; i < filenames.length; i++) {
-			v.add(filenames[i]);
+			v.addElement(filenames[i]);
 		}
 		
 		return v;
@@ -160,7 +160,7 @@ public class FileHandlerImpl implements BaseFileHandler, RandomAccessStream {
 			if (!rootFilename.endsWith("/")) {
 				rootFilename += "/";
 			}
-			v.add(rootFilename);
+			v.addElement(rootFilename);
 		}
 		
 		return v;
