@@ -37,6 +37,8 @@
  */
 package org.thenesis.midpath.font.bdf;
 
+import java.util.Vector;
+
 /**
  * Parses a font in BDF format.
  * <p>The BDF Font specification from Adobe can be fount at
@@ -270,11 +272,11 @@ public class BDFParser implements BDFParserConstants {
 
 	// Gets this font's comments
 	final public String[] getComments() throws ParseException {
-		java.util.ArrayList list = new java.util.ArrayList();
+		Vector list = new Vector();
 		label_3: while (true) {
 			jj_consume_token(COMMENT);
 			jj_consume_token(CONTENTSTRING);
-			list.add(token.image);
+			list.addElement(token.image);
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
 			case COMMENT:
 				;
@@ -286,8 +288,13 @@ public class BDFParser implements BDFParserConstants {
 		}
 		String[] comments = new String[list.size()];
 		{
-			if (true)
-				return (String[]) list.toArray(comments);
+			if (true) {
+				list.copyInto(comments);
+				return comments;
+			}
+			
+//			if (true)
+//				return (String[]) list.toArray(comments);
 		}
 		throw new Error("Missing return statement in function");
 	}
@@ -335,14 +342,45 @@ public class BDFParser implements BDFParserConstants {
 		String[] template = new String[14];
 		jj_consume_token(FONTNAME);
 		string = jj_consume_token(FONTFAMILYSTRING);
-		java.util.Arrays.fill(template, "");
-		String[] split = string.image.trim().split("-");
+	
+		//java.util.Arrays.fill(template, "");
+		//String[] split = string.image.trim().split("-");
+		
+		for (int i = 0; i < template.length; i++) {
+			template[i] = "";
+		}
+		System.out.println("AAAAAAAAAAAa:" + string.image.trim());
+		String[] split = split(string.image.trim(), "-");
+		
+		
 		System.arraycopy(split, 1, template, 0, split.length - 2);
 		{
 			if (true)
 				return template;
 		}
 		throw new Error("Missing return statement in function");
+	}
+	
+	private String[] split(String s, String separator) {
+		
+		Vector v = new Vector();
+		
+		int index = 0;
+		int lastIndex = 0;
+		if (s.startsWith(separator)) {
+			lastIndex = separator.length();
+		}
+		
+		while((index = s.indexOf(separator, lastIndex)) != -1) {
+			v.addElement(s.substring(lastIndex, index));
+			System.out.println(s.substring(lastIndex, index));
+			lastIndex = index + 1;
+		}
+		
+		String[] strings = new String[v.size()];
+		v.copyInto(strings);
+		
+		return strings;
 	}
 
 	// Gets the font properties
