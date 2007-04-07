@@ -1,5 +1,5 @@
 #
-# Makefile created at Sat Apr  7 19:58:09 2007, by mmake
+# Makefile created at Sat Apr  7 19:37:59 2007, by mmake
 #
 
 # Programs (with common options):
@@ -104,70 +104,17 @@ endif
 
 # Packages we should compile
 PACKAGES = \
-	com.sun.midp.chameleon \
-	com.sun.midp.midlet \
-	com.sun.midp.configurator \
-	com.sun.midp.chameleon.skins.resources \
-	com.sun.cldchi.jvm \
-	org.thenesis.midpath.ui.backend.swt \
-	com.sun.midp.rms \
-	com.sun.midp.util \
-	com.sun.cldc.io \
-	javax.microedition.lcdui.game \
-	com.sun.midp.events \
-	javax.microedition.midlet \
-	org.thenesis.midpath.font.bdf \
-	javax.microedition.rms \
-	org.thenesis.midpath \
-	org.thenesis.midpath.io.backend.j2se \
-	com.sun.midp.l10n \
-	javax.microedition.lcdui \
-	com.sun.midp.io \
-	com.sun.midp.io.j2me.serversocket \
-	com.sun.midp.i18n \
-	com.sun.midp.main \
-	org.thenesis.midpath.ui \
-	com.sun.midp.io.j2me.socket \
-	com.sun.midp.midletsuite \
-	javax.microedition.media.control \
-	org.thenesis.midpath.ui.backend.awt \
-	com.sun.midp.chameleon.layers \
-	com.sun.midp.security \
-	javax.microedition.io.file \
-	org.thenesis.midpath.installer \
-	com.sun.midp.chameleon.input \
-	javax.microedition.media \
-	com.sun.midp.log \
-	com.sun.midp.io.j2me.http \
-	org.thenesis.midpath.ui.backend.x11 \
-	org.thenesis.midpath.zip \
-	org.thenesis.midpath.io.backend.cldc \
-	javax.microedition.io \
-	org.thenesis.midpath.ui.virtual \
-	com.sun.midp.chameleon.skins \
-	com.sun.midp.lcdui \
-	com.sun.midp.io.j2me.file \
-	com.sun.midp.installer \
-	org.thenesis.midpath.image.png \
-	org.thenesis.midpath.mmedia \
-	org.thenesis.midpath.io
+	java.util \
+	java.lang \
+	com.sun.cldc.i18n.j2me
 
 
 # All packages that can be recursively compiled.
 ALL_PACKAGES = \
-	com.sun.midp \
-	javax \
-	com.sun.cldc \
-	org \
-	javax.microedition \
+	com.sun.cldc.i18n \
+	java \
 	com.sun \
-	org.thenesis.midpath.image \
-	com.sun.cldchi \
-	org.thenesis.midpath.ui.backend \
-	org.thenesis.midpath.io.backend \
-	org.thenesis \
-	org.thenesis.midpath.font \
-	com.sun.midp.io.j2me \
+	com.sun.cldc \
 	com \
 	$(PACKAGES)
 
@@ -458,65 +405,12 @@ ifneq ($(DEPEND),)
 endif
 
 #package targets
-com.sun.midp : $(call PACKAGE_OBJS,com.sun.midp)
-javax : $(call PACKAGE_OBJS,javax)
-com.sun.cldc : $(call PACKAGE_OBJS,com.sun.cldc)
-org : $(call PACKAGE_OBJS,org)
-javax.microedition : $(call PACKAGE_OBJS,javax.microedition)
+com.sun.cldc.i18n : $(call PACKAGE_OBJS,com.sun.cldc.i18n)
+java : $(call PACKAGE_OBJS,java)
 com.sun : $(call PACKAGE_OBJS,com.sun)
-org.thenesis.midpath.image : $(call PACKAGE_OBJS,org.thenesis.midpath.image)
-com.sun.cldchi : $(call PACKAGE_OBJS,com.sun.cldchi)
-org.thenesis.midpath.ui.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend)
-org.thenesis.midpath.io.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.io.backend)
-org.thenesis : $(call PACKAGE_OBJS,org.thenesis)
-org.thenesis.midpath.font : $(call PACKAGE_OBJS,org.thenesis.midpath.font)
-com.sun.midp.io.j2me : $(call PACKAGE_OBJS,com.sun.midp.io.j2me)
+com.sun.cldc : $(call PACKAGE_OBJS,com.sun.cldc)
 com : $(call PACKAGE_OBJS,com)
-com.sun.midp.chameleon : $(call PACKAGE_OBJS,com.sun.midp.chameleon)
-com.sun.midp.midlet : $(call PACKAGE_OBJS,com.sun.midp.midlet)
-com.sun.midp.configurator : $(call PACKAGE_OBJS,com.sun.midp.configurator)
-com.sun.midp.chameleon.skins.resources : $(call PACKAGE_OBJS,com.sun.midp.chameleon.skins.resources)
-com.sun.cldchi.jvm : $(call PACKAGE_OBJS,com.sun.cldchi.jvm)
-org.thenesis.midpath.ui.backend.swt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.swt)
-com.sun.midp.rms : $(call PACKAGE_OBJS,com.sun.midp.rms)
-com.sun.midp.util : $(call PACKAGE_OBJS,com.sun.midp.util)
-com.sun.cldc.io : $(call PACKAGE_OBJS,com.sun.cldc.io)
-javax.microedition.lcdui.game : $(call PACKAGE_OBJS,javax.microedition.lcdui.game)
-com.sun.midp.events : $(call PACKAGE_OBJS,com.sun.midp.events)
-javax.microedition.midlet : $(call PACKAGE_OBJS,javax.microedition.midlet)
-org.thenesis.midpath.font.bdf : $(call PACKAGE_OBJS,org.thenesis.midpath.font.bdf)
-javax.microedition.rms : $(call PACKAGE_OBJS,javax.microedition.rms)
-org.thenesis.midpath : $(call PACKAGE_OBJS,org.thenesis.midpath)
-org.thenesis.midpath.io.backend.j2se : $(call PACKAGE_OBJS,org.thenesis.midpath.io.backend.j2se)
-com.sun.midp.l10n : $(call PACKAGE_OBJS,com.sun.midp.l10n)
-javax.microedition.lcdui : $(call PACKAGE_OBJS,javax.microedition.lcdui)
-com.sun.midp.io : $(call PACKAGE_OBJS,com.sun.midp.io)
-com.sun.midp.io.j2me.serversocket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.serversocket)
-com.sun.midp.i18n : $(call PACKAGE_OBJS,com.sun.midp.i18n)
-com.sun.midp.main : $(call PACKAGE_OBJS,com.sun.midp.main)
-org.thenesis.midpath.ui : $(call PACKAGE_OBJS,org.thenesis.midpath.ui)
-com.sun.midp.io.j2me.socket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.socket)
-com.sun.midp.midletsuite : $(call PACKAGE_OBJS,com.sun.midp.midletsuite)
-javax.microedition.media.control : $(call PACKAGE_OBJS,javax.microedition.media.control)
-org.thenesis.midpath.ui.backend.awt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.awt)
-com.sun.midp.chameleon.layers : $(call PACKAGE_OBJS,com.sun.midp.chameleon.layers)
-com.sun.midp.security : $(call PACKAGE_OBJS,com.sun.midp.security)
-javax.microedition.io.file : $(call PACKAGE_OBJS,javax.microedition.io.file)
-org.thenesis.midpath.installer : $(call PACKAGE_OBJS,org.thenesis.midpath.installer)
-com.sun.midp.chameleon.input : $(call PACKAGE_OBJS,com.sun.midp.chameleon.input)
-javax.microedition.media : $(call PACKAGE_OBJS,javax.microedition.media)
-com.sun.midp.log : $(call PACKAGE_OBJS,com.sun.midp.log)
-com.sun.midp.io.j2me.http : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.http)
-org.thenesis.midpath.ui.backend.x11 : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.x11)
-org.thenesis.midpath.zip : $(call PACKAGE_OBJS,org.thenesis.midpath.zip)
-org.thenesis.midpath.io.backend.cldc : $(call PACKAGE_OBJS,org.thenesis.midpath.io.backend.cldc)
-javax.microedition.io : $(call PACKAGE_OBJS,javax.microedition.io)
-org.thenesis.midpath.ui.virtual : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.virtual)
-com.sun.midp.chameleon.skins : $(call PACKAGE_OBJS,com.sun.midp.chameleon.skins)
-com.sun.midp.lcdui : $(call PACKAGE_OBJS,com.sun.midp.lcdui)
-com.sun.midp.io.j2me.file : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.file)
-com.sun.midp.installer : $(call PACKAGE_OBJS,com.sun.midp.installer)
-org.thenesis.midpath.image.png : $(call PACKAGE_OBJS,org.thenesis.midpath.image.png)
-org.thenesis.midpath.mmedia : $(call PACKAGE_OBJS,org.thenesis.midpath.mmedia)
-org.thenesis.midpath.io : $(call PACKAGE_OBJS,org.thenesis.midpath.io)
+java.util : $(call PACKAGE_OBJS,java.util)
+java.lang : $(call PACKAGE_OBJS,java.lang)
+com.sun.cldc.i18n.j2me : $(call PACKAGE_OBJS,com.sun.cldc.i18n.j2me)
 
