@@ -23,8 +23,6 @@ package sdljava.video;
  */
 import java.util.Vector;
 
-import javax.microedition.lcdui.List;
-
 import sdljava.x.swig.SDL_Color;
 import sdljava.x.swig.SDL_PixelFormat;
 import sdljava.x.swig.SWIG_SDLVideo;
