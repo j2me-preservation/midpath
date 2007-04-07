@@ -4,3 +4,7 @@ Instructions
 ------------
 
 # cp java_lang_Object.c com_sun_cldc_io_ResourceInputStream.c java_lang_String.c $CACAO_TRUNK_PATH/src/native/vm/cldc1.1/
+
+or
+ 
+# patch -p0 < svn-diff.patch
