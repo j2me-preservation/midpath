@@ -108,7 +108,6 @@ PACKAGES = \
 	com.sun.midp.midlet \
 	com.sun.midp.configurator \
 	com.sun.midp.chameleon.skins.resources \
-	com.sun.cldchi.jvm \
 	org.thenesis.midpath.ui.backend.swt \
 	com.sun.midp.rms \
 	com.sun.midp.util \
@@ -162,7 +161,6 @@ ALL_PACKAGES = \
 	javax.microedition \
 	com.sun \
 	org.thenesis.midpath.image \
-	com.sun.cldchi \
 	org.thenesis.midpath.ui.backend \
 	org.thenesis.midpath.io.backend \
 	org.thenesis \
@@ -465,7 +463,6 @@ org : $(call PACKAGE_OBJS,org)
 javax.microedition : $(call PACKAGE_OBJS,javax.microedition)
 com.sun : $(call PACKAGE_OBJS,com.sun)
 org.thenesis.midpath.image : $(call PACKAGE_OBJS,org.thenesis.midpath.image)
-com.sun.cldchi : $(call PACKAGE_OBJS,com.sun.cldchi)
 org.thenesis.midpath.ui.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend)
 org.thenesis.midpath.io.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.io.backend)
 org.thenesis : $(call PACKAGE_OBJS,org.thenesis)
@@ -476,7 +473,6 @@ com.sun.midp.chameleon : $(call PACKAGE_OBJS,com.sun.midp.chameleon)
 com.sun.midp.midlet : $(call PACKAGE_OBJS,com.sun.midp.midlet)
 com.sun.midp.configurator : $(call PACKAGE_OBJS,com.sun.midp.configurator)
 com.sun.midp.chameleon.skins.resources : $(call PACKAGE_OBJS,com.sun.midp.chameleon.skins.resources)
-com.sun.cldchi.jvm : $(call PACKAGE_OBJS,com.sun.cldchi.jvm)
 org.thenesis.midpath.ui.backend.swt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.swt)
 com.sun.midp.rms : $(call PACKAGE_OBJS,com.sun.midp.rms)
 com.sun.midp.util : $(call PACKAGE_OBJS,com.sun.midp.util)
