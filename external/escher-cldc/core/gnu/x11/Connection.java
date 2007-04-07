@@ -10,8 +10,6 @@ import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
-import com.sun.midp.io.j2me.serversocket.Socket;
-
 
 /**
  * Low-level network input/output with X server.
@@ -152,7 +150,7 @@ public class Connection {
 
     try {
     	int port = 6000+display_no;
-    	System.out.println("port: " + port);
+    	//System.out.println("port: " + port);
     	streamConnection = (StreamConnection) Connector.open("socket://" + hostname + ":" + port);
     	//socket = new Socket (hostname, 6000+display_no);
 
