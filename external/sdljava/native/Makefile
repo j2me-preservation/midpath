@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS=-O3
+CFLAGS=-O -fPIC -g
 
 INCLUDE=-I. -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I/usr/include -I/usr/include/SDL -I/usr/local/include -I/usr/local/include/SDL
 
