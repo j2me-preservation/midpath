@@ -1,4 +1,4 @@
-package gnu.app;
+package gnu.x11.test;
 
 import gnu.x11.Enum;
 import gnu.x11.Window;
