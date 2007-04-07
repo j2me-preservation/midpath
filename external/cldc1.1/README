@@ -3,16 +3,18 @@ This folder contains a CLDC1.1 implementation with modifications needed by cacao
 How to patch cacao-cldc
 =======================
 
+# cd $MIDPATH_HOME/external/cldc1.1/cacao-cldc-patch
 # cp java_lang_Object.c com_sun_cldc_io_ResourceInputStream.c java_lang_String.c $CACAO_TRUNK_PATH/src/native/vm/cldc1.1/
 
 or
  
-# patch -p0 < cacao-svn-diff.patch
+# cd $CACAO_TRUNK_PATH
+# patch -p0 < $MIDPATH_HOME/external/cldc1.1/cacao-cldc-patch/cacao-svn-diff.patch
 
 How to sync from the phoneME SVN trunk:
 =======================================
 
-# cd $MIDPATH_HOME/src/external/cldc1.1
+# cd $MIDPATH_HOME/external/cldc1.1
 # svn export https://phoneme.dev.java.net/svn/phoneme/components/cldc/trunk cldc-phoneme
 # cp -rf cldc-phoneme/src/javaapi/share/*  cldc-phoneme/src/javaapi/cldc1.1/* src
 # cp -rf cacao-cldc-patch/ResourceInputStream.java src/com/sun/cldc/io/
