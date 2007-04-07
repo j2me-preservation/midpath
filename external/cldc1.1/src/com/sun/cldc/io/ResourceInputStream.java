@@ -33,13 +33,9 @@ import java.util.Vector;
 /**
  * Input stream class for accessing resource files in classpath.
  */
-public class ResourceInputStream extends InputStream {
-    
-    private byte[] buffer = new byte[300000];
-    private int resourceLength;
-    private int position = 0;
-    private int markPosition;
-    private int readLimit;
+public class ResourceInputStream_DEFAULT extends InputStream {
+    private Object fileDecoder;
+    private Object savedDecoder; // used for mark/reset functionality
 
     /**
      * Fixes the resource name to be conformant with the CLDC 1.0
@@ -115,15 +111,12 @@ public class ResourceInputStream extends InputStream {
      *              name must not have a leading '/'.
      * @exception  IOException  if an I/O error occurs.
      */
-    public ResourceInputStream(String name) throws IOException {
+    public ResourceInputStream_DEFAULT(String name) throws IOException {
         String fixedName = fixResourceName(name);
-        
-        resourceLength = readAllBytes(fixedName, buffer);
-        
-        if (resourceLength < 0) {
-        	throw new IOException();
+        fileDecoder = open(fixedName);
+        if (fileDecoder == null) {
+            throw new IOException();
         }
-        
      }
 
     /**
@@ -134,16 +127,11 @@ public class ResourceInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      */
     public int read() throws IOException {
-       
-    	if (position > (resourceLength - 1)) {
-    		//System.out.println("test read(): EOF");
-    		return -1;
-    	}
-    	
-    	//System.out.println("test read():" + (buffer[position] & 0xff));
-    	
-    	return (buffer[position++] & 0xff);
-    	
+        // Fix for CR 6303054
+        if (fileDecoder == null) {
+            throw new IOException();
+        }
+        return readByte(fileDecoder);
     }
 
     /**
@@ -153,12 +141,10 @@ public class ResourceInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      */
     public int available() throws IOException {
-    	
-    	if (position > (resourceLength - 1)) {
-    		return 0;
-    	}
-    	
-        return (resourceLength - position);
+        if (fileDecoder == null) {
+            throw new IOException();
+        }
+        return bytesRemain(fileDecoder);
     }
 
     /**
@@ -172,36 +158,21 @@ public class ResourceInputStream extends InputStream {
      * @exception  IOException  if an I/O error occurs.
      */
     public int read(byte b[], int off, int len) throws IOException {
-    	
-    	//System.out.println("test read() 2");
-      
+        // Fix for CR 6303054
+        if (fileDecoder == null) {
+            throw new IOException();
+        }
         if (b == null) {
             throw new NullPointerException();
         } else if ((off < 0) || (off > b.length) || (len < 0) ||
                    ((off + len) > b.length) || ((off + len) < 0)) {
             throw new IndexOutOfBoundsException();
         }
-        
-        if (position > (resourceLength - 1)) {
-    		return -1;
-    	}
-        
-        // Data available
-        int available = resourceLength - position;
-        int copyLength = Math.min(available, len);
-        
-//        for (int i = 0; i < copyLength; i++) {
-//        	b[off + i] = (byte)(buffer[position + i] & 0xFF);
-//        }
-        
-        System.arraycopy(buffer, position, b, off, copyLength);
-        position += copyLength;
-        
-        return copyLength;
+        return readBytes(fileDecoder, b, off, len);
     }
 
     public void close() throws IOException {
-        // TODO
+        fileDecoder = null;
     }
 
     /**
@@ -213,7 +184,9 @@ public class ResourceInputStream extends InputStream {
      * @see   java.io.InputStream#reset()
      */
     public void mark(int readlimit) {
-        markPosition = position;
+        if (fileDecoder != null) {
+            savedDecoder = clone(fileDecoder);
+        }
     }
 
     /**
@@ -224,7 +197,10 @@ public class ResourceInputStream extends InputStream {
      * @see   java.io.InputStream#mark(int)
      */
     public void reset() throws IOException {
-        position = markPosition;
+        if (fileDecoder == null || savedDecoder == null) {
+            throw new IOException();
+        }
+        fileDecoder = clone(savedDecoder);
     }
 
     /**
@@ -236,18 +212,16 @@ public class ResourceInputStream extends InputStream {
     public boolean markSupported() {
         return true;
     }
-    
-    private static native int readAllBytes(String name, byte b[]);
 
-//    // OS-specific interface to underlying file system.
-//    private static native Object open(String name);
-//    private static native int bytesRemain(Object fileDecoder);
-//    private static native int readByte(Object fileDecoder);
-//    private static native int readBytes(Object fileDecoder,
-//                                        byte b[], int off, int len);
-//    /*
-//     * Copies all fields from one FileDecoder object to another -
-//     * used remember or restore current ResourceInputStream state.
-//     */
-//    private static native Object clone(Object source);
+    // OS-specific interface to underlying file system.
+    private static native Object open(String name);
+    private static native int bytesRemain(Object fileDecoder);
+    private static native int readByte(Object fileDecoder);
+    private static native int readBytes(Object fileDecoder,
+                                        byte b[], int off, int len);
+    /*
+     * Copies all fields from one FileDecoder object to another -
+     * used remember or restore current ResourceInputStream state.
+     */
+    private static native Object clone(Object source);
 }
