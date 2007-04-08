@@ -4,7 +4,7 @@ How to patch cacao-cldc
 =======================
 
 # cd $MIDPATH_HOME/external/cldc1.1/cacao-cldc-patch
-# cp java_lang_Object.c com_sun_cldc_io_ResourceInputStream.c java_lang_String.c $CACAO_TRUNK_PATH/src/native/vm/cldc1.1/
+# cp com_sun_cldc_io_ResourceInputStream.c $CACAO_TRUNK_PATH/src/native/vm/cldc1.1/
 
 or
  

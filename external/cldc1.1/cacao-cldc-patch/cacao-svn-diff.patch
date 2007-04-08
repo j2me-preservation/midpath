@@ -1,67 +1,6 @@
-Index: src/native/vm/cldc1.1/java_lang_String.c
-===================================================================
---- src/native/vm/cldc1.1/java_lang_String.c	(revision 7675)
-+++ src/native/vm/cldc1.1/java_lang_String.c	(working copy)
-@@ -134,6 +134,8 @@
- }
- 
- 
-+
-+
- /*
-  * Class:     java/lang/String
-  * Method:    lastIndexOf
-@@ -164,7 +166,17 @@
- 	return -1;
- }
- 
-+/*
-+ * Class:     java/lang/String
-+ * Method:    lastIndexOf
-+ * Signature: (I)I
-+ */
-+JNIEXPORT s4 JNICALL Java_java_lang_String_lastIndexOf__I(JNIEnv *env, java_lang_String *this, s4 ch) 
-+{	
-+	return Java_java_lang_String_lastIndexOf__II(env, this, ch, this->count - 1);
-+}
- 
-+
- #if 0
- /*
-  * Class:     java/lang/String
-Index: src/native/vm/cldc1.1/java_lang_Object.c
-===================================================================
---- src/native/vm/cldc1.1/java_lang_Object.c	(revision 7675)
-+++ src/native/vm/cldc1.1/java_lang_Object.c	(working copy)
-@@ -84,17 +84,16 @@
- 	_Jv_java_lang_Object_notify(this);
- }
- 
--
--#if 0
- /*
-- * Class:     java/lang/Object
-- * Method:    notifyAll
-- * Signature: ()V
-- */
--JNIEXPORT void JNICALL Java_java_lang_Object_notifyAll(JNIEnv *env, struct java_lang_Object* this);
--#endif
-+ *  * Class:     java/lang/Object
-+ *   * Method:    notifyAll
-+ *    * Signature: ()V
-+ *     */
-+JNIEXPORT void JNICALL Java_java_lang_Object_notifyAll(JNIEnv *env, struct java_lang_Object* this)
-+{
-+	    _Jv_java_lang_Object_notifyAll(this);
-+}
- 
--
- /*
-  * Class:     java/lang/Object
-  * Method:    wait
 Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 ===================================================================
---- src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c	(revision 7675)
+--- src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c	(revision 7676)
 +++ src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c	(working copy)
 @@ -30,14 +30,152 @@
  #include "config.h"
