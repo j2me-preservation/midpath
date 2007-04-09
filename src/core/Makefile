@@ -1,5 +1,5 @@
 #
-# Makefile created at Sat Apr  7 19:58:09 2007, by mmake
+# Makefile created at Mon Apr  9 22:16:57 2007, by mmake
 #
 
 # Programs (with common options):
@@ -125,13 +125,13 @@ PACKAGES = \
 	com.sun.midp.io.j2me.serversocket \
 	com.sun.midp.i18n \
 	com.sun.midp.main \
-	org.thenesis.midpath.ui \
 	com.sun.midp.io.j2me.socket \
 	com.sun.midp.midletsuite \
 	javax.microedition.media.control \
 	org.thenesis.midpath.ui.backend.awt \
 	com.sun.midp.chameleon.layers \
 	com.sun.midp.security \
+	org.thenesis.midpath.ui.backend.sdl \
 	javax.microedition.io.file \
 	org.thenesis.midpath.installer \
 	com.sun.midp.chameleon.input \
@@ -161,6 +161,7 @@ ALL_PACKAGES = \
 	javax.microedition \
 	com.sun \
 	org.thenesis.midpath.image \
+	org.thenesis.midpath.ui \
 	org.thenesis.midpath.ui.backend \
 	org.thenesis.midpath.io.backend \
 	org.thenesis \
@@ -463,6 +464,7 @@ org : $(call PACKAGE_OBJS,org)
 javax.microedition : $(call PACKAGE_OBJS,javax.microedition)
 com.sun : $(call PACKAGE_OBJS,com.sun)
 org.thenesis.midpath.image : $(call PACKAGE_OBJS,org.thenesis.midpath.image)
+org.thenesis.midpath.ui : $(call PACKAGE_OBJS,org.thenesis.midpath.ui)
 org.thenesis.midpath.ui.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend)
 org.thenesis.midpath.io.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.io.backend)
 org.thenesis : $(call PACKAGE_OBJS,org.thenesis)
@@ -490,13 +492,13 @@ com.sun.midp.io : $(call PACKAGE_OBJS,com.sun.midp.io)
 com.sun.midp.io.j2me.serversocket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.serversocket)
 com.sun.midp.i18n : $(call PACKAGE_OBJS,com.sun.midp.i18n)
 com.sun.midp.main : $(call PACKAGE_OBJS,com.sun.midp.main)
-org.thenesis.midpath.ui : $(call PACKAGE_OBJS,org.thenesis.midpath.ui)
 com.sun.midp.io.j2me.socket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.socket)
 com.sun.midp.midletsuite : $(call PACKAGE_OBJS,com.sun.midp.midletsuite)
 javax.microedition.media.control : $(call PACKAGE_OBJS,javax.microedition.media.control)
 org.thenesis.midpath.ui.backend.awt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.awt)
 com.sun.midp.chameleon.layers : $(call PACKAGE_OBJS,com.sun.midp.chameleon.layers)
 com.sun.midp.security : $(call PACKAGE_OBJS,com.sun.midp.security)
+org.thenesis.midpath.ui.backend.sdl : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.sdl)
 javax.microedition.io.file : $(call PACKAGE_OBJS,javax.microedition.io.file)
 org.thenesis.midpath.installer : $(call PACKAGE_OBJS,org.thenesis.midpath.installer)
 com.sun.midp.chameleon.input : $(call PACKAGE_OBJS,com.sun.midp.chameleon.input)
