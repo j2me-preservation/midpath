@@ -19,12 +19,11 @@
  * Clara, CA 95054 or visit www.sun.com if you need additional
  * information or have any questions. 
  */
-package org.thenesis.midpath.ui;
-
-import javax.microedition.lcdui.Toolkit;
+package org.thenesis.midpath.ui.backend.sdl;
 
 import sdljava.event.SDLEvent;
 import sdljava.event.SDLExposeEvent;
+import sdljava.event.SDLKey;
 import sdljava.event.SDLKeyboardEvent;
 import sdljava.event.SDLMouseButtonEvent;
 import sdljava.event.SDLMouseMotionEvent;
@@ -52,10 +51,9 @@ public class SDLEventPump implements Runnable {
 	 * that no drag is active) when the mouse is released.
 	 */
 	private int drag;
-
 	private boolean running = true;
 	
-	private String LETTERS = "abcdefghiklmnopqrstuvwxyz";
+	//private String LETTERS = "abcdefghiklmnopqrstuvwxyz";
 
 	/**
 	 * Creates a new SDLEventPump for the specified X Display.
@@ -79,8 +77,10 @@ public class SDLEventPump implements Runnable {
 				processEvent(SDLEvent.waitEvent(true));
 			}
 
-		} catch (Throwable x) {
-			System.err.println("Exception during event dispatch:");
+		} catch (Throwable t) {
+			//Logging.report(Logging.ERROR, LogChannels.LC_EVENTS, "Exception during event dispatch: " + x.getMessage());
+			Logging.trace(t, "Exception during event dispatch");
+			//System.err.println("Exception during event dispatch: " + x.getMessage());
 			//x.printStackTrace(System.err);
 		}
 
@@ -151,32 +151,7 @@ public class SDLEventPump implements Runnable {
 		int unicode = event.getUnicode();
 		int keyCode = event.getSym();
 		
-		// If the key code is visible, check if we need upper case
-		if (unicode != 0) {
-			keyCode = unicode;
-			if (event.getMod().shift()) {
-				
-				char c = (char) unicode;
-				if (LETTERS.indexOf(unicode) != -1) {
-					keyCode = (int)Character.toUpperCase(c);
-				}
-				
-//				if (Character.isLetter(unicode))
-//					keyCode = Character.toUpperCase(unicode);
-			}
-			
-		} else {
-			// Skip the key code if it's not a known code
-			// If it's not an internal event key, test if it's a system key
-			int code = SDLEventMapper.mapToInternalEvent(keyCode);
-			if (code == keyCode) {
-				if (Toolkit.getToolkit().getEventMapper().getSystemKey(keyCode) == 0) 
-					return;
-			}
-		}
-		
 		NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
-		
 		// Set event type (intParam1)
 		if (event.getState() == SDLPressedState.PRESSED) {
 			if (Logging.TRACE_ENABLED)
@@ -185,42 +160,22 @@ public class SDLEventPump implements Runnable {
 		} else if (event.getState() == SDLPressedState.RELEASED) {
 			nativeEvent.intParam1 = EventConstants.RELEASED;
 		}
-		
 		// Set event key code (intParam2)
-		nativeEvent.intParam2 = SDLEventMapper.mapToInternalEvent(keyCode);
+		char c = (char)unicode;
+		int internalCode = SDLEventMapper.mapToInternalEvent(keyCode, c);
+		if (internalCode != 0) {
+			nativeEvent.intParam2 = internalCode;
+		} else if ((unicode != 0) && (keyCode != SDLKey.SDLK_LSHIFT) && (keyCode != SDLKey.SDLK_RSHIFT)) {
+			nativeEvent.intParam2 = c;
+		} else {
+			return;
+		}
+		
 		// Set event source (intParam4). Fake display with id=1
 		nativeEvent.intParam4 = 1;
-		
+
 		EventQueue.getEventQueue().post(nativeEvent);
 		
-//		// TODO Fake only one available window yet
-//		Integer windowKey = new Integer(0);
-//		Window awtWindow = (Window) windows.get(windowKey);
-//
-//		long when = System.currentTimeMillis();
-//		int keyCode = EventMapping.mapToKeyCode(event);
-//		int modifiers = EventMapping.mapModifiers(event);
-//		char keyChar = EventMapping.mapToKeyChar(event);
-//		KeyEvent ke;
-//		
-//		//if (SDLToolkit.DEBUG)
-//		//	System.out.println("[DEBUG] SDLEventPump.processEvent(SDLKeyboardEvent event): key : " + keyChar);
-//
-//		if (event.getState() == SDLPressedState.PRESSED) {
-//			System.out.println("[DEBUG] SDLEventPump.processEvent(SDLKeyboardEvent event): key pressed : code : " + keyCode);
-//			//ke = new KeyEvent(awtWindow, KeyEvent.KEY_PRESSED, when, modifiers, keyCode, keyChar);
-//			ke = new KeyEvent(awtWindow, KeyEvent.KEY_PRESSED, when, modifiers, keyCode, KeyEvent.CHAR_UNDEFINED);
-//			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(ke);
-//			if (keyChar != KeyEvent.CHAR_UNDEFINED) {
-//				System.out.println("[DEBUG] SDLEventPump.processEvent(SDLKeyboardEvent event): key typed: " + keyChar);
-//				ke = new KeyEvent(awtWindow, KeyEvent.KEY_TYPED, when, modifiers, KeyEvent.VK_UNDEFINED, keyChar);
-//				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(ke);
-//			}
-//		} else {
-//			System.out.println("[DEBUG] SDLEventPump.processEvent(SDLKeyboardEvent event): key released: code :" + keyCode);
-//			ke = new KeyEvent(awtWindow, KeyEvent.KEY_RELEASED, when, modifiers, keyCode, KeyEvent.CHAR_UNDEFINED);
-//			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(ke);
-//		}
 
 	}
 

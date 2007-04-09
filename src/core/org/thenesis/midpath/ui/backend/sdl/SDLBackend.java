@@ -1,9 +1,8 @@
-package org.thenesis.midpath.ui.virtual;
+package org.thenesis.midpath.ui.backend.sdl;
 
-import org.thenesis.midpath.ui.SDLGraphics;
-import org.thenesis.midpath.ui.SDLToolkit;
+import org.thenesis.midpath.ui.virtual.UIBackend;
+import org.thenesis.midpath.ui.virtual.VirtualSurface;
 
-import sdljava.SDLException;
 import sdljava.video.SDLSurface;
 
 import com.sun.midp.events.EventMapper;
@@ -39,11 +38,14 @@ public class SDLBackend implements UIBackend {
 		
 		// Draw rgb field on the surface
 		sdlSurface.setPixelData32(rootVirtualSurface.data);
-		try {
-			sdlSurface.updateRect(x, y, width, heigth);
-		} catch (SDLException e) {
-			e.printStackTrace();
-		}
+		
+		toolkit.refresh(1, x, y, width, heigth);
+		
+//		try {
+//			sdlSurface.updateRect(x, y, width, heigth);
+//		} catch (SDLException e) {
+//			e.printStackTrace();
+//		}
 		
 	}
 	

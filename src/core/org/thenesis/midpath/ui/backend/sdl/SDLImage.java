@@ -19,7 +19,7 @@
  * Clara, CA 95054 or visit www.sun.com if you need additional
  * information or have any questions. 
  */
-package org.thenesis.midpath.ui;
+package org.thenesis.midpath.ui.backend.sdl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

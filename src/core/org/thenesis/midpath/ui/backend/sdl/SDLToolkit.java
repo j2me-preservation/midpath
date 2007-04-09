@@ -19,7 +19,7 @@
  * Clara, CA 95054 or visit www.sun.com if you need additional
  * information or have any questions. 
  */
-package org.thenesis.midpath.ui;
+package org.thenesis.midpath.ui.backend.sdl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,35 +37,33 @@ import sdljava.video.SDLVideo;
 
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 
 public class SDLToolkit extends Toolkit {
 	
-	/**
-	 * Set to true to enable debug output.
-	 */
-	//static boolean DEBUG = true;
-
-	private SDLSurface rootSurface;
+	private SDLSurface screenSurface;
+	private SDLSurface rootARGBSurface;
 	private SDLGraphics rootPeer;
-	//private static SDLToolkit defaultToolkit = new SDLToolkit();
 	private SDLEventPump eventPump;
 	private EventMapper eventMapper = new SDLEventMapper();
 
 	public SDLToolkit() {
 	}
 
-//	public static SDLToolkit getToolkit() {
-//		return defaultToolkit;
-//	}
-
 	public void initialize(int w, int h) {
+		
+		int bitsPerPixel = Configuration.getPositiveIntProperty("org.thenesis.midpath.ui.backend.sdl.bitsPerPixel", 32);
+		String videoMode = Configuration.getPropertyDefault("org.thenesis.midpath.ui.backend.sdl.videoMode", "SW");
+		long flags = videoMode.equalsIgnoreCase("HW") ? SDLVideo.SDL_HWSURFACE : SDLVideo.SDL_SWSURFACE;
 
 		try {
 			SDLMain.init(SDLMain.SDL_INIT_VIDEO);
-			rootSurface = SDLVideo.setVideoMode(w, h, 32, SDLVideo.SDL_SWSURFACE);
+			screenSurface = SDLVideo.setVideoMode(w, h, bitsPerPixel, flags);
+			rootARGBSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, w, h, 32, 0x00ff0000L,
+					0x0000ff00L, 0x000000ffL, 0xff000000L);
 			if (Logging.TRACE_ENABLED)
-				System.out.println("[DEBUG] Toolkit.initialize(): VideoSurface: " + rootSurface);
-			rootPeer = new SDLGraphics(rootSurface);
+				System.out.println("[DEBUG] Toolkit.initialize(): VideoSurface: " + rootARGBSurface);
+			rootPeer = new SDLGraphics(rootARGBSurface);
 			eventPump = new SDLEventPump();
 			
 		} catch (SDLException e) {
@@ -102,7 +100,9 @@ public class SDLToolkit extends Toolkit {
 			System.out.println("[DEBUG] Toolkit.refresh(): x=" + x + " y=" + y + " widht=" + widht + " heigth=" + heigth);
 
 		try {
-			rootSurface.updateRect(x, y, widht, heigth);
+			
+			rootARGBSurface.blitSurface(screenSurface);
+			screenSurface.updateRect(x, y, widht, heigth);
 		} catch (SDLException e) {
 			e.printStackTrace();
 		}
@@ -111,8 +111,8 @@ public class SDLToolkit extends Toolkit {
 	SDLSurface createSDLSurface(int w, int h) throws SDLException {
 
 		// Create surface compatible with display surface
-		long flags = rootSurface.getFlags();
-		SDLPixelFormat format = rootSurface.getFormat();
+		long flags = rootARGBSurface.getFlags();
+		SDLPixelFormat format = rootARGBSurface.getFormat();
 		int pitch = format.getBitsPerPixel();
 		long rMask = format.getRMask();
 		long gMask = format.getGMask();

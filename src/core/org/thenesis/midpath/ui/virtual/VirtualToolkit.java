@@ -31,6 +31,7 @@ import javax.microedition.lcdui.Toolkit;
 
 import org.thenesis.midpath.ui.backend.awt.AWTBackend;
 import org.thenesis.midpath.ui.backend.awt.AWTGrabberBackend;
+import org.thenesis.midpath.ui.backend.sdl.SDLBackend;
 import org.thenesis.midpath.ui.backend.swt.SWTBackend;
 import org.thenesis.midpath.ui.backend.x11.X11Backend;
 

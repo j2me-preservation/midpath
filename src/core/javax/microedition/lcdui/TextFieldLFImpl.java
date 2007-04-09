@@ -29,8 +29,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import org.thenesis.midpath.ui.SDLToolkit;
-
 import com.sun.midp.chameleon.CGraphicsUtil;
 import com.sun.midp.chameleon.SubMenuCommand;
 import com.sun.midp.chameleon.input.BasicTextInputSession;

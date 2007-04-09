@@ -25,9 +25,7 @@
 
 package javax.microedition.lcdui;
 
-import org.thenesis.midpath.ui.SDLGraphics;
-import org.thenesis.midpath.ui.SDLImage;
-import org.thenesis.midpath.ui.SDLToolkit;
+import org.thenesis.midpath.ui.backend.sdl.SDLGraphics;
 
 /**
  * Provides simple 2D geometric rendering capability.

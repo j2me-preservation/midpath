@@ -30,8 +30,6 @@ import java.io.InputStream;
 
 import javax.microedition.lcdui.game.Sprite;
 
-import org.thenesis.midpath.ui.SDLToolkit;
-
 /**
  * The <code>Image</code> class is used to hold graphical image
  * data. <code>Image</code>

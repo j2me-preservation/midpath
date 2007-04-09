@@ -24,7 +24,7 @@ package javax.microedition.lcdui;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.thenesis.midpath.ui.SDLToolkit;
+import org.thenesis.midpath.ui.backend.sdl.SDLToolkit;
 import org.thenesis.midpath.ui.virtual.VirtualToolkit;
 
 import com.sun.midp.events.EventMapper;

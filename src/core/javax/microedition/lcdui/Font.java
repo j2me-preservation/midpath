@@ -25,7 +25,6 @@
 
 package javax.microedition.lcdui;
 
-import org.thenesis.midpath.ui.SDLToolkit;
 
 /**
  * The <code>Font</code> class represents fonts and font
