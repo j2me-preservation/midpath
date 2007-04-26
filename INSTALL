@@ -126,7 +126,7 @@ How to compile cacao-cldc for MIDPath
 Compile CDLC classes
 --------------------
 
-The MIDPath build script (build.sh) compile cldc automatically with needed patches. More infos in the SVN cldc1.1 directory
+The MIDPath build script (build.sh) compile cldc automatically with needed patches (see external/cldc1.1/README)
 
 Compile cacao-cldc
 ------------------
@@ -148,4 +148,4 @@ Compile cacao-cldc
 # make
 # make install
 
-(adapted from How to build CACAO for CLDC1.1) on the cacao wiki.
+(adapted from "Howto build CACAO for CLDC1.1") on the cacao wiki.
