@@ -1,0 +1,151 @@
+Install from the distribution
+==============================
+
+Step 1 : Get the distro
+-----------------------
+
+ # tar -zxf midpath-<VERSION>.tar.gz
+
+We obtain a directory named midpath. We will refer to it below by this environment variable: $MIDPATH_HOME
+
+Step 2: Set the Java environment
+--------------------------------
+
+* Install your favorite JVM
+
+ - JamVM 
+ 	
+ 	# apt-get install jamvm
+
+ - Kaffe 
+
+    # apt-get install kaffe
+
+ - Cacao 
+
+    # apt-get install cacao
+    
+  - Cacao-cldc: See "How to compile cacao-cldc for MIDPath" below 
+
+Step 3: Install Classpath (not needed if you use Kaffe or cacao-cldc)
+---------------------------------------------------------------------
+	
+	# apt-get install classpath-common
+
+ Step 4 (optional): SDL installation
+------------------------------------
+
+# apt-get install libsdl1.2debian-all libsdl-gfx1.2 libsdl-image1.2 libsdl-mixer1.2 libsdl-ttf1.2 libsdl1.2-dev 
+
+* SDLJava installation
+
+Compile SDLJava native part:
+
+# cd $MIDPATH_HOME/external/sdljava/native
+# make
+# cp *.so $MIDPATH_HOME/dist
+
+Step 5: Configure your MIDP2 environment
+----------------------------------------
+
+Modify configuration.cfg file in resources-embedded/com/sun/midp/configuration/ directory
+
+Set the screen size and choose your backend (see below).
+
+(note: do not modify the parameter javax.microedition.lcdui.toolkit. Let it to "virtual" value)
+
+##========================================
+## Graphics parameters
+##========================================
+javax.microedition.lcdui.screenWidth:176
+javax.microedition.lcdui.screenHeight:210
+# Possible toolkit values: SDL, virtual
+javax.microedition.lcdui.toolkit:virtual
+
+##======================================
+## Parameters for the Virtual Toolkit
+##====================================== 
+# Possible backend values: SDL, AWT, AWT_GRABBER, SWT, X11
+org.thenesis.midpath.ui.backend:AWT
+# SDL backend configuration. 
+# Possible bitsPerPixels values: 8, 16, 32
+# Possible video mode values: SW, HW (i.e software, hardware)
+org.thenesis.midpath.ui.backend.sdl.bitsPerPixel:32
+org.thenesis.midpath.ui.backend.sdl.videoMode:SW
+# X11 backend configuration. 
+# Display value examples: :0.0, 192.168.0.1:1.0 
+org.thenesis.midpath.ui.backend.x11.Display::0.0
+# Possible fontRenderer values: raw, BDF
+org.thenesis.midpath.ui.fontRenderer:raw
+org.thenesis.midpath.font.bdf.filename:VeraMono-12-8.bdf
+
+##======================================
+## Event parameters
+##====================================== 
+javax.microedition.lcdui.pointerSupported:true
+javax.microedition.lcdui.pointerMotionSupported:true
+
+Step 6: Start the test MIDlet
+-----------------------------
+
+# cd $MIDPATH_HOME/bin
+# chmod u+x midpath-test.sh
+# ./midpath-test.sh
+
+For cacao-cldc, use the midpath-test-cacao-cldc.sh script
+
+Install from the source repository
+==================================
+
+Step A : Grab the sources
+-------------------------
+
+# svn export https://midpath.svn.sourceforge.net/svnroot/midpath/trunk
+# export MIDPATH_HOME=$(pwd)/trunk
+
+Step B : Set the compilation Java environment
+---------------------------------------------
+
+* Complete Step 3
+* Install ecj (or a package which contains javac) 
+
+  # apt-get install ecj
+
+Step C : Build
+--------------
+
+# cd $MIDPATH_HOME
+# chmod u+x build.sh
+# ./build.sh
+
+Now complete steps 2,5 and 6
+
+How to compile cacao-cldc for MIDPath
+=====================================
+
+Compile CDLC classes
+--------------------
+
+The MIDPath build script (build.sh) compile cldc automatically with needed patches (see external/cldc1.1/README)
+
+Compile cacao-cldc
+------------------
+
+* Grab cacao sources from SVN 
+
+# svn co svn://c1.complang.tuwien.ac.at/ahome/cacao/svn/cacao/trunk cacao
+
+* Replace com_sun_cldc_io_ResourceInputStream.c in cacao sources by the patched file 
+
+# cd cacao
+# cp com_sun_cldc_io_ResourceInputStream.c src/native/vm/cldc1.1/
+
+* Compile cacao-cldc 
+
+# ./configure --prefix=/install/cacao-cldc --enable-java=cldc1.1 \
+ --with-classpath=cldc1.1 --with-classpath-classes=$MIDPATH_HOME/dist/cldc1.1.jar \
+ --with-classpath-includedir=/install/classpath-0.93/include --enable-jni
+# make
+# make install
+
+(adapted from "Howto build CACAO for CLDC1.1") on the cacao wiki.
