@@ -1,0 +1,14 @@
+
+0.1-alpha2 (11/04/2006)
+-----------------------
+
+* Added a Virtual Toolkit (pure Java rendering)
+* Added BDF font support (thanks to Stephane Meslin-Weber)
+* Added pure Java PNG library (based on Sixlegs PNG library)
+* Added AWT, SWT, (socket-based) X11 backends
+* MIDPath works with cacao-cldc now (thanks to Christian Thalinger -a.k.a twisti- for his help)
+
+0.1-alpha1 (20/12/2006)
+-----------------------
+
+* Initial version
