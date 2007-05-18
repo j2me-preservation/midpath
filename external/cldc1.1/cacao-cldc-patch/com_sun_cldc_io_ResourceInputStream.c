@@ -46,16 +46,18 @@
 #endif
 
 #include "native/jni.h"
+#include "native/native.h"
 
 #include "native/include/java_lang_Object.h"
 #include "native/include/java_lang_String.h"
+#include "native/include/com_sun_cldc_io_ResourceInputStream.h"
 
 #include "vm/builtin.h"
 #include "vm/exceptions.h"
 #include "vm/initialize.h"
 #include "vm/stringlocal.h"
 #include "vm/properties.h"
-#include "vm/vm.h"
+#include "vm/vm.h" /* REMOVE ME: temporarily */
 
 #include "vm/jit/asmpart.h"
 
@@ -72,6 +74,29 @@
 #include "toolbox/logging.h"
 #include "toolbox/util.h"
 
+
+/* native methods implemented by this file ************************************/
+ 
+static JNINativeMethod methods[] = {
+	{ "readAllBytes", "(Ljava/lang/String;[B)I", (void *) (ptrint) &Java_com_sun_cldc_io_ResourceInputStream_readAllBytes },
+};
+ 
+ 
+ 
+/* _Jv_com_sun_cldc_io_ResourceInputStream_init ********************************
+ 
+   Register native functions.
+ 
+*******************************************************************************/
+ 
+void _Jv_com_sun_cldc_io_ResourceInputStream_init(void)
+{
+	utf *u;
+ 
+	u = utf_new_char("com/sun/cldc/io/ResourceInputStream");
+ 
+	native_method_register(u, methods, NATIVE_METHODS_COUNT);
+}
 
 
 
@@ -212,9 +237,9 @@ JNIEXPORT java_lang_Object* JNICALL Java_com_sun_cldc_io_ResourceInputStream_ope
 }
 
 /*
- * Class:     com_sun_cldc_io_ResourceInputStream
- * Method:    readBytes
- * Signature: (Ljava/lang/Object;[BII)I
+ * Class:     com/sun/cldc/io/ResourceInputStream
+ * Method:    readAllBytes
+ * Signature: (Ljava/lang/String;[B)I
  */
 JNIEXPORT jint JNICALL Java_com_sun_cldc_io_ResourceInputStream_readAllBytes(JNIEnv *env, jclass clazz, java_lang_String *name, java_bytearray *jarray) {
 
