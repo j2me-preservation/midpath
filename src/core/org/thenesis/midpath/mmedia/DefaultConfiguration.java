@@ -229,24 +229,24 @@ public class DefaultConfiguration extends Configuration {
         // Protocol handlers.
         handlers.put("http", "com.sun.mmedia.protocol.CommonDS");
         handlers.put("file", "com.sun.mmedia.protocol.CommonDS");
-        handlers.put("capture", "com.sun.mmedia.protocol.WavCapture");
+        //handlers.put("capture", "com.sun.mmedia.protocol.WavCapture");
 
-        // Device handlers.
-        if (needQSound) {
-            handlers.put(TONE_DEVICE_LOCATOR, "com.sun.mmedia.QSoundToneSequencePlayer");
-            handlers.put(MIDI_DEVICE_LOCATOR, "com.sun.mmedia.QSoundMIDIPlayer");
-        } else {
-            handlers.put(TONE_DEVICE_LOCATOR, "com.sun.mmedia.ToneSequencePlayer");
-            handlers.put(MIDI_DEVICE_LOCATOR, "com.sun.mmedia.MIDIPlayer");
-        }
-        
-        if (needAMMS) {
-            handlers.put(RADIO_CAPTURE_LOCATOR, "com.sun.amms.AmmsTuner");
-            handlers.put(VIDEO_CAPTURE_LOCATOR, "com.sun.amms.AmmsCameraPlayer");
-        } else {
-            handlers.put(RADIO_CAPTURE_LOCATOR, "com.sun.mmedia.MmapiTuner");
-            handlers.put(VIDEO_CAPTURE_LOCATOR, "com.sun.mmedia.MmapiCameraPlayer");
-        }
+//        // Device handlers.
+//        if (needQSound) {
+//            handlers.put(TONE_DEVICE_LOCATOR, "com.sun.mmedia.QSoundToneSequencePlayer");
+//            handlers.put(MIDI_DEVICE_LOCATOR, "com.sun.mmedia.QSoundMIDIPlayer");
+//        } else {
+//            handlers.put(TONE_DEVICE_LOCATOR, "com.sun.mmedia.ToneSequencePlayer");
+//            handlers.put(MIDI_DEVICE_LOCATOR, "com.sun.mmedia.MIDIPlayer");
+//        }
+//        
+//        if (needAMMS) {
+//            handlers.put(RADIO_CAPTURE_LOCATOR, "com.sun.amms.AmmsTuner");
+//            handlers.put(VIDEO_CAPTURE_LOCATOR, "com.sun.amms.AmmsCameraPlayer");
+//        } else {
+//            handlers.put(RADIO_CAPTURE_LOCATOR, "com.sun.mmedia.MmapiTuner");
+//            handlers.put(VIDEO_CAPTURE_LOCATOR, "com.sun.mmedia.MmapiCameraPlayer");
+//        }
         
         // Content handlers.
         
@@ -271,13 +271,24 @@ public class DefaultConfiguration extends Configuration {
 //        supportedProtocols.put(MIME_AUDIO_MIDI, hfdProtocols);
 //        supportedProtocols.put(MIME_AUDIO_SP_MIDI, hfProtocols);
         
+        
         // Other multimedia content ...
         //handlers.put(MIME_IMAGE_GIF, "com.sun.mmedia.GIFPlayer");
-        handlers.put(MIME_AUDIO_WAV, "org.thenesis.midp2.mmedia.SDLPlayer");
-        handlers.put(MIME_AUDIO_MP3, "org.thenesis.midp2.mmedia.SDLPlayer");
-        handlers.put(MIME_AUDIO_OGG, "org.thenesis.midp2.mmedia.SDLPlayer");
-        handlers.put(MIME_AUDIO_XM, "org.thenesis.midp2.mmedia.SDLPlayer");
-        handlers.put(MIME_AUDIO_MOD, "org.thenesis.midp2.mmedia.SDLPlayer");
+        
+        String soundEngineName = com.sun.midp.main.Configuration.getPropertyDefault("org.thenesis.midpath.sound.engine", "null");
+        
+        if (soundEngineName.equalsIgnoreCase("SDL")) {
+        	handlers.put(MIME_AUDIO_WAV, "org.thenesis.midpath.mmedia.SDLWavPlayer");
+        	handlers.put(MIME_AUDIO_MP3, "org.thenesis.midpath.mmedia.SDLMusicPlayer");
+        	handlers.put(MIME_AUDIO_OGG, "org.thenesis.midpath.mmedia.SDLMusicPlayer");
+        	handlers.put(MIME_AUDIO_XM, "org.thenesis.midpath.mmedia.SDLMusicPlayer");
+        	handlers.put(MIME_AUDIO_MOD, "org.thenesis.midpath.mmedia.SDLMusicPlayer");
+        } else if (soundEngineName.equalsIgnoreCase("virtual")) {
+        	handlers.put(MIME_AUDIO_WAV, "org.thenesis.midpath.mmedia.VirtualSoundPlayer");
+        	handlers.put(MIME_AUDIO_MP3, "org.thenesis.midpath.mmedia.VirtualSoundPlayer");
+        	handlers.put(MIME_AUDIO_OGG, "org.thenesis.midpath.mmedia.VirtualSoundPlayer");
+        }
+        
         //handlers.put(MIME_VIDEO_MPEG, "com.sun.mmedia.JavaMPEG1Player2");
         
 //        supportedProtocols.put(MIME_IMAGE_GIF, hfProtocols);

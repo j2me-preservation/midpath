@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -14,10 +14,6 @@
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
- * 
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 or visit www.sun.com if you need additional
- * information or have any questions. 
  */
 package org.thenesis.midpath.mmedia;
 
@@ -34,7 +30,7 @@ import sdljava.SDLException;
 import sdljava.mixer.MixChunk;
 import sdljava.mixer.SDLMixer;
 
-public class SDLWavPlayer extends BasicPlayer {
+public class SDLWavPlayer extends SDLPlayer {
 
 	private InputStream stream;
 	private String type;
