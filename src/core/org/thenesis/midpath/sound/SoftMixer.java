@@ -81,7 +81,7 @@ public class SoftMixer extends Mixer {
 		// Prevent operations while mixing (other lines acquiring the lock, line added to the pool)
 		//synchronized (mutex) {
 
-		aliveLines.clear();
+		aliveLines.removeAllElements();
 
 		// Check if we have to mix the buffers.
 		for (int i = 0; i < lineList.size(); i++) {
@@ -93,7 +93,7 @@ public class SoftMixer extends Mixer {
 					return;
 				}
 				// Add a line to the mix 
-				aliveLines.add(line);
+				aliveLines.addElement(line);
 
 			}
 
