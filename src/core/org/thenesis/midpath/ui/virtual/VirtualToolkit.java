@@ -27,7 +27,7 @@ import java.io.InputStream;
 import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Toolkit;
+import javax.microedition.lcdui.UIToolkit;
 
 import org.thenesis.midpath.ui.backend.awt.AWTBackend;
 import org.thenesis.midpath.ui.backend.awt.AWTGrabberBackend;
@@ -40,7 +40,7 @@ import com.sun.midp.events.EventMapper;
 import com.sun.midp.log.Logging;
 import com.sun.midp.main.Configuration;
 
-public class VirtualToolkit extends Toolkit {
+public class VirtualToolkit extends UIToolkit {
 
 	private VirtualSurface rootSurface;
 	private VirtualGraphics rootPeer;
@@ -180,6 +180,10 @@ public class VirtualToolkit extends Toolkit {
 	
 	UIBackend getBackend() {
 		return backend;
+	}
+
+	public void close() {
+		backend.close();
 	}
 
 }

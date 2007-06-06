@@ -51,12 +51,12 @@ public class X11Backend implements UIBackend {
 	private X11EventMapper eventMapper = new X11EventMapper();
 
 	public X11Backend(int w, int h) {
-		
+
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-		
+
 		String display = Configuration.getPropertyDefault("org.thenesis.midpath.ui.backend.x11.Display", ":0.0");
 		Environment.setValue("DISPLAY", display);
-		
+
 		x11App = new X11Application(new String[] { "" }, w, h);
 		x11App.start();
 	}
@@ -76,6 +76,10 @@ public class X11Backend implements UIBackend {
 	public void updateSurfacePixels(int x, int y, long width, long height) {
 		x11App.setPixels(x, y, (int) width, (int) height, rootVirtualSurface.data, 0, rootVirtualSurface.width);
 		x11App.paint();
+	}
+
+	public void close() {
+		x11App.stop();
 	}
 
 	private class VirtualSurfaceImpl extends VirtualSurface {
@@ -114,7 +118,7 @@ public class X11Backend implements UIBackend {
 
 			display = new Display(display_name);
 			display.connection.send_mode = send_mode;
-			leave_display_open = true;
+			leave_display_open = false;
 			zpixmap = new ZPixmap(display, width, height, display.default_pixmap_format);
 
 			Window.Attributes win_attr = new Window.Attributes();
@@ -147,7 +151,7 @@ public class X11Backend implements UIBackend {
 			this.width = width;
 			this.height = height;
 		}
-		
+
 		public void setPixels(int startX, int startY, int w, int h, int[] rgbArray, int offset, int scansize) {
 			for (int y = startX; y < startY + h; y++) {
 				for (int x = startX; x < startX + w; x++) {
@@ -158,6 +162,7 @@ public class X11Backend implements UIBackend {
 
 		public void paint() {
 			window.put_image(display.default_gc, zpixmap, 0, 0);
+			display.flush();
 		}
 
 		public void run() {
@@ -177,7 +182,10 @@ public class X11Backend implements UIBackend {
 
 			switch (event.code()) {
 			case ClientMessage.CODE:
-				//if (((ClientMessage) event).delete_window ())
+				if (((ClientMessage) event).delete_window()) {
+					NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
+					EventQueue.getEventQueue().post(nativeEvent);
+				}
 				break;
 			case Expose.CODE:
 				exposed = true;

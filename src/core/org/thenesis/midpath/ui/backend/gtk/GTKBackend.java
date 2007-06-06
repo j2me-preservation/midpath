@@ -58,6 +58,10 @@ public class GTKBackend extends GTKCanvas implements UIBackend {
 		//System.out.println("[DEBUG] GTKBackend.updateSurfacePixels(): " + x + " " + y + " " + width + " " + height);	
 		updateARGBPixels(rootVirtualSurface.data, x, y, (int)width, (int)height);
 	}
+	
+	public void close() {
+		stop();
+	}
 
 	private class VirtualSurfaceImpl extends VirtualSurface {
 
@@ -145,6 +149,17 @@ public class GTKBackend extends GTKCanvas implements UIBackend {
 
 			EventQueue.getEventQueue().post(nativeEvent);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.thenesis.midpath.ui.backend.gtk.GTKCanvas#onWindowDeleteEvent()
+	 */
+	public void onWindowDeleteEvent() {
+		if (Logging.TRACE_ENABLED)
+			System.out.println("Window delete event received: ");
+		
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
+		EventQueue.getEventQueue().post(nativeEvent);
 	}
 
 }

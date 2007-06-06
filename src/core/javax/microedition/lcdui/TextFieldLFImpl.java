@@ -875,7 +875,7 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 	 * @return true if keu code is Clear one, false otherwise
 	 */
 	public boolean isClearKey(int keyCode) {
-		return EventConstants.SYSTEM_KEY_CLEAR == Toolkit.getToolkit().getEventMapper().getSystemKey(keyCode);
+		return EventConstants.SYSTEM_KEY_CLEAR == UIToolkit.getToolkit().getEventMapper().getSystemKey(keyCode);
 
 		// return EventConstants.SYSTEM_KEY_CLEAR ==
 		//     KeyConverter.getSystemKey(keyCode);        
@@ -1005,7 +1005,7 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 			// IMPL NOTE: add back in the phone dial support after defining
 			// more system keys like 'send'
 
-			int systemKeyCode = Toolkit.getToolkit().getEventMapper().getSystemKey(keyCode);
+			int systemKeyCode = UIToolkit.getToolkit().getEventMapper().getSystemKey(keyCode);
 			
 			if (systemKeyCode == EventConstants.SYSTEM_KEY_SEND) {
 				if ((getConstraints() & TextField.CONSTRAINT_MASK) == TextField.PHONENUMBER) {

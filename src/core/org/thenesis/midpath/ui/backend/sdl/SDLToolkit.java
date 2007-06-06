@@ -27,7 +27,7 @@ import java.io.InputStream;
 import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Toolkit;
+import javax.microedition.lcdui.UIToolkit;
 
 import sdljava.SDLException;
 import sdljava.SDLMain;
@@ -39,7 +39,7 @@ import com.sun.midp.events.EventMapper;
 import com.sun.midp.log.Logging;
 import com.sun.midp.main.Configuration;
 
-public class SDLToolkit extends Toolkit {
+public class SDLToolkit extends UIToolkit {
 	
 	private SDLSurface screenSurface;
 	private SDLSurface rootARGBSurface;
@@ -57,7 +57,7 @@ public class SDLToolkit extends Toolkit {
 		long flags = videoMode.equalsIgnoreCase("HW") ? SDLVideo.SDL_HWSURFACE : SDLVideo.SDL_SWSURFACE;
 
 		try {
-			SDLMain.init(SDLMain.SDL_INIT_VIDEO);
+			SDLMain.initSubSystem(SDLMain.SDL_INIT_VIDEO);
 			screenSurface = SDLVideo.setVideoMode(w, h, bitsPerPixel, flags);
 			rootARGBSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, w, h, 32, 0x00ff0000L,
 					0x0000ff00L, 0x000000ffL, 0xff000000L);
@@ -65,6 +65,7 @@ public class SDLToolkit extends Toolkit {
 				System.out.println("[DEBUG] Toolkit.initialize(): VideoSurface: " + rootARGBSurface);
 			rootPeer = new SDLGraphics(rootARGBSurface);
 			eventPump = new SDLEventPump();
+			eventPump.start();
 			
 		} catch (SDLException e) {
 			e.printStackTrace();
@@ -183,6 +184,11 @@ public class SDLToolkit extends Toolkit {
 
 	public Image createImage(int[] rgb, int width, int height, boolean processAlpha) {
 		 return new SDLImage(rgb, width, height, processAlpha);
+	}
+
+	public void close() {
+		eventPump.stop();
+		SDLMain.quitSubSystem(SDLMain.SDL_INIT_VIDEO);
 	}
 	
 	// Note : Events processing : DisplayEventListener class

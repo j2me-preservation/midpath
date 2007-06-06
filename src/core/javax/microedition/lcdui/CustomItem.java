@@ -480,7 +480,7 @@ abstract public class CustomItem extends Item {
     public int getGameAction(int keyCode) {
         
     	//int n = KeyConverter.getGameAction(keyCode);
-    	int n = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+    	int n = UIToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
 
         if (n == -1) {
             throw new IllegalArgumentException();

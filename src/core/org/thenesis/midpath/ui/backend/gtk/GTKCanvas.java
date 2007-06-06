@@ -24,8 +24,8 @@ import com.sun.cldchi.jvm.JVM;
 public class GTKCanvas {
 
 	static {
-		JVM.loadLibrary("libgtkcanvas.so");
-		//System.loadLibrary("gtkcanvas");
+		JVM.loadLibrary("libmidpathgtk.so");
+		//System.loadLibrary("midpathgtk");
 	}
 
 	private int width;
@@ -54,7 +54,6 @@ public class GTKCanvas {
 
 	public void stop() {
 		gtkThread.stop();
-		destroy();
 	}
 
 	/**
@@ -90,6 +89,9 @@ public class GTKCanvas {
 					// Do nothing
 				}
 			}
+			
+			// Destroy GTK context.
+			destroy();
 
 		} // run()
 
@@ -153,6 +155,14 @@ public class GTKCanvas {
 		} else {
 			System.out.println("button released: " + x + " " + y);
 		}
+	}
+	
+	public void onWindowDeleteEvent() {
+		
+		System.out.println("Window delete event received: ");
+		
+//		NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
+//		EventQueue.getEventQueue().post(nativeEvent);
 	}
 
 	/* Native methods */

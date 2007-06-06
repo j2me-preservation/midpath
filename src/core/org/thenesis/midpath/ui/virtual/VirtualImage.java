@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Toolkit;
+import javax.microedition.lcdui.UIToolkit;
 import javax.microedition.lcdui.game.Sprite;
 
 import org.thenesis.midpath.image.png.PngImage;
@@ -56,7 +56,7 @@ public class VirtualImage extends Image {
 	}
 
 	private VirtualSurface createSurface(int w, int h) {
-		return ((VirtualToolkit) Toolkit.getToolkit()).getBackend().createSurface(w, h);
+		return ((VirtualToolkit) UIToolkit.getToolkit()).getBackend().createSurface(w, h);
 	}
 
 	public VirtualImage(InputStream is) throws IOException {

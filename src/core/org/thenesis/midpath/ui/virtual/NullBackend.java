@@ -36,6 +36,10 @@ public class NullBackend implements UIBackend {
 		
 	}
 
+	public void close() {
+		// Do nothing
+	}
+
 	
 
 }

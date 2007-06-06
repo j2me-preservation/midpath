@@ -290,7 +290,7 @@ public class Image {
 			throw new IllegalArgumentException();
 		}
 
-		return Toolkit.getToolkit().createImage(width, height);
+		return UIToolkit.getToolkit().createImage(width, height);
 
 		// SYNC NOTE: Not accessing any shared data, no locking necessary
 		//return new Image(ImageDataFactory.getImageDataFactory().
@@ -336,7 +336,7 @@ public class Image {
 		}
 		
 		if (source.isMutable()) {
-			return Toolkit.getToolkit().createImage(source);
+			return UIToolkit.getToolkit().createImage(source);
 		} else {
 			return source;
 		}
@@ -368,7 +368,7 @@ public class Image {
 			throw new java.lang.NullPointerException();
 		}
 		
-		return Toolkit.getToolkit().createImage(name);
+		return UIToolkit.getToolkit().createImage(name);
 	}
 
 	/**
@@ -421,7 +421,7 @@ public class Image {
 		}
 
 		try {
-			return Toolkit.getToolkit().createImage(imageData, imageOffset, imageLength);
+			return UIToolkit.getToolkit().createImage(imageData, imageOffset, imageLength);
 		} catch (IOException e) {
 			throw new IllegalArgumentException(e.getMessage());
 		}
@@ -521,7 +521,7 @@ public class Image {
 
 		if (x == 0 && y == 0 && width == image.getWidth() && height == image.getHeight()
 				&& transform == Sprite.TRANS_NONE) {
-			return Toolkit.getToolkit().createImage(image);
+			return UIToolkit.getToolkit().createImage(image);
 			//return createImage(image);
 		} else {
 			//            return 
@@ -533,7 +533,7 @@ public class Image {
 			// TODO
 			//return null;
 			try {
-				return Toolkit.getToolkit().createImage(image, x, y, width, height, transform);
+				return UIToolkit.getToolkit().createImage(image, x, y, width, height, transform);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;
@@ -563,7 +563,7 @@ public class Image {
 			throw new java.lang.NullPointerException();
 		}
 
-		return Toolkit.getToolkit().createImage(stream);
+		return UIToolkit.getToolkit().createImage(stream);
 
 		//        try {
 		//            return new Image(ImageDataFactory.getImageDataFactory().
@@ -645,7 +645,7 @@ public class Image {
 			throw new ArrayIndexOutOfBoundsException();
 		}
 
-		return Toolkit.getToolkit().createImage(rgb, width, height, processAlpha);
+		return UIToolkit.getToolkit().createImage(rgb, width, height, processAlpha);
 
 		//        return new Image(ImageDataFactory.getImageDataFactory().
 		//                         createImmutableImageData(rgb, 

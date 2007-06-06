@@ -546,7 +546,7 @@ public class Display {
 
 		okCommand = new Command(Resource.getString(ResourceConstants.OK), Command.OK, 2);
 		
-		Toolkit toolkit = Toolkit.getToolkit();
+		UIToolkit toolkit = UIToolkit.getToolkit();
 		toolkit.initialize(WIDTH, HEIGHT);
 
 	}
@@ -1992,7 +1992,7 @@ public class Display {
 	 */
 	private void refresh0(int displayId, int x1, int y1, int x2, int y2) {
 		
-		Toolkit.getToolkit().refresh(displayId, x1, y1, x2- x1, y2 - y1);
+		UIToolkit.getToolkit().refresh(displayId, x1, y1, x2- x1, y2 - y1);
 		// TODO
 		//System.out.println("[DEBUG] Display.refresh0(): not implemented yet : x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2= "+ y2);
 	}

@@ -1,0 +1,8 @@
+
+CC = gcc 
+CFLAGS = `pkg-config --cflags gtk+-2.0 hildon-libs` -I/usr/include/classpath
+LDFLAGS = `pkg-config --libs gtk+-2.0 hildon-libs`
+
+SOURCES=org_thenesis_midpath_ui_backend_gtk_GTKCanvas.c maemo/maemo_input.c
+
+include Makefile.all

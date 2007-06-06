@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package org.thenesis.midpath.ui.backend.awt;
 
 import java.awt.Dimension;
@@ -9,6 +26,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 
 import org.thenesis.midpath.ui.virtual.UIBackend;
@@ -58,6 +77,7 @@ public class AWTBackend implements UIBackend {
 		AWTEventConverter listener = new AWTEventConverter();
 
 		frame = new Frame();
+		frame.addWindowListener(listener);
 		panel.addKeyListener(listener);
 		panel.addMouseListener(listener);
 		panel.addMouseMotionListener(listener);
@@ -92,6 +112,10 @@ public class AWTBackend implements UIBackend {
 		panel.repaint();
 
 	}
+	
+	public void close() {
+		frame.dispose();
+	}
 
 	private class VirtualSurfaceImpl extends VirtualSurface {
 
@@ -103,7 +127,7 @@ public class AWTBackend implements UIBackend {
 
 	}
 
-	private class AWTEventConverter implements KeyListener, MouseListener, MouseMotionListener {
+	private class AWTEventConverter implements KeyListener, MouseListener, MouseMotionListener, WindowListener {
 
 		public void keyPressed(KeyEvent e) {
 
@@ -172,14 +196,13 @@ public class AWTBackend implements UIBackend {
 
 		public void mouseExited(MouseEvent e) {
 			// Not used
-
 		}
 
 		public void mousePressed(MouseEvent e) {
-			
+
 			if (Logging.TRACE_ENABLED)
 				System.out.println("[DEBUG] AWTBackend.mousePressed()");
-			
+
 			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
 			nativeEvent.intParam1 = EventConstants.PRESSED; // Event type
 			nativeEvent.intParam2 = e.getX(); // x
@@ -192,7 +215,7 @@ public class AWTBackend implements UIBackend {
 		}
 
 		public void mouseReleased(MouseEvent e) {
-			
+
 			if (Logging.TRACE_ENABLED)
 				System.out.println("[DEBUG] AWTBackend.mouseReleased()");
 
@@ -208,10 +231,10 @@ public class AWTBackend implements UIBackend {
 		}
 
 		public void mouseDragged(MouseEvent e) {
-			
+
 			if (Logging.TRACE_ENABLED)
 				System.out.println("[DEBUG] AWTBackend.mouseDragged()");
-			
+
 			NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
 			nativeEvent.intParam1 = EventConstants.DRAGGED; // Event type
 			nativeEvent.intParam2 = e.getX(); // x
@@ -223,8 +246,39 @@ public class AWTBackend implements UIBackend {
 
 		}
 
-		public void mouseMoved(MouseEvent e) {
-			// Not used
+		public void mouseMoved(MouseEvent e) { 
+			/* Not used */
+		}
+
+		public void windowClosing(WindowEvent e) {
+			
+			// User attempts to close the window from the window's system menu.
+			// Send shutdown event
+			NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
+			EventQueue.getEventQueue().post(nativeEvent);
+			
+			// MIDletStateHandler.getMidletStateHandler().destroySuite();
+			// NativeEvent nativeEvent = new NativeEvent(EventTypes.DESTROY_MIDLET_EVENT);
+			// Set event source (intParam4). Fake display with id=1
+			// nativeEvent.intParam4 = 1;
+		}
+
+		public void windowClosed(WindowEvent e) {
+		}
+
+		public void windowActivated(WindowEvent arg0) {
+		}
+
+		public void windowDeactivated(WindowEvent arg0) {
+		}
+
+		public void windowDeiconified(WindowEvent arg0) {
+		}
+
+		public void windowIconified(WindowEvent arg0) {
+		}
+
+		public void windowOpened(WindowEvent arg0) {
 		}
 
 	}

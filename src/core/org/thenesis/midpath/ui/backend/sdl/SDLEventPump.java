@@ -51,7 +51,7 @@ public class SDLEventPump implements Runnable {
 	 * that no drag is active) when the mouse is released.
 	 */
 	private int drag;
-	private boolean running = true;
+	private volatile Thread thread;
 	
 	//private String LETTERS = "abcdefghiklmnopqrstuvwxyz";
 
@@ -60,8 +60,15 @@ public class SDLEventPump implements Runnable {
 	 */
 	SDLEventPump() {
 		drag = -1;
-		Thread t = new Thread(this);
-		t.start();
+	}
+	
+	public void start() {
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public void stop() {
+		thread = null;
 	}
 
 	/**
@@ -73,7 +80,7 @@ public class SDLEventPump implements Runnable {
 			
 			SDLEvent.enableUNICODE(1);
 
-			while (running) {
+			while (Thread.currentThread() == thread) {
 				processEvent(SDLEvent.waitEvent(true));
 			}
 
@@ -175,12 +182,12 @@ public class SDLEventPump implements Runnable {
 		nativeEvent.intParam4 = 1;
 
 		EventQueue.getEventQueue().post(nativeEvent);
-		
-
+	
 	}
 
 	public void processEvent(SDLQuitEvent event) {
-		//System.exit(0);
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
+		EventQueue.getEventQueue().post(nativeEvent);
 	}
 
 	public void processEvent(SDLExposeEvent event) {

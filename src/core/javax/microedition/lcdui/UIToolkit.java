@@ -30,11 +30,11 @@ import org.thenesis.midpath.ui.virtual.VirtualToolkit;
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.main.Configuration;
 
-public abstract class Toolkit {
+public abstract class UIToolkit {
 
 	//private static Toolkit toolkit = new SDLToolkit();
 	//private static Toolkit toolkit = new VirtualToolkit();
-	private static Toolkit toolkit;
+	private static UIToolkit toolkit;
 	
 	static {
 		String toolkitName = Configuration.getPropertyDefault("javax.microedition.lcdui.toolkit", "virtual");
@@ -45,15 +45,17 @@ public abstract class Toolkit {
 		}
 	}
 	
-	public static void setToolkit(Toolkit toolkit) {
-		Toolkit.toolkit = toolkit;
+	public static void setToolkit(UIToolkit toolkit) {
+		UIToolkit.toolkit = toolkit;
 	}
 	
-	public static Toolkit getToolkit() {
+	public static UIToolkit getToolkit() {
 		return toolkit;
 	}
 	
 	public abstract void initialize(int w, int h);
+	
+	public abstract void close();
 
 	public abstract Graphics getRootGraphics();
 

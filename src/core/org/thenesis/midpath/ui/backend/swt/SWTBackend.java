@@ -1,6 +1,25 @@
+/*
+ * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package org.thenesis.midpath.ui.backend.swt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -23,7 +42,7 @@ import com.sun.midp.events.NativeEvent;
 import com.sun.midp.lcdui.EventConstants;
 import com.sun.midp.log.Logging;
 
-public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListener, MouseMoveListener {
+public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListener, MouseMoveListener, DisposeListener {
 
 	private VirtualSurface rootVirtualSurface;
 	private SWTEventMapper eventMapper = new SWTEventMapper();
@@ -76,6 +95,11 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		}
 
 	}
+	
+	public void close() {
+		stop();
+	}
+	
 
 	private class VirtualSurfaceImpl extends VirtualSurface {
 
@@ -106,6 +130,10 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		}
 
 	}
+	
+	private void stop() {
+		shell.dispose();
+	}
 
 	public void run() {
 
@@ -134,6 +162,7 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		canvas.addKeyListener(this);
 		canvas.addMouseListener(this);
 		canvas.addMouseMoveListener(this);
+		canvas.addDisposeListener(this);
 		canvas.forceFocus();
 		shell.pack();
 		shell.open();
@@ -144,7 +173,6 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-		gc.dispose();
 		display.dispose();
 
 	}
@@ -258,6 +286,11 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 			EventQueue.getEventQueue().post(nativeEvent);
 		}
 
+	}
+
+	public void widgetDisposed(DisposeEvent e) {
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
+		EventQueue.getEventQueue().post(nativeEvent);
 	}
 
 }

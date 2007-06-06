@@ -584,7 +584,7 @@ class FormLFImpl extends ScreenLFImpl implements FormLF {
             || keyCode == Constants.KEYCODE_LEFT
             || keyCode == Constants.KEYCODE_RIGHT) 
         {
-        	int dir = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+        	int dir = UIToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
             //int dir = KeyConverter.getGameAction(keyCode);
             
             // If 2D traversal is not enabled, we "direction-bend"
@@ -665,7 +665,7 @@ class FormLFImpl extends ScreenLFImpl implements FormLF {
             || keyCode == Constants.KEYCODE_RIGHT) 
         {
             //int dir = KeyConverter.getGameAction(keyCode);
-        	int dir = Toolkit.getToolkit().getEventMapper().getGameAction(keyCode);
+        	int dir = UIToolkit.getToolkit().getEventMapper().getGameAction(keyCode);
             
             // If 2D traversal is not enabled, we "direction-bend"
             // and traverse in a typewriter-like fashion, line-by-line
