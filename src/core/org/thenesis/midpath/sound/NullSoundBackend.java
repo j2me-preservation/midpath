@@ -35,45 +35,107 @@
  */
 package org.thenesis.midpath.sound;
 
-import org.thenesis.midpath.sound.backend.alsa.AlsaBackend;
+import java.io.IOException;
 
-import com.sun.midp.main.Configuration;
-
-public class SoundToolkit {
+public class NullSoundBackend implements SoundBackend {
 	
-	private static int bufferSize;
-	private static String deviceName;
-	public static SoundBackend soundBackend;
-	private static AudioFormat audioFormat;
+	//private static final int DEFAULT_BUFFER_SIZE = 8192;
+	private Mixer mixer;
+	private AudioFormat audioFormat;
+	private int bufferSize;
+	private boolean isOpen = false;
 
-	static {
-		int sampleRate = com.sun.midp.main.Configuration.getIntProperty("org.thenesis.midpath.sound.sampleRate", 44100);
-		bufferSize = com.sun.midp.main.Configuration.getIntProperty("org.thenesis.midpath.sound.bufferSize", 8192);
-		deviceName = com.sun.midp.main.Configuration.getPropertyDefault("org.thenesis.midpath.sound.device", "default");
-		audioFormat = new AudioFormat(sampleRate, AudioFormat.BITS_16, AudioFormat.STEREO, true, false);
-		
-		String backendName = Configuration.getPropertyDefault("org.thenesis.midpath.sound.backend", "NULL");
-		if (backendName.equalsIgnoreCase("ALSA")) {
-			soundBackend = new AlsaBackend();
-		} else {
-			soundBackend = new NullSoundBackend();
-		} 
-	}
-
-	public static SoundBackend getBackend() {
-		return soundBackend;
-	}
-
-	public static AudioFormat getAudioFormat() {
-		return audioFormat;
-	}
-
-	public static int getBufferSize() {
+	public int available() {
 		return bufferSize;
 	}
 
-	public static String getDeviceName() {
-		return deviceName;
+	public void close() {
+		// Do nothing
 	}
 
+	public AudioFormat getAudioFormat() {
+		return audioFormat;
+	}
+
+	public int getBufferSize() {
+		return bufferSize;
+	}
+
+	public Mixer getMixer() {
+		return mixer;
+	}
+
+	public boolean isOpen() {
+		return isOpen;
+	}
+
+	public void open() throws IOException {
+		if (!isOpen) {
+			audioFormat = SoundToolkit.getAudioFormat();
+			bufferSize = SoundToolkit.getBufferSize();
+			mixer = new NullMixer();
+			isOpen = true;
+		}
+	}
+
+	public int write(byte[] buf, int offset, int len) {
+		return len;
+	}
+	
+	class NullMixer extends Mixer {
+
+		public Line createLine(AudioFormat format) {
+			return new NullLine(format);
+		}
+		
+	}
+	
+	class NullLine implements Line {
+		
+		private AudioFormat lineAudioFormat;
+		public int state = STOPPED;
+		
+		public NullLine(AudioFormat format) {
+			lineAudioFormat = format;
+		}
+
+		public int available() {
+			return bufferSize;
+		}
+		
+		public void start() {
+			state = STARTED;
+		}
+
+		public void stop() {
+			state = STOPPED;
+		}
+
+		public void close() {
+			state = CLOSED;
+		}
+
+		public void drain() {
+			// Do nothing
+		}
+
+		public AudioFormat getFormat() {
+			return lineAudioFormat;
+		}
+
+		public boolean isRunning() {
+			return (state == STARTED) ? true : false;
+		}
+
+
+		public int write(byte[] b, int offset, int length) {
+			return length;
+		}
+		
+	}
+	
+
+
 }
+
+
