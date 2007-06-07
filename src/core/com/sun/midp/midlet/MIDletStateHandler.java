@@ -590,6 +590,9 @@ public class MIDletStateHandler {
         displayEventHandler.donePreempting(null);
         if (Logging.TRACE_ENABLED)
         	System.out.println("[DEBUG] MidletStateHandler.startSuite() 3");
+        
+        // FIXME ??
+        midletSuite = null;
     }
 
     /**

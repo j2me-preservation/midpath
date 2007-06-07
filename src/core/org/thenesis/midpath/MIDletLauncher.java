@@ -1,7 +1,9 @@
 package org.thenesis.midpath;
 
 import javax.microedition.lcdui.DisplayEventHandlerImpl;
+import javax.microedition.lcdui.UIToolkit;
 
+import com.sun.midp.events.EventQueue;
 import com.sun.midp.lcdui.DisplayEventHandlerFactory;
 import com.sun.midp.main.MIDletSuiteLoader;
 
@@ -37,6 +39,11 @@ public class MIDletLauncher {
 	public static void launch(String className, String midletName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
 		MIDletSuiteLoader.init(className, midletName);
+		
+		// Clean and exit
+		UIToolkit.getToolkit().close();
+		EventQueue.getEventQueue().shutdown();
+		System.exit(0);
 	}
 
 }

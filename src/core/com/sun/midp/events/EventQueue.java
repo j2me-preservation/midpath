@@ -76,8 +76,8 @@ public class EventQueue implements Runnable {
 	 */
 	Thread eventQueueThread;
 
-	/** The thread running the native event monitor. */
-	Thread eventMonitorThread;
+	///** The thread running the native event monitor. */
+	//Thread eventMonitorThread;
 
 	/** Next event to dispatch. */
 	Event nextEvent;
@@ -101,7 +101,7 @@ public class EventQueue implements Runnable {
 	boolean alive; // = false
 
 	/** A pool for reusing native events. */
-	NativeEventPool pool;
+	//NativeEventPool pool;
 
 	/** This is for the native finalizer to reset peer native queue. */
 	int nativeEventQueueHandle = -1;
@@ -137,9 +137,7 @@ public class EventQueue implements Runnable {
 	 */
 	public static EventQueue getEventQueue() {
 		MIDletSuite midletSuite = MIDletStateHandler.getMidletStateHandler().getMIDletSuite();
-
-		midletSuite.checkIfPermissionAllowed(Permissions.MIDP);
-
+		//midletSuite.checkIfPermissionAllowed(Permissions.MIDP);
 		return eventQueue;
 	}
 
@@ -157,18 +155,18 @@ public class EventQueue implements Runnable {
 		tableSize = Configuration.getPositiveIntProperty("com.sun.midp.events.dispatchTableInitSize", tableSize);
 		dispatchTable = new DispatchData[tableSize];
 
-		pool = new NativeEventPool();
+		//pool = new NativeEventPool();
 
 		eventQueueThread = new Thread(this);
 
-		eventMonitorThread = new Thread(new NativeEventMonitor(eventQueueThread, this, pool));
+		//eventMonitorThread = new Thread(new NativeEventMonitor(eventQueueThread, this, pool));
 	}
 
 	/** Starts the event queue and event monitor threads. */
 	void start() {
 		resetNativeEventQueue();
 		eventQueueThread.start();
-		eventMonitorThread.start();
+		//eventMonitorThread.start();
 	}
 
 	/**
@@ -217,18 +215,24 @@ public class EventQueue implements Runnable {
 	 *            ID of the receiving Isolate
 	 */
 	public void sendNativeEventToIsolate(NativeEvent event, int isolateId) {
-		// TODO
+	
 		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] EventQueue.sendNativeEventToIsolate(): not yet implemented");
+			System.out.println("[DEBUG] EventQueue.sendNativeEventToIsolate(): id=" + event.type);
+		
+		post(event);
+		
 	}
 
 	/**
 	 * Queue a shutdown event to the native event queue.
 	 */
 	private void sendShutdownEvent() {
-		// TODO
+		
+		NativeEvent nativeEvent = new NativeEvent(EventTypes.EVENT_QUEUE_SHUTDOWN);
+		post(nativeEvent);
+		
 		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] EventQueue.sendShutdownEvent(): not yet implemented");
+			System.out.println("[DEBUG] EventQueue.sendShutdownEvent()");
 	}
 
 	/**
@@ -488,9 +492,9 @@ public class EventQueue implements Runnable {
 
 				dispatchData.listener.process(event);
 
-				if (event instanceof NativeEvent) {
-					pool.putBack((NativeEvent) event);
-				}
+//				if (event instanceof NativeEvent) {
+//					pool.putBack((NativeEvent) event);
+//				}
 
 				// IMPL_NOTE
 				if (Logging.REPORT_LEVEL <= Logging.INFORMATION) {
@@ -539,159 +543,159 @@ class DispatchData {
 	}
 }
 
-/**
- * Runs in its own Java thread. Wait for set of native events to arrive and then
- * post them as a set to the Java event queue.
- */
-class NativeEventMonitor implements Runnable {
-	/**
-	 * Wait for a native event and then read it.
-	 * 
-	 * @param event empty event to fill in
-	 * 
-	 * @return number of events still pending
-	 */
-	private static int waitForNativeEvent(NativeEvent event) {
-		
-		// TODO
-		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] EventQueue.waitForNativeEvent(): not yet implemented");
-		return 0;
-		//throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Read a native event without blocking.
-	 * 
-	 * @param event empty event to fill in
-	 * 
-	 * @return true if an event was read else false
-	 */
-	private static boolean readNativeEvent(NativeEvent event) {
-		// TODO
-		System.out.println("EventQueue.readNativeEvent(): not yet implemented");
-		return false;
-
-	}
-
-	/** Event queue lock to synchronize on. */
-	private Object eventQueueLock;
-
-	/** The event queue to which native events should be posted. */
-	private EventQueue eventQueue;
-
-	/** The pool for reusing native events. */
-	private NativeEventPool pool;
-
-	/**
-	 * Construct a native event monitor.
-	 * 
-	 * @param theEventQueueLock
-	 *            event queue lock used synchronize event posting and processing
-	 * @param theEventQueue
-	 *            event queue to post native events into
-	 * @param thePool
-	 *            the pool from which native events are drawn
-	 */
-	NativeEventMonitor(Object theEventQueueLock, EventQueue theEventQueue, NativeEventPool thePool) {
-		eventQueueLock = theEventQueueLock;
-		eventQueue = theEventQueue;
-		pool = thePool;
-	}
-
-	/**
-	 * Runs the native event monitor. See the class description for details.
-	 */
-	public void run() {
-		try {
-			//for (;;) {
-				NativeEvent nativeEvent = pool.get();
-				int eventsStillPending = waitForNativeEvent(nativeEvent);
-
-				/*
-				 * To avoid back log in the native event queue, try to post any
-				 * pending native events to the queue before processing an event
-				 * from the Java event queue.
-				 */
-				synchronized (eventQueueLock) {
-					eventQueue.post(nativeEvent);
-
-					for (; eventsStillPending > 0; eventsStillPending--) {
-						nativeEvent = pool.get();
-
-						if (!readNativeEvent(nativeEvent)) {
-							break;
-						}
-
-						eventQueue.post(nativeEvent);
-					}
-				}
-			//}
-		} catch (Throwable t) {
-			if (!(t instanceof OutOfMemoryError)) {
-				t.printStackTrace();
-			}
-			EventQueue.handleFatalError(t);
-		}
-	}
-}
-
-/**
- * Pools native events, to avoid repetitive allocation by the native event
- * monitor.
- */
-class NativeEventPool {
-	/** The default size of the pool. */
-	static final int DEFAULT_SIZE = 20;
-
-	/** Native event storage. */
-	NativeEvent[] eventStack;
-
-	/** Number of events in the pool. */
-	int eventsInPool; // = 0;
-
-	/** Set up an event pool. */
-	NativeEventPool() {
-		eventStack = new NativeEvent[DEFAULT_SIZE];
-	}
-
-	/**
-	 * Gets an event from the pool or allocates one if the pool is empty.
-	 * 
-	 * Note: the array entry isn't cleared. This isn't a problem because the
-	 * event will either eventually be returned to the pool, or its entry will
-	 * be overwritten by another event returned to the pool.
-	 * 
-	 * @return native event
-	 */
-	NativeEvent get() {
-		synchronized (eventStack) {
-			if (eventsInPool == 0) {
-				return new NativeEvent();
-			}
-
-			eventsInPool--;
-			return eventStack[eventsInPool];
-		}
-	}
-
-	/**
-	 * Returns an event to the pool. Simply discards the event if the pool is
-	 * full. Otherwise, cleans out the event (so that its strings can be GC'ed)
-	 * and adds the event to the pool.
-	 * 
-	 * @param event
-	 *            event that has been processed
-	 */
-	void putBack(NativeEvent event) {
-		synchronized (eventStack) {
-			if (eventsInPool == eventStack.length) {
-				return;
-			}
-
-			event.clear();
-			eventStack[eventsInPool] = event;
-			eventsInPool++;
-		}
-	}
-}
+///**
+// * Runs in its own Java thread. Wait for set of native events to arrive and then
+// * post them as a set to the Java event queue.
+// */
+//class NativeEventMonitor implements Runnable {
+//	/**
+//	 * Wait for a native event and then read it.
+//	 * 
+//	 * @param event empty event to fill in
+//	 * 
+//	 * @return number of events still pending
+//	 */
+//	private static int waitForNativeEvent(NativeEvent event) {
+//		
+//		// TODO
+//		if (Logging.TRACE_ENABLED)
+//			System.out.println("[DEBUG] EventQueue.waitForNativeEvent(): not yet implemented");
+//		return 0;
+//		//throw new UnsupportedOperationException();
+//	}
+//
+//	/**
+//	 * Read a native event without blocking.
+//	 * 
+//	 * @param event empty event to fill in
+//	 * 
+//	 * @return true if an event was read else false
+//	 */
+//	private static boolean readNativeEvent(NativeEvent event) {
+//		// TODO
+//		System.out.println("EventQueue.readNativeEvent(): not yet implemented");
+//		return false;
+//
+//	}
+//
+//	/** Event queue lock to synchronize on. */
+//	private Object eventQueueLock;
+//
+//	/** The event queue to which native events should be posted. */
+//	private EventQueue eventQueue;
+//
+//	/** The pool for reusing native events. */
+//	private NativeEventPool pool;
+//
+//	/**
+//	 * Construct a native event monitor.
+//	 * 
+//	 * @param theEventQueueLock
+//	 *            event queue lock used synchronize event posting and processing
+//	 * @param theEventQueue
+//	 *            event queue to post native events into
+//	 * @param thePool
+//	 *            the pool from which native events are drawn
+//	 */
+//	NativeEventMonitor(Object theEventQueueLock, EventQueue theEventQueue, NativeEventPool thePool) {
+//		eventQueueLock = theEventQueueLock;
+//		eventQueue = theEventQueue;
+//		pool = thePool;
+//	}
+//
+//	/**
+//	 * Runs the native event monitor. See the class description for details.
+//	 */
+//	public void run() {
+//		try {
+//			//for (;;) {
+//				NativeEvent nativeEvent = pool.get();
+//				int eventsStillPending = waitForNativeEvent(nativeEvent);
+//
+//				/*
+//				 * To avoid back log in the native event queue, try to post any
+//				 * pending native events to the queue before processing an event
+//				 * from the Java event queue.
+//				 */
+//				synchronized (eventQueueLock) {
+//					eventQueue.post(nativeEvent);
+//
+//					for (; eventsStillPending > 0; eventsStillPending--) {
+//						nativeEvent = pool.get();
+//
+//						if (!readNativeEvent(nativeEvent)) {
+//							break;
+//						}
+//
+//						eventQueue.post(nativeEvent);
+//					}
+//				}
+//			//}
+//		} catch (Throwable t) {
+//			if (!(t instanceof OutOfMemoryError)) {
+//				t.printStackTrace();
+//			}
+//			EventQueue.handleFatalError(t);
+//		}
+//	}
+//}
+//
+///**
+// * Pools native events, to avoid repetitive allocation by the native event
+// * monitor.
+// */
+//class NativeEventPool {
+//	/** The default size of the pool. */
+//	static final int DEFAULT_SIZE = 20;
+//
+//	/** Native event storage. */
+//	NativeEvent[] eventStack;
+//
+//	/** Number of events in the pool. */
+//	int eventsInPool; // = 0;
+//
+//	/** Set up an event pool. */
+//	NativeEventPool() {
+//		eventStack = new NativeEvent[DEFAULT_SIZE];
+//	}
+//
+//	/**
+//	 * Gets an event from the pool or allocates one if the pool is empty.
+//	 * 
+//	 * Note: the array entry isn't cleared. This isn't a problem because the
+//	 * event will either eventually be returned to the pool, or its entry will
+//	 * be overwritten by another event returned to the pool.
+//	 * 
+//	 * @return native event
+//	 */
+//	NativeEvent get() {
+//		synchronized (eventStack) {
+//			if (eventsInPool == 0) {
+//				return new NativeEvent();
+//			}
+//
+//			eventsInPool--;
+//			return eventStack[eventsInPool];
+//		}
+//	}
+//
+//	/**
+//	 * Returns an event to the pool. Simply discards the event if the pool is
+//	 * full. Otherwise, cleans out the event (so that its strings can be GC'ed)
+//	 * and adds the event to the pool.
+//	 * 
+//	 * @param event
+//	 *            event that has been processed
+//	 */
+//	void putBack(NativeEvent event) {
+//		synchronized (eventStack) {
+//			if (eventsInPool == eventStack.length) {
+//				return;
+//			}
+//
+//			event.clear();
+//			eventStack[eventsInPool] = event;
+//			eventsInPool++;
+//		}
+//	}
+//}

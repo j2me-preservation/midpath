@@ -437,11 +437,15 @@ public class MIDletSuiteLoader {
 		
 		midletStateHandler.startSuite(midletSuite, 0, midletClassname);
 		//midletStateHandler.startMIDlet(midletClassname, displayName);
+		//midletSuite.close();
+		//midletStateHandler.destroySuite();
 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MidletSuiteLoader.init()");
 	
 	}
+	
+	
 
 	/**
 	 * Display an exception to the user.

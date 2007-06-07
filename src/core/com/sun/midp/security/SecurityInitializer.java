@@ -89,8 +89,10 @@ public final class SecurityInitializer {
      * previously
      */
     public static SecurityToken initDisplay() {
-        if (initialized) {
-            throw new SecurityException();
+        
+    	if (initialized) {
+        	return internalSecurityToken;
+            //throw new SecurityException();
         }
 
         initialized = true;
@@ -131,7 +133,8 @@ public final class SecurityInitializer {
     public static SecurityToken init() {
 
         if (initialized) {
-            throw new SecurityException();
+        	return internalSecurityToken;
+            //throw new SecurityException();
         }
 
         try {
