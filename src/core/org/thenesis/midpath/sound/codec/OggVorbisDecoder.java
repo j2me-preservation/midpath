@@ -33,7 +33,6 @@ import com.jcraft.jorbis.Block;
 import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
-import com.jcraft.jorbis.test.IllegalDecoderStateException;
 
 /**
  * Takes a vorbis bitstream from an input stream and writes raw stereo PCM to
