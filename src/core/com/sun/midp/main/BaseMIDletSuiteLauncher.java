@@ -25,6 +25,8 @@
 
 package com.sun.midp.main;
 
+import javax.microedition.lcdui.DisplayEventHandlerImpl;
+
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.events.EventQueue;
 import com.sun.midp.i18n.Resource;
@@ -63,7 +65,7 @@ import com.sun.midp.security.SecurityToken;
  * In MVM mode it only handles the first MIDlet suite isolate which is used by
  * the MIDP AMS and other internal MIDlets.
  */
-public class MIDletSuiteLoader {
+public class BaseMIDletSuiteLauncher {
 
 	/** The unique ID of the last MIDlet suite to run. */
 	static String lastMidletSuiteToRun;
@@ -71,255 +73,333 @@ public class MIDletSuiteLoader {
 	/** The class name of the last MIDlet to run. */
 	static String lastMidletToRun;
 
-	/**
-	 * Called at the initial start of the VM.
-	 * Initializes internal security and any other AMS classes related
-	 * classes before starting the MIDlet.
-	 *
-	 * @param args not used, a {@link CommandState} object is obtained
-	 *             using a native method instead of the argument.
-	 */
-	public static void main(String args[]) {
-		CommandState state;
-		MIDletSuite midletSuite = null;
-
-//		/*
-//		 * WARNING: Don't add any calls before this !
-//		 *
-//		 * Register AMS Isolate ID in native global variable.
-//		 * Since native functions rely on this value to distinguish
-//		 * whether Java AMS is running, this MUST be called before any 
-//		 * other native functions from this Isolate. I.E. This call
-//		 * must be the first thing this main make.
-//		 */
-//		registerAmsIsolateId();
-//
-//		if (Logging.REPORT_LEVEL <= Logging.INFORMATION) {
-//			Logging.report(Logging.INFORMATION, LogChannels.LC_CORE, "MIDlet suite loader started");
-//		}
-//		// current isolate & AMS isolate is the same object
-//		int amsIsolateId = MIDletSuiteLoader.getAmsIsolateId();
-//		int currentIsolateId = MIDletSuiteLoader.getIsolateId();
-//		vmBeginStartUp(currentIsolateId);
-//
-//		// Throws SecurityException if already called,
-//		SecurityToken internalSecurityToken = SecurityInitializer.init();
-//		EventQueue eventQueue = EventQueue.getEventQueue(internalSecurityToken);
-//
-//		// create all needed event-related objects but not initialize ...
-//		MIDletEventProducer midletEventProducer = new MIDletEventProducer(internalSecurityToken, eventQueue);
-//
-//		MIDletControllerEventProducer midletControllerEventProducer = new MIDletControllerEventProducer(
-//				internalSecurityToken, eventQueue, amsIsolateId, currentIsolateId);
-//
-//		DisplayEventProducer displayEventProducer = new DisplayEventProducer(internalSecurityToken, eventQueue);
-//
-//		RepaintEventProducer repaintEventProducer = new RepaintEventProducer(internalSecurityToken, eventQueue);
-//		MIDletProxyList midletProxyList = new MIDletProxyList(eventQueue);
-//
-//		DisplayContainer displayContainer = new DisplayContainer(internalSecurityToken, currentIsolateId);
-//
-//		DisplayEventHandler displayEventHandler = DisplayEventHandlerFactory
-//				.getDisplayEventHandler(internalSecurityToken);
-//		/*
-//		 * Bad style of type casting, but 
-//		 * DisplayEventHandlerImpl implement both 
-//		 * DisplayEventHandler & ItemEventConsumer I/Fs
-//		 */
-//		ItemEventConsumer itemEventConsumer = (ItemEventConsumer) displayEventHandler;
-//
-//		MIDletStateHandler midletStateHandler = MIDletStateHandler.getMidletStateHandler();
-//
-//		MIDletEventListener midletEventListener = new MIDletEventListener(internalSecurityToken, eventQueue,
-//				displayContainer);
-//
-//		LCDUIEventListener lcduiEventListener = new LCDUIEventListener(internalSecurityToken, eventQueue,
-//				itemEventConsumer);
-//
-//		// do all initialization for already created event-related objects ...
-//		MIDletProxy.initClass(midletEventProducer);
-//		MIDletProxyList.initClass(midletProxyList);
-//
-//		AmsUtil.initClass(midletProxyList, midletControllerEventProducer);
-//
-//		displayEventHandler.initDisplayEventHandler(internalSecurityToken, eventQueue, displayEventProducer,
-//				midletControllerEventProducer, repaintEventProducer, displayContainer);
-//
-//		MIDletPeer.initClass(internalSecurityToken, displayEventHandler, midletStateHandler,
-//				midletControllerEventProducer);
-//		midletStateHandler.initMIDletStateHandler(internalSecurityToken, displayEventHandler,
-//				midletControllerEventProducer, displayContainer);
-//
-//		AutomationInitializer.init(eventQueue, midletControllerEventProducer);
-//
-//		state = CommandState.getCommandState();
-//
-//		try {
-//			String temp;
-//			MIDletSuiteStorage midletSuiteStorage;
-//
-//			state.status = Constants.MIDLET_CONSTRUCTOR_FAILED;
-//
-//			if (state.suiteID == null) {
-//				if (Logging.REPORT_LEVEL <= Logging.ERROR) {
-//					Logging.report(Logging.ERROR, LogChannels.LC_CORE, "The suite ID for the "
-//							+ "MIDlet suite was not given");
-//				}
-//
-//				state.status = Constants.MIDLET_SUITE_NOT_FOUND;
-//				return;
-//			}
-//
-//			if (state.midletClassName == null) {
-//				if (Logging.REPORT_LEVEL <= Logging.ERROR) {
-//					Logging.report(Logging.ERROR, LogChannels.LC_CORE, "The class name for the "
-//							+ "MIDlet was not given");
-//				}
-//
-//				state.status = Constants.MIDLET_CLASS_NOT_FOUND;
-//				return;
-//			}
-//
-//			midletSuiteStorage = MIDletSuiteStorage.getMIDletSuiteStorage(internalSecurityToken);
-//
-//			ExecuteMIDletEventListener.startListening(internalSecurityToken, displayEventHandler, eventQueue);
-//
-//			// Start inbound connection watcher thread.
-//			PushRegistryImpl.startListening();
-//
-//			// Initialize the Content Handler Monitor of MIDlet exits
-//			CHManager.getManager(internalSecurityToken).initCleanupMonitor(midletProxyList);
-//
-//			// Initialize WMA's cleanup monitor
-//			WMACleanupMonitor.init(midletProxyList);
-//
-//			if (state.suiteID.equals("internal")) {
-//				// assume a class name of a MIDlet in the classpath
-//				midletSuite = InternalMIDletSuiteImpl.create(null, state.suiteID);
-//
-//				// This is for Manager MIDlet.
-//				if (Constants.MEASURE_STARTUP || state.logoDisplayed) {
-//					midletSuite.setTempProperty(internalSecurityToken, "logo-displayed", "");
-//				} else {
-//					state.logoDisplayed = true;
-//				}
-//			} else {
-//				midletSuite = midletSuiteStorage.getMIDletSuite(state.suiteID, false);
-//			}
-//
-//			if (midletSuite == null) {
-//				displayException(displayEventHandler, Resource
-//						.getString(ResourceConstants.AMS_MIDLETSUITELDR_MIDLETSUITE_NOTFOUND));
-//				state.status = Constants.MIDLET_SUITE_NOT_FOUND;
-//				return;
-//			}
-//
-//			if (!midletSuite.isEnabled()) {
-//				displayException(displayEventHandler, Resource
-//						.getString(ResourceConstants.AMS_MIDLETSUITELDR_MIDLETSUITE_DISABLED));
-//				state.status = Constants.MIDLET_SUITE_DISABLED;
-//				return;
-//			}
-//
-//			if (state.arg0 != null) {
-//				midletSuite.setTempProperty(internalSecurityToken, "arg-0", state.arg0);
-//				state.arg0 = null;
-//			}
-//
-//			if (state.arg1 != null) {
-//				midletSuite.setTempProperty(internalSecurityToken, "arg-1", state.arg1);
-//				state.arg1 = null;
-//			}
-//
-//			if (state.arg2 != null) {
-//				midletSuite.setTempProperty(internalSecurityToken, "arg-2", state.arg2);
-//				state.arg2 = null;
-//			}
-//
-//			if (Logging.REPORT_LEVEL <= Logging.WARNING) {
-//				Logging.report(Logging.WARNING, LogChannels.LC_CORE, "MIDlet suite loader starting a suite");
-//			}
-//
-//			vmEndStartUp(currentIsolateId);
-//			midletStateHandler.startSuite(midletSuite, 0, state.midletClassName);
-//
-//			if (midletProxyList.shutdownInProgress()) {
-//				/*
-//				 * The MIDlet was shutdown by either the OS or the
-//				 * push system. Set the command state to signal this
-//				 * to the native AMS code.
-//				 */
-//				state.status = CommandState.SHUTDOWN;
-//				midletProxyList.waitForShutdownToComplete();
-//			} else {
-//				state.status = CommandState.OK;
-//			}
-//
-//			if (Logging.REPORT_LEVEL <= Logging.WARNING) {
-//				Logging.report(Logging.INFORMATION, LogChannels.LC_CORE, "MIDlet suite loader exiting");
-//			}
-//		} catch (Throwable t) {
-//			state.status = MIDletSuiteLoader.handleException(displayEventHandler, t);
-//		} finally {
-//			/*
-//			 * Shutdown the event queue gracefully to process any events
-//			 * that may be in the queue currently.
-//			 */
-//			eventQueue.shutdown();
-//
-//			/*
-//			 * The midletSuite is not closed because the other
-//			 * active threads may be depending on it.
-//			 * For example, Display uses isTrusted to update
-//			 * screen icons.
-//			 * A native finalizer will take care of unlocking
-//			 * the native locks.	     
-//			 */
-//
-//			state.suiteID = null;
-//			state.midletClassName = null;
-//
-//			if (state.status != CommandState.SHUTDOWN) {
-//				if (lastMidletSuiteToRun != null) {
-//					state.lastSuiteID = lastMidletSuiteToRun;
-//					state.lastMidletClassName = lastMidletToRun;
-//				}
-//
-//				// Check to see if we need to run a selected suite next
-//				if (AmsUtil.nextMidletSuiteToRun != null) {
-//					state.suiteID = AmsUtil.nextMidletSuiteToRun;
-//					state.midletClassName = AmsUtil.nextMidletToRun;
-//
-//					state.arg0 = AmsUtil.arg0ForNextMidlet;
-//					state.arg1 = AmsUtil.arg1ForNextMidlet;
-//					state.arg2 = AmsUtil.arg2ForNextMidlet;
-//				} else if (state.lastSuiteID != null) {
-//					state.suiteID = state.lastSuiteID;
-//					state.midletClassName = state.lastMidletClassName;
-//
-//					/* Avoid an endless loop. */
-//					state.lastSuiteID = null;
-//					state.lastMidletClassName = null;
-//
-//					/*
-//					 * This could an bad JAD from an auto test suite,
-//					 * so make sure the status to OK, the native
-//					 * code will run the last suite.
-//					 */
-//					state.status = CommandState.OK;
-//				}
-//			}
-//
-//			state.save();
-//
-//			/*
-//			 * Return specific non-zero number so the native AMS code can
-//			 * know that this is graceful exit and not VM abort.
-//			 */
-//			CommandState.exitInternal(CommandState.MAIN_EXIT);
-//		}
+	/** This class is not meant to be instantiated. */
+	//	private BaseMIDletSuiteLauncher() {
+	//	}
+	public void initialize() {
+		DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
 	}
 
+	/* FIXME temp hack */
+	public void launch(MIDletClassLoader classLoader, String midletClassname, String displayName)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		// Throws SecurityException if already called,
+		SecurityToken internalSecurityToken = SecurityInitializer.init();
+		EventQueue eventQueue = EventQueue.getEventQueue(internalSecurityToken);
+
+		// create all needed event-related objects but not initialize ...
+		MIDletEventProducer midletEventProducer = new MIDletEventProducer(internalSecurityToken, eventQueue);
+
+		int amsIsolateId = BaseMIDletSuiteLauncher.getAmsIsolateId();
+		int currentIsolateId = BaseMIDletSuiteLauncher.getIsolateId();
+
+		MIDletControllerEventProducer midletControllerEventProducer = new MIDletControllerEventProducer(
+				internalSecurityToken, eventQueue, amsIsolateId, currentIsolateId);
+
+		DisplayEventProducer displayEventProducer = new DisplayEventProducer(internalSecurityToken, eventQueue);
+
+		RepaintEventProducer repaintEventProducer = new RepaintEventProducer(internalSecurityToken, eventQueue);
+		MIDletProxyList midletProxyList = new MIDletProxyList(eventQueue);
+
+		DisplayContainer displayContainer = new DisplayContainer(internalSecurityToken, currentIsolateId);
+
+		DisplayEventHandler displayEventHandler = DisplayEventHandlerFactory
+				.getDisplayEventHandler(internalSecurityToken);
+		/*
+		 * Bad style of type casting, but 
+		 * DisplayEventHandlerImpl implement both 
+		 * DisplayEventHandler & ItemEventConsumer I/Fs
+		 */
+		ItemEventConsumer itemEventConsumer = (ItemEventConsumer) displayEventHandler;
+
+		MIDletStateHandler midletStateHandler = MIDletStateHandler.getMidletStateHandler();
+
+		MIDletEventListener midletEventListener = new MIDletEventListener(internalSecurityToken, eventQueue,
+				displayContainer);
+
+		LCDUIEventListener lcduiEventListener = new LCDUIEventListener(internalSecurityToken, eventQueue,
+				itemEventConsumer);
+
+		// do all initialization for already created event-related objects ...
+		MIDletProxy.initClass(midletEventProducer);
+		MIDletProxyList.initClass(midletProxyList);
+
+		//AmsUtil.initClass(midletProxyList, midletControllerEventProducer);
+
+		displayEventHandler.initDisplayEventHandler(internalSecurityToken, eventQueue, displayEventProducer,
+				midletControllerEventProducer, repaintEventProducer, displayContainer);
+
+		MIDletPeer.initClass(internalSecurityToken, displayEventHandler, midletStateHandler,
+				midletControllerEventProducer);
+
+		midletStateHandler.initMIDletStateHandler(internalSecurityToken, displayEventHandler,
+				midletControllerEventProducer, displayContainer, classLoader);
+
+		//assume a class name of a MIDlet in the classpath
+		MIDletSuite midletSuite = null;
+		String suiteID = "0";
+		midletSuite = InternalMIDletSuiteImpl.create(null, suiteID);
+
+		midletStateHandler.startSuite(midletSuite, 0, midletClassname);
+		//midletStateHandler.startMIDlet(midletClassname, displayName);
+		//midletSuite.close();
+		//midletStateHandler.destroySuite();
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] MidletSuiteLoader.init()");
+
+	}
+
+	//
+	//	/**
+	//	 * Called at the initial start of the VM.
+	//	 * Initializes internal security and any other AMS classes related
+	//	 * classes before starting the MIDlet.
+	//	 *
+	//	 * @param args not used, a {@link CommandState} object is obtained
+	//	 *             using a native method instead of the argument.
+	//	 */
+	//	public static void main(String args[]) {
+	//		CommandState state;
+	//		MIDletSuite midletSuite = null;
+	//
+	//		/*
+	//		 * WARNING: Don't add any calls before this !
+	//		 *
+	//		 * Register AMS Isolate ID in native global variable.
+	//		 * Since native functions rely on this value to distinguish
+	//		 * whether Java AMS is running, this MUST be called before any 
+	//		 * other native functions from this Isolate. I.E. This call
+	//		 * must be the first thing this main make.
+	//		 */
+	//		registerAmsIsolateId();
+	//
+	//		if (Logging.REPORT_LEVEL <= Logging.INFORMATION) {
+	//			Logging.report(Logging.INFORMATION, LogChannels.LC_CORE, "MIDlet suite loader started");
+	//		}
+	//		// current isolate & AMS isolate is the same object
+	//		int amsIsolateId = MIDletSuiteLoader.getAmsIsolateId();
+	//		int currentIsolateId = MIDletSuiteLoader.getIsolateId();
+	//		vmBeginStartUp(currentIsolateId);
+	//
+	//		// Throws SecurityException if already called,
+	//		SecurityToken internalSecurityToken = SecurityInitializer.init();
+	//		EventQueue eventQueue = EventQueue.getEventQueue(internalSecurityToken);
+	//
+	//		// create all needed event-related objects but not initialize ...
+	//		MIDletEventProducer midletEventProducer = new MIDletEventProducer(internalSecurityToken, eventQueue);
+	//
+	//		MIDletControllerEventProducer midletControllerEventProducer = new MIDletControllerEventProducer(
+	//				internalSecurityToken, eventQueue, amsIsolateId, currentIsolateId);
+	//
+	//		DisplayEventProducer displayEventProducer = new DisplayEventProducer(internalSecurityToken, eventQueue);
+	//
+	//		RepaintEventProducer repaintEventProducer = new RepaintEventProducer(internalSecurityToken, eventQueue);
+	//		MIDletProxyList midletProxyList = new MIDletProxyList(eventQueue);
+	//
+	//		DisplayContainer displayContainer = new DisplayContainer(internalSecurityToken, currentIsolateId);
+	//
+	//		DisplayEventHandler displayEventHandler = DisplayEventHandlerFactory
+	//				.getDisplayEventHandler(internalSecurityToken);
+	//		/*
+	//		 * Bad style of type casting, but 
+	//		 * DisplayEventHandlerImpl implement both 
+	//		 * DisplayEventHandler & ItemEventConsumer I/Fs
+	//		 */
+	//		ItemEventConsumer itemEventConsumer = (ItemEventConsumer) displayEventHandler;
+	//
+	//		MIDletStateHandler midletStateHandler = MIDletStateHandler.getMidletStateHandler();
+	//
+	//		MIDletEventListener midletEventListener = new MIDletEventListener(internalSecurityToken, eventQueue,
+	//				displayContainer);
+	//
+	//		LCDUIEventListener lcduiEventListener = new LCDUIEventListener(internalSecurityToken, eventQueue,
+	//				itemEventConsumer);
+	//
+	//		// do all initialization for already created event-related objects ...
+	//		MIDletProxy.initClass(midletEventProducer);
+	//		MIDletProxyList.initClass(midletProxyList);
+	//
+	//		AmsUtil.initClass(midletProxyList, midletControllerEventProducer);
+	//
+	//		displayEventHandler.initDisplayEventHandler(internalSecurityToken, eventQueue, displayEventProducer,
+	//				midletControllerEventProducer, repaintEventProducer, displayContainer);
+	//
+	//		MIDletPeer.initClass(internalSecurityToken, displayEventHandler, midletStateHandler,
+	//				midletControllerEventProducer);
+	//		midletStateHandler.initMIDletStateHandler(internalSecurityToken, displayEventHandler,
+	//				midletControllerEventProducer, displayContainer);
+	//
+	//		AutomationInitializer.init(eventQueue, midletControllerEventProducer);
+	//
+	//		state = CommandState.getCommandState();
+	//
+	//		try {
+	//			String temp;
+	//			MIDletSuiteStorage midletSuiteStorage;
+	//
+	//			state.status = Constants.MIDLET_CONSTRUCTOR_FAILED;
+	//
+	//			if (state.suiteID == null) {
+	//				if (Logging.REPORT_LEVEL <= Logging.ERROR) {
+	//					Logging.report(Logging.ERROR, LogChannels.LC_CORE, "The suite ID for the "
+	//							+ "MIDlet suite was not given");
+	//				}
+	//
+	//				state.status = Constants.MIDLET_SUITE_NOT_FOUND;
+	//				return;
+	//			}
+	//
+	//			if (state.midletClassName == null) {
+	//				if (Logging.REPORT_LEVEL <= Logging.ERROR) {
+	//					Logging.report(Logging.ERROR, LogChannels.LC_CORE, "The class name for the "
+	//							+ "MIDlet was not given");
+	//				}
+	//
+	//				state.status = Constants.MIDLET_CLASS_NOT_FOUND;
+	//				return;
+	//			}
+	//
+	//			midletSuiteStorage = MIDletSuiteStorage.getMIDletSuiteStorage(internalSecurityToken);
+	//
+	//			ExecuteMIDletEventListener.startListening(internalSecurityToken, displayEventHandler, eventQueue);
+	//
+	//			// Start inbound connection watcher thread.
+	//			PushRegistryImpl.startListening();
+	//
+	//			// Initialize the Content Handler Monitor of MIDlet exits
+	//			CHManager.getManager(internalSecurityToken).initCleanupMonitor(midletProxyList);
+	//
+	//			// Initialize WMA's cleanup monitor
+	//			WMACleanupMonitor.init(midletProxyList);
+	//
+	//			if (state.suiteID.equals("internal")) {
+	//				// assume a class name of a MIDlet in the classpath
+	//				midletSuite = InternalMIDletSuiteImpl.create(null, state.suiteID);
+	//
+	//				// This is for Manager MIDlet.
+	//				if (Constants.MEASURE_STARTUP || state.logoDisplayed) {
+	//					midletSuite.setTempProperty(internalSecurityToken, "logo-displayed", "");
+	//				} else {
+	//					state.logoDisplayed = true;
+	//				}
+	//			} else {
+	//				midletSuite = midletSuiteStorage.getMIDletSuite(state.suiteID, false);
+	//			}
+	//
+	//			if (midletSuite == null) {
+	//				displayException(displayEventHandler, Resource
+	//						.getString(ResourceConstants.AMS_MIDLETSUITELDR_MIDLETSUITE_NOTFOUND));
+	//				state.status = Constants.MIDLET_SUITE_NOT_FOUND;
+	//				return;
+	//			}
+	//
+	//			if (!midletSuite.isEnabled()) {
+	//				displayException(displayEventHandler, Resource
+	//						.getString(ResourceConstants.AMS_MIDLETSUITELDR_MIDLETSUITE_DISABLED));
+	//				state.status = Constants.MIDLET_SUITE_DISABLED;
+	//				return;
+	//			}
+	//
+	//			if (state.arg0 != null) {
+	//				midletSuite.setTempProperty(internalSecurityToken, "arg-0", state.arg0);
+	//				state.arg0 = null;
+	//			}
+	//
+	//			if (state.arg1 != null) {
+	//				midletSuite.setTempProperty(internalSecurityToken, "arg-1", state.arg1);
+	//				state.arg1 = null;
+	//			}
+	//
+	//			if (state.arg2 != null) {
+	//				midletSuite.setTempProperty(internalSecurityToken, "arg-2", state.arg2);
+	//				state.arg2 = null;
+	//			}
+	//
+	//			if (Logging.REPORT_LEVEL <= Logging.WARNING) {
+	//				Logging.report(Logging.WARNING, LogChannels.LC_CORE, "MIDlet suite loader starting a suite");
+	//			}
+	//
+	//			vmEndStartUp(currentIsolateId);
+	//			midletStateHandler.startSuite(midletSuite, 0, state.midletClassName);
+	//
+	//			if (midletProxyList.shutdownInProgress()) {
+	//				/*
+	//				 * The MIDlet was shutdown by either the OS or the
+	//				 * push system. Set the command state to signal this
+	//				 * to the native AMS code.
+	//				 */
+	//				state.status = CommandState.SHUTDOWN;
+	//				midletProxyList.waitForShutdownToComplete();
+	//			} else {
+	//				state.status = CommandState.OK;
+	//			}
+	//
+	//			if (Logging.REPORT_LEVEL <= Logging.WARNING) {
+	//				Logging.report(Logging.INFORMATION, LogChannels.LC_CORE, "MIDlet suite loader exiting");
+	//			}
+	//		} catch (Throwable t) {
+	//			state.status = MIDletSuiteLoader.handleException(displayEventHandler, t);
+	//		} finally {
+	//			/*
+	//			 * Shutdown the event queue gracefully to process any events
+	//			 * that may be in the queue currently.
+	//			 */
+	//			eventQueue.shutdown();
+	//
+	//			/*
+	//			 * The midletSuite is not closed because the other
+	//			 * active threads may be depending on it.
+	//			 * For example, Display uses isTrusted to update
+	//			 * screen icons.
+	//			 * A native finalizer will take care of unlocking
+	//			 * the native locks.	     
+	//			 */
+	//
+	//			state.suiteID = null;
+	//			state.midletClassName = null;
+	//
+	//			if (state.status != CommandState.SHUTDOWN) {
+	//				if (lastMidletSuiteToRun != null) {
+	//					state.lastSuiteID = lastMidletSuiteToRun;
+	//					state.lastMidletClassName = lastMidletToRun;
+	//				}
+	//
+	//				// Check to see if we need to run a selected suite next
+	//				if (AmsUtil.nextMidletSuiteToRun != null) {
+	//					state.suiteID = AmsUtil.nextMidletSuiteToRun;
+	//					state.midletClassName = AmsUtil.nextMidletToRun;
+	//
+	//					state.arg0 = AmsUtil.arg0ForNextMidlet;
+	//					state.arg1 = AmsUtil.arg1ForNextMidlet;
+	//					state.arg2 = AmsUtil.arg2ForNextMidlet;
+	//				} else if (state.lastSuiteID != null) {
+	//					state.suiteID = state.lastSuiteID;
+	//					state.midletClassName = state.lastMidletClassName;
+	//
+	//					/* Avoid an endless loop. */
+	//					state.lastSuiteID = null;
+	//					state.lastMidletClassName = null;
+	//
+	//					/*
+	//					 * This could an bad JAD from an auto test suite,
+	//					 * so make sure the status to OK, the native
+	//					 * code will run the last suite.
+	//					 */
+	//					state.status = CommandState.OK;
+	//				}
+	//			}
+	//
+	//			state.save();
+	//
+	//			/*
+	//			 * Return specific non-zero number so the native AMS code can
+	//			 * know that this is graceful exit and not VM abort.
+	//			 */
+	//			CommandState.exitInternal(CommandState.MAIN_EXIT);
+	//		}
+	//	}
+	//
 	/**
 	 * Common exception handling for MIDlet suite loading.
 	 *
@@ -376,76 +456,6 @@ public class MIDletSuiteLoader {
 
 		return status;
 	}
-	
-	/* FIXME temp hack */
-	public static void init(String midletClassname, String displayName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		// Throws SecurityException if already called,
-		SecurityToken internalSecurityToken = SecurityInitializer.init();
-		EventQueue eventQueue = EventQueue.getEventQueue(internalSecurityToken);
-
-		// create all needed event-related objects but not initialize ...
-		MIDletEventProducer midletEventProducer = new MIDletEventProducer(internalSecurityToken, eventQueue);
-
-		int amsIsolateId = MIDletSuiteLoader.getAmsIsolateId();
-		int currentIsolateId = MIDletSuiteLoader.getIsolateId();
-		
-		MIDletControllerEventProducer midletControllerEventProducer = new MIDletControllerEventProducer(
-				internalSecurityToken, eventQueue, amsIsolateId, currentIsolateId);
-
-		DisplayEventProducer displayEventProducer = new DisplayEventProducer(internalSecurityToken, eventQueue);
-
-		RepaintEventProducer repaintEventProducer = new RepaintEventProducer(internalSecurityToken, eventQueue);
-		MIDletProxyList midletProxyList = new MIDletProxyList(eventQueue);
-
-		DisplayContainer displayContainer = new DisplayContainer(internalSecurityToken, currentIsolateId);
-
-		DisplayEventHandler displayEventHandler = DisplayEventHandlerFactory
-				.getDisplayEventHandler(internalSecurityToken);
-		/*
-		 * Bad style of type casting, but 
-		 * DisplayEventHandlerImpl implement both 
-		 * DisplayEventHandler & ItemEventConsumer I/Fs
-		 */
-		ItemEventConsumer itemEventConsumer = (ItemEventConsumer) displayEventHandler;
-
-		MIDletStateHandler midletStateHandler = MIDletStateHandler.getMidletStateHandler();
-
-		MIDletEventListener midletEventListener = new MIDletEventListener(internalSecurityToken, eventQueue,
-				displayContainer);
-
-		LCDUIEventListener lcduiEventListener = new LCDUIEventListener(internalSecurityToken, eventQueue,
-				itemEventConsumer);
-
-		// do all initialization for already created event-related objects ...
-		MIDletProxy.initClass(midletEventProducer);
-		MIDletProxyList.initClass(midletProxyList);
-
-		//AmsUtil.initClass(midletProxyList, midletControllerEventProducer);
-
-		displayEventHandler.initDisplayEventHandler(internalSecurityToken, eventQueue, displayEventProducer,
-				midletControllerEventProducer, repaintEventProducer, displayContainer);
-
-		MIDletPeer.initClass(internalSecurityToken, displayEventHandler, midletStateHandler,
-				midletControllerEventProducer);
-		midletStateHandler.initMIDletStateHandler(internalSecurityToken, displayEventHandler,
-				midletControllerEventProducer, displayContainer);
-		
-		//assume a class name of a MIDlet in the classpath
-		MIDletSuite midletSuite = null;
-		String suiteID = "0";
-		midletSuite = InternalMIDletSuiteImpl.create(null, suiteID);
-		
-		midletStateHandler.startSuite(midletSuite, 0, midletClassname);
-		//midletStateHandler.startMIDlet(midletClassname, displayName);
-		//midletSuite.close();
-		//midletStateHandler.destroySuite();
-
-		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] MidletSuiteLoader.init()");
-	
-	}
-	
-	
 
 	/**
 	 * Display an exception to the user.
@@ -455,9 +465,9 @@ public class MIDletSuiteLoader {
 	 */
 	static void displayException(DisplayEventHandler handler, String exceptionMsg) {
 
-//		SystemAlert alert = new SystemAlert(handler, "Exception", exceptionMsg, null, AlertType.ERROR);
-//
-//		alert.waitForUser();
+		//		SystemAlert alert = new SystemAlert(handler, "Exception", exceptionMsg, null, AlertType.ERROR);
+		//
+		//		alert.waitForUser();
 	}
 
 	/**
@@ -607,18 +617,18 @@ public class MIDletSuiteLoader {
 			String displayName, String arg0, String arg1, String arg2) {
 
 		// FIXME
-		
-//		MIDletSuiteStorage midletSuiteStorage;
-//
-//		// Note: getMIDletSuiteStorage performs an AMS permission check.
-//		if (securityToken != null) {
-//			midletSuiteStorage = MIDletSuiteStorage.getMIDletSuiteStorage(securityToken);
-//		} else {
-//			midletSuiteStorage = MIDletSuiteStorage.getMIDletSuiteStorage();
-//		}
-//
-//		return AmsUtil.executeWithArgs(midletSuiteStorage, externalAppId, id, midlet, displayName, arg0, arg1, arg2);
-		
+
+		//		MIDletSuiteStorage midletSuiteStorage;
+		//
+		//		// Note: getMIDletSuiteStorage performs an AMS permission check.
+		//		if (securityToken != null) {
+		//			midletSuiteStorage = MIDletSuiteStorage.getMIDletSuiteStorage(securityToken);
+		//		} else {
+		//			midletSuiteStorage = MIDletSuiteStorage.getMIDletSuiteStorage();
+		//		}
+		//
+		//		return AmsUtil.executeWithArgs(midletSuiteStorage, externalAppId, id, midlet, displayName, arg0, arg1, arg2);
+
 		return false;
 	}
 
@@ -670,12 +680,12 @@ public class MIDletSuiteLoader {
 	 *
 	 * @return Isolate ID of AMS Isolate
 	 */
-	public static int getAmsIsolateId(){
-    	// TODO 
+	public static int getAmsIsolateId() {
+		// TODO 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MIDletSuiteLoader.getAmsIsolateId(): not yet implemented");
-    	return 0;
-    }
+		return 0;
+	}
 
 	/**
 	 * Get the current Isolate ID.
@@ -683,11 +693,11 @@ public class MIDletSuiteLoader {
 	 * @return ID of this Isolate.
 	 */
 	public static int getIsolateId() {
-    	// TODO 
+		// TODO 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MIDletSuiteLoader. getIsolateId(): not yet implemented");
-    	return 0;
-    }
+		return 0;
+	}
 
 	/**
 	 * Register the Isolate ID of the AMS Isolate by making a native
@@ -695,11 +705,11 @@ public class MIDletSuiteLoader {
 	 * it in the proper native variable.
 	 */
 	private static void registerAmsIsolateId() {
-    	// TODO 
+		// TODO 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MIDletSuiteLoader.registerAmsIsolateId(): not yet implemented");
-    	
-    }
+
+	}
 
 	/**
 	 * Send hint to VM about begin of a MIDlet startup phase within specified
@@ -709,10 +719,10 @@ public class MIDletSuiteLoader {
 	 * @param midletIsolateId ID of the started MIDlet isolate
 	 */
 	static void vmBeginStartUp(int midletIsolateId) {
-    	// TODO 
+		// TODO 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MIDletSuiteLoader. vmBeginStartUp(): not yet implemented");
-    }
+	}
 
 	/**
 	 * Send hint to VM about end of a MIDlet startup phase within specified
@@ -722,10 +732,10 @@ public class MIDletSuiteLoader {
 	 * @param midletIsolateId ID of the started MIDlet isolate
 	 */
 	static void vmEndStartUp(int midletIsolateId) {
-    	// TODO
+		// TODO
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MIDletSuiteLoader.vmEndStartUp(): not yet implemented");
-    }
+	}
 
 	/**
 	 * Secure method to send VM hint about begin of a MIDlet startup phase
@@ -735,8 +745,8 @@ public class MIDletSuiteLoader {
 	 * @param midletIsolateId ID of the started MIDlet isolate
 	 */
 	static public void vmBeginStartUp(SecurityToken token, int midletIsolateId) {
-//		token.checkIfPermissionAllowed(Permissions.AMS);
-//		vmBeginStartUp(midletIsolateId);
+		//		token.checkIfPermissionAllowed(Permissions.AMS);
+		//		vmBeginStartUp(midletIsolateId);
 	}
 
 	/**
@@ -747,11 +757,8 @@ public class MIDletSuiteLoader {
 	 * @param midletIsolateId ID of the started MIDlet isolate
 	 */
 	static public void vmEndStartUp(SecurityToken token, int midletIsolateId) {
-//		token.checkIfPermissionAllowed(Permissions.AMS);
-//		vmEndStartUp(midletIsolateId);
+		//		token.checkIfPermissionAllowed(Permissions.AMS);
+		//		vmEndStartUp(midletIsolateId);
 	}
 
-	/** This class is not meant to be instantiated. */
-	private MIDletSuiteLoader() {
-	}
 }

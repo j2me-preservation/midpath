@@ -880,7 +880,7 @@ public class MIDletProxyList implements MIDletControllerEventConsumer {
 			//MIDletProxyUtils.normalPriority(foregroundMidlet);
 			notifyListenersOfProxyUpdate(foregroundMidlet, MIDletProxyListListener.ALERT_WAITING);
 		} else {
-			setForegroundInNativeState(MIDletSuiteLoader.getAmsIsolateId(), -1);
+			setForegroundInNativeState(BaseMIDletSuiteLauncher.getAmsIsolateId(), -1);
 		}
 	}
 

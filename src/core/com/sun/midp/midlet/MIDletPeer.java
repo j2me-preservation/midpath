@@ -34,7 +34,7 @@ import com.sun.midp.lcdui.DisplayAccess;
 import com.sun.midp.lcdui.DisplayEventHandler;
 import com.sun.midp.main.Configuration;
 import com.sun.midp.main.MIDletControllerEventProducer;
-import com.sun.midp.main.MIDletSuiteLoader;
+import com.sun.midp.main.BaseMIDletSuiteLauncher;
 import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
 
@@ -444,7 +444,7 @@ public class MIDletPeer implements MIDletEventConsumer {
                  * cancelled.
                  */
                 if (INSTALLER_CLASS.equals(
-                    MIDletSuiteLoader.getNextMIDletToRun())) {
+                    BaseMIDletSuiteLauncher.getNextMIDletToRun())) {
                     /*
                      * Try to cancel the installer midlet. Note this call only
                      * works now because suite are not run concurrently and
@@ -453,7 +453,7 @@ public class MIDletPeer implements MIDletEventConsumer {
                      * This cancel code can be remove when the installer is
                      * runs concurrently with this suite.
                      */
-                    MIDletSuiteLoader.execute(classSecurityToken, null,
+                    BaseMIDletSuiteLauncher.execute(classSecurityToken, null,
                                               null, null);
                     return false;
                 }
@@ -585,7 +585,7 @@ public class MIDletPeer implements MIDletEventConsumer {
      * content can be fetched.
      */
     private boolean dispatchMidletSuiteUrl(String url) {
-        return MIDletSuiteLoader.executeWithArgs(classSecurityToken,
+        return BaseMIDletSuiteLauncher.executeWithArgs(classSecurityToken,
             "internal", INSTALLER_CLASS, "MIDlet Suite Installer", "I",
             url, null);
     }

@@ -177,7 +177,7 @@ class ExecuteMIDletEventListener implements EventListener, Runnable {
      */
     public void run() {
         try {
-            MIDletSuiteLoader.executeWithArgs(classSecurityToken,
+            BaseMIDletSuiteLauncher.executeWithArgs(classSecurityToken,
                 externalAppId, id, midlet, displayName, arg0, arg1, arg2);
         } catch (Throwable t) {
             if (Logging.TRACE_ENABLED) {
@@ -185,7 +185,7 @@ class ExecuteMIDletEventListener implements EventListener, Runnable {
                     "Exception calling MIDletSuiteLoader.execute");
             }
 
-            MIDletSuiteLoader.displayException(displayEventHandler,
+            BaseMIDletSuiteLauncher.displayException(displayEventHandler,
                  Resource.getString(
                  ResourceConstants.AMS_MIDLETSUITELDR_CANT_EXE_NEXT_MIDLET) +
                              "\n\n" + t.getMessage());

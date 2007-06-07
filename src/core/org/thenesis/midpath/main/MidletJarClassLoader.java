@@ -1,4 +1,4 @@
-package org.thenesis.midpath.installer;
+package org.thenesis.midpath.main;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +69,7 @@ public class MidletJarClassLoader extends java.net.URLClassLoader {
 //			// This should not happen, as we have 
 //			// disabled access checks
 //		}
-//	}*/
+//	}
 	
 	
 }

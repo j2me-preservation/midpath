@@ -33,10 +33,11 @@ import com.sun.midp.lcdui.DisplayContainer;
 import com.sun.midp.lcdui.DisplayEventHandler;
 import com.sun.midp.log.LogChannels;
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.MIDletClassLoader;
 import com.sun.midp.main.MIDletControllerEventProducer;
 import com.sun.midp.main.MIDletProxy;
 import com.sun.midp.main.MIDletProxyList;
-import com.sun.midp.main.MIDletSuiteLoader;
+import com.sun.midp.main.BaseMIDletSuiteLauncher;
 import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
 
@@ -125,6 +126,8 @@ public class MIDletStateHandler {
     /** New MIDlet peer waiting for the next MIDlet created to claim it. */
     private static MIDletPeer newMidletPeer;
     
+    private MIDletClassLoader classLoader;
+    
 
     /**
      * Construct a new MIDletStateHandler object.
@@ -193,13 +196,14 @@ public class MIDletStateHandler {
         SecurityToken token,
         DisplayEventHandler theDisplayEventHandler,
         MIDletControllerEventProducer theMIDletControllerEventProducer,
-        DisplayContainer theDisplayContainer) {
+        DisplayContainer theDisplayContainer, MIDletClassLoader classLoader) {
 
         token.checkIfPermissionAllowed(Permissions.MIDP);
         
         displayEventHandler = theDisplayEventHandler;
         midletControllerEventProducer = theMIDletControllerEventProducer;
         displayContainer = theDisplayContainer;
+        this.classLoader = classLoader;
     }
 
     /**
@@ -793,12 +797,14 @@ public class MIDletStateHandler {
                 throw new SecurityException("Recusive MIDlet creation");
             }
 
-            midletClass = Class.forName(classname);
-            if (!Class.forName(
-                    "javax.microedition.midlet.MIDlet").isAssignableFrom(
-                    midletClass)) {
-                throw new InstantiationException("Class not a MIDlet");
-            }
+//            midletClass = Class.forName(classname);
+//            if (!Class.forName(
+//                    "javax.microedition.midlet.MIDlet").isAssignableFrom(
+//                    midletClass)) {
+//                throw new InstantiationException("Class not a MIDlet");
+//            }
+            
+            midletClass = classLoader.getMIDletClass(classname);
 
             // Do ContentHandler initialization for this MIDlet
 //            CHManager.getManager(classSecurityToken).
@@ -877,8 +883,8 @@ public class MIDletStateHandler {
      * isolate to allow VM to adjust internal parameters for better performance
      */
     static void vmBeginStartUp() {
-        MIDletSuiteLoader.vmBeginStartUp(
-            classSecurityToken, MIDletSuiteLoader.getIsolateId());
+        BaseMIDletSuiteLauncher.vmBeginStartUp(
+            classSecurityToken, BaseMIDletSuiteLauncher.getIsolateId());
     }
 
     /**
@@ -887,7 +893,7 @@ public class MIDletStateHandler {
      * startup time for better performance
      */
     static void vmEndStartUp() {
-        MIDletSuiteLoader.vmEndStartUp(
-            classSecurityToken, MIDletSuiteLoader.getIsolateId());
+        BaseMIDletSuiteLauncher.vmEndStartUp(
+            classSecurityToken, BaseMIDletSuiteLauncher.getIsolateId());
     }
 }
