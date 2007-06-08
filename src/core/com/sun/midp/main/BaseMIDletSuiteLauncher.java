@@ -26,6 +26,7 @@
 package com.sun.midp.main;
 
 import javax.microedition.lcdui.DisplayEventHandlerImpl;
+import javax.microedition.lcdui.UIToolkit;
 
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.events.EventQueue;
@@ -76,12 +77,12 @@ public class BaseMIDletSuiteLauncher {
 	/** This class is not meant to be instantiated. */
 	//	private BaseMIDletSuiteLauncher() {
 	//	}
-	public void initialize() {
+	public static void initialize() {
 		DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
 	}
 
 	/* FIXME temp hack */
-	public void launch(MIDletClassLoader classLoader, String midletClassname, String displayName)
+	public static void launch(MIDletClassLoader classLoader, String midletClassname, String displayName)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		// Throws SecurityException if already called,
 		SecurityToken internalSecurityToken = SecurityInitializer.init();
@@ -148,6 +149,13 @@ public class BaseMIDletSuiteLauncher {
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] MidletSuiteLoader.init()");
 
+	}
+	
+	public static void close() {
+		// Clean and exit
+		UIToolkit.getToolkit().close();
+		EventQueue.getEventQueue().shutdown();
+		System.exit(0);
 	}
 
 	//

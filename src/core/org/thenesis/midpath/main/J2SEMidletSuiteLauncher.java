@@ -1,27 +1,54 @@
+/*
+ * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details (a copy is
+ * included at /legal/license.txt). 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA 
+ * 
+ * Linking this library statically or dynamically with other modules is
+ * making a combined work based on this library.  Thus, the terms and
+ * conditions of the GNU General Public License cover the whole
+ * combination.
+ *
+ * As a special exception, the copyright holders of this library give you
+ * permission to link this library with independent modules to produce an
+ * executable, regardless of the license terms of these independent
+ * modules, and to copy and distribute the resulting executable under
+ * terms of your choice, provided that you also meet, for each linked
+ * independent module, the terms and conditions of the license of that
+ * module.  An independent module is a module which is not derived from
+ * or based on this library.  If you modify this library, you may extend
+ * this exception to your version of the library, but you are not
+ * obligated to do so.  If you do not wish to do so, delete this
+ * exception statement from your version.
+ */
 package org.thenesis.midpath.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Vector;
 
 import com.sun.midp.installer.ManifestProperties;
+import com.sun.midp.main.BaseMIDletSuiteLauncher;
 import com.sun.midp.main.MIDletClassLoader;
 import com.sun.midp.midletsuite.MIDletInfo;
 
-public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
+public class J2SEMidletSuiteLauncher  {
 
-	private MidletJarClassLoader loader;
-	private URL jarURL;
-
-	public J2SEMidletSuiteLauncher(String url) throws Exception {
-		this(new URL(url));
-	}
-
-	public J2SEMidletSuiteLauncher(URL url) throws Exception {
-		jarURL = url;
-		loader = new MidletJarClassLoader(jarURL);
+	
+	public J2SEMidletSuiteLauncher() {
 	}
 
 //	public J2SEMidletSuiteLauncher() {
@@ -56,14 +83,76 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 //
 //	}
 	
-	void launchFirstMIDlet() throws Exception {
-		ManifestProperties manifestProperties = getManifestProperties();
+	static MIDletRespository repository;
+	static MIDletSuiteJar launchMidletSuiteJar;
+	static MIDletInfo launchMidletInfo;
+	
+	public void launchManager(String repositoryPath) throws Exception {
+		
+		BaseMIDletSuiteLauncher.initialize();
+		
+		MIDletClassLoader classLoader = new MIDletClassLoader() {
+			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
+				Class midletClass = Class.forName(className);
+		         if (!Class.forName(
+		                 "javax.microedition.midlet.MIDlet").isAssignableFrom(
+		                 midletClass)) {
+		             throw new InstantiationException("Class not a MIDlet");
+		         }
+		         return midletClass;
+			}
+		};
+		
+		// Initialize the manager MIDlet
+		repository = new MIDletRespository(repositoryPath);
+		BaseMIDletSuiteLauncher.launch(classLoader, "org.thenesis.midpath.main.SuiteManagerMIDlet", "Suite Manager");
+		
+		// Launch the MIDlet returned by the manager
+		MIDletInfo info = new MIDletInfo("TextFieldDemo", null,"org.thenesis.midpath.test.ui.textfield.TextFieldDemo");
+		File file = new File("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
+		final MIDletSuiteJar midletSuiteJar = new MIDletSuiteJar(file.toURL());
+		classLoader = new MIDletClassLoader() {
+			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
+				Class midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
+		         if (!Class.forName(
+		                 "javax.microedition.midlet.MIDlet").isAssignableFrom(
+		                 midletClass)) {
+		             throw new InstantiationException("Class not a MIDlet");
+		         }
+		         return midletClass;
+			}
+		};
+		BaseMIDletSuiteLauncher.launch(classLoader, info.classname, info.name);
+		
+		// Clean all and stop the VM
+		BaseMIDletSuiteLauncher.close();
+		
+	}
+	
+	void launchFirstMIDlet(URL url) throws Exception {
+		
+		BaseMIDletSuiteLauncher.initialize();
+		
+		final MIDletSuiteJar midletSuiteJar = new MIDletSuiteJar(url);
+		MIDletClassLoader classLoader = new MIDletClassLoader() {
+			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
+				Class midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
+		         if (!Class.forName(
+		                 "javax.microedition.midlet.MIDlet").isAssignableFrom(
+		                 midletClass)) {
+		             throw new InstantiationException("Class not a MIDlet");
+		         }
+		         return midletClass;
+			}
+		};
+		
+		ManifestProperties manifestProperties = midletSuiteJar.getManifestProperties();
 		int size = manifestProperties.size();
 		for  (int i = 0; i < size; i++) {
 			System.out.println(manifestProperties.getKeyAt(i) + "=" + manifestProperties.getValueAt(i));
 		}
 
-		MIDletInfo[] infos = getMIDletInfo(manifestProperties);
+		MIDletInfo[] infos = midletSuiteJar.getMIDletInfo(manifestProperties);
 
 		final MIDletInfo info = infos[0];
 		if (infos.length == 0) {
@@ -71,7 +160,10 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 			return;
 		}
 		
-		launchAndClose(info.classname, info.name);
+		BaseMIDletSuiteLauncher.launch(classLoader, info.classname, info.name);
+		BaseMIDletSuiteLauncher.close();
+		
+		
 
 				//		MIDletSuiteInfo[] suiteInfos = getMidletSuiteInfo();
 				//		
@@ -87,11 +179,14 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 		
 	}
 
-	void launch(String className, String midletName) throws Exception {
+	void launch(URL url, String className, String midletName) throws Exception {
 		
+		BaseMIDletSuiteLauncher.initialize();
+		
+		final MIDletSuiteJar midletSuiteJar = new MIDletSuiteJar(url);
 		MIDletClassLoader classLoader = new MIDletClassLoader() {
 			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
-				Class midletClass = loader.loadClass(className);
+				Class midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
 		         if (!Class.forName(
 		                 "javax.microedition.midlet.MIDlet").isAssignableFrom(
 		                 midletClass)) {
@@ -101,9 +196,15 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 			}
 		};
 
-		launch(classLoader, className, midletName);
-
+		BaseMIDletSuiteLauncher.launch(classLoader, className, midletName);
+		BaseMIDletSuiteLauncher.close();
 	}
+	
+//	public void launchAndClose(URL url, String className, String midletName) throws Exception {
+//		BaseMIDletSuiteLauncher.initialize();
+//		launch(url, className, midletName);
+//		BaseMIDletSuiteLauncher.close();
+//	}
 
 	//	public String getId() {
 	//		String id = manifestProperties.getProperty(ManifestProperties.SUITE_NAME_PROP);
@@ -131,50 +232,47 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 	//		
 	//	}
 
-	public MIDletInfo[] getMIDletInfo(ManifestProperties manifestProperties) throws IOException {
+//	public MIDletInfo[] getMIDletInfo(ManifestProperties manifestProperties) throws IOException {
+//
+//		String midlet = null;
+//		MIDletInfo midletInfo = null;
+//		Vector infoList = new Vector();
+//
+//		for (int i = 1;; i++) {
+//			midlet = manifestProperties.getProperty("MIDlet-" + i);
+//			if (midlet == null) {
+//				break;
+//			}
+//
+//			/*
+//			 * Verify the MIDlet class is present in the JAR
+//			 * An exception thrown if not.
+//			 * Do the proper install notify on an exception
+//			 */
+//
+//			midletInfo = new MIDletInfo(midlet);
+//			infoList.addElement(midletInfo);
+//			//verifyMIDlet(midletInfo.classname);
+//
+//		}
+//
+//		MIDletInfo[] infos = new MIDletInfo[infoList.size()];
+//		for (int j = 0; j < infoList.size(); j++) {
+//			infos[j] = (MIDletInfo) infoList.elementAt(j);
+//		}
+//
+//		return infos;
+//
+//	}
 
-		String midlet = null;
-		MIDletInfo midletInfo = null;
-		Vector infoList = new Vector();
-
-		for (int i = 1;; i++) {
-			midlet = manifestProperties.getProperty("MIDlet-" + i);
-			if (midlet == null) {
-				break;
-			}
-
-			/*
-			 * Verify the MIDlet class is present in the JAR
-			 * An exception thrown if not.
-			 * Do the proper install notify on an exception
-			 */
-
-			midletInfo = new MIDletInfo(midlet);
-			infoList.addElement(midletInfo);
-			//verifyMIDlet(midletInfo.classname);
-
-		}
-
-		MIDletInfo[] infos = new MIDletInfo[infoList.size()];
-		for (int j = 0; j < infoList.size(); j++) {
-			infos[j] = (MIDletInfo) infoList.elementAt(j);
-		}
-
-		return infos;
-
-	}
-
-	//	//http://developers.sun.com/techtopics/mobility/midp/ttips/getAppProperty/index.html
-	//	//http://www.onjava.com/pub/a/onjava/2001/04/26/midlet.html
-	public ManifestProperties getManifestProperties() throws IOException {
-
-		MidletJarClassLoader loader = new MidletJarClassLoader(jarURL);
-		InputStream is = loader.getManifest();
-		ManifestProperties manifestProperties = new ManifestProperties();
-		manifestProperties.load(is);
-		return manifestProperties;
-
-	}
+	
+//	public ManifestProperties getManifestProperties(MidletJarClassLoader loader) throws IOException {
+//		InputStream is = loader.getManifest();
+//		ManifestProperties manifestProperties = new ManifestProperties();
+//		manifestProperties.load(is);
+//		return manifestProperties;
+//
+//	}
 
 	//	public ManifestProperties[] getManifests() throws IOException {
 	//		
@@ -241,10 +339,14 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 	public static void main(String[] args) {
 
 		//File file = new File("ext/games/MobileSudoku/MobileSudoku.jar");
-		File file = new File("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
+		//File file = new File("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
 		try {
-			J2SEMidletSuiteLauncher launcher = new J2SEMidletSuiteLauncher(file.toURL());
-			launcher.launchFirstMIDlet();
+			J2SEMidletSuiteLauncher launcher = new J2SEMidletSuiteLauncher();
+			//launcher.launchFirstMIDlet(file.toURL());
+			launcher.launchManager("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
+			
+//			MIDletRespository rep = new MIDletRespository("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
+//			System.out.println(rep.getInstallDirectory("mipd2-sdl-test.jar"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -295,4 +397,66 @@ public class J2SEMidletSuiteLauncher extends StandardMIDletLauncher {
 			return id;
 		}
 	}
+	
 }
+
+class MIDletRespository {
+	
+	private File repositoryDir;
+	private Vector installedJars = new Vector();
+	private Vector notInstalledJars = new Vector();
+	
+	public MIDletRespository(String path) {
+		repositoryDir = new File(path);
+	}
+	
+	public void scanRepository() throws IOException {
+//		File[] files = repositoryDir.listFiles(new FilenameFilter() {
+//			public boolean accept(File dir, String name) {
+//				if (name.endsWith("jar")) {
+//					return true;
+//				}
+//				return false;
+//			}
+//		});
+		
+		File[] files = repositoryDir.listFiles();
+		
+		for (int i = 0; i < files.length; i++) {
+			String name = files[i].getName();
+			if (name.toLowerCase().endsWith(".jar") && files[i].isFile()) {
+				File dir = new File(repositoryDir, getInstallDirectory(name));
+				if (dir.exists()) {
+					installedJars.add(new MIDletSuiteJar(files[i].toURL()));
+				} else {
+					notInstalledJars.add(new MIDletSuiteJar(files[i].toURL()));
+				}
+			}	
+		}
+	
+	}
+	
+	public void removeSuite(File file) {
+		
+	}
+	
+	public void installSuite(File file) {
+		
+	}
+	
+	public String getInstallDirectory(String jarFileName) {
+		return jarFileName.substring(0, jarFileName.length() - 4);
+	}
+	
+	
+//	class RepositoryJarInfo  {
+//
+//		public RepositoryJarInfo(File file) {
+//			super(attr);
+//			// TODO Auto-generated constructor stub
+//		}
+//		
+//	}
+	
+}
+
