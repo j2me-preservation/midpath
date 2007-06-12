@@ -35,44 +35,11 @@
  */
 package org.thenesis.midpath.main;
 
-/*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version
- * 2 only, as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License version 2 for more details (a copy is
- * included at /legal/license.txt). 
- * 
- * You should have received a copy of the GNU General Public License
- * version 2 along with this work; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA 
- * 
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library.  Thus, the terms and
- * conditions of the GNU General Public License cover the whole
- * combination.
- *
- * As a special exception, the copyright holders of this library give you
- * permission to link this library with independent modules to produce an
- * executable, regardless of the license terms of these independent
- * modules, and to copy and distribute the resulting executable under
- * terms of your choice, provided that you also meet, for each linked
- * independent module, the terms and conditions of the license of that
- * module.  An independent module is a module which is not derived from
- * or based on this library.  If you modify this library, you may extend
- * this exception to your version of the library, but you are not
- * obligated to do so.  If you do not wish to do so, delete this
- * exception statement from your version.
- */
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Vector;
@@ -82,11 +49,14 @@ import com.sun.midp.midletsuite.MIDletInfo;
 
 public class MIDletSuiteJar  {
 
+	private File file;
 	private URL url;
 	private URLClassLoader classLoader;
+	private ManifestProperties manifestProperties;
 
-	public MIDletSuiteJar(URL url) {
-		this.url = url;
+	public MIDletSuiteJar(File file) throws MalformedURLException {
+		this.file = file;
+		this.url = file.toURL();
 	}
 	
 	public URLClassLoader getURLClassLoader() {
@@ -95,6 +65,11 @@ public class MIDletSuiteJar  {
 		}
 		return classLoader;
 	}
+	
+//	public void unload() {
+//		classLoader = null;
+//		System.gc();
+//	}
 	
 	public InputStream getManifest() throws IOException {
 		
@@ -108,21 +83,27 @@ public class MIDletSuiteJar  {
 	//http://developers.sun.com/techtopics/mobility/midp/ttips/getAppProperty/index.html
 	//http://www.onjava.com/pub/a/onjava/2001/04/26/midlet.html
 	public ManifestProperties getManifestProperties() throws IOException {
-		InputStream is = getManifest();
-		ManifestProperties manifestProperties = new ManifestProperties();
-		manifestProperties.load(is);
+		if (manifestProperties == null) {
+			InputStream is = getManifest();
+			manifestProperties = new ManifestProperties();
+			manifestProperties.load(is);
+			is.close();
+		}
 		return manifestProperties;
-
 	}
 	
-	public MIDletInfo[] getMIDletInfo(ManifestProperties manifestProperties) throws IOException {
+	public String getSuiteName() throws IOException {
+		return getManifestProperties().getProperty(ManifestProperties.SUITE_NAME_PROP);
+	}
+	
+	public MIDletInfo[] getMIDletInfo() throws IOException {
 
 		String midlet = null;
 		MIDletInfo midletInfo = null;
 		Vector infoList = new Vector();
 
 		for (int i = 1;; i++) {
-			midlet = manifestProperties.getProperty("MIDlet-" + i);
+			midlet = getManifestProperties().getProperty("MIDlet-" + i);
 			if (midlet == null) {
 				break;
 			}
@@ -146,6 +127,14 @@ public class MIDletSuiteJar  {
 
 		return infos;
 
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public URL getUrl() {
+		return url;
 	}
 
 	

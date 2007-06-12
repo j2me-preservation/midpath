@@ -35,8 +35,8 @@
  */
 package org.thenesis.midpath.main;
 
+import java.io.File;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MidletJarClassLoaderTest {
@@ -59,11 +59,11 @@ public class MidletJarClassLoaderTest {
 
 	public void test1() throws Exception {
 
-		URL url;
+		File file;
 		try {
-			url = new URL(
-					"file:///E:/Development/eclipse-3.2/workspace/midp2-sdl/ext/games/MobileSudoku/MobileSudoku.jar");
-			MIDletSuiteJar loader = new MIDletSuiteJar(url);
+			//url = new URL("file:///E:/Development/eclipse-3.2/workspace/midp2-sdl/ext/games/MobileSudoku/MobileSudoku.jar");
+			file = new File("E:/Development/eclipse-3.2/workspace/midp2-sdl/ext/games/MobileSudoku/MobileSudoku.jar");
+			MIDletSuiteJar loader = new MIDletSuiteJar(file);
 			//loader.listMidlets();
 			//System.out.println(loader.getMainClassName());
 
@@ -76,11 +76,9 @@ public class MidletJarClassLoaderTest {
 	public void testResourceLoading() throws Exception {
 		
 		System.out.println("testResourceLoading()");
-		
-		URL url;
 
-		url = new URL("file:///E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
-		MIDletSuiteJar loader = new MIDletSuiteJar(url); 
+		File file = new File("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
+		MIDletSuiteJar loader = new MIDletSuiteJar(file); 
 		Class clazz = loader.getURLClassLoader().loadClass("SimpleClass");
 		Method[] methods = clazz.getMethods();
 		for (int i = 0; i < methods.length; i++) {
