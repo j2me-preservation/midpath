@@ -383,6 +383,7 @@ class MIDletRespository {
 
 	public MIDletRespository(String path) {
 		repositoryDir = new File(path);
+		repositoryDir = repositoryDir.getAbsoluteFile();
 	}
 
 	public void scanRepository() throws IOException {
