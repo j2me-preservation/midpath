@@ -22,7 +22,7 @@ public class IOToolkit {
 //		return new FileConnectionImpl(name);
 //	}
 	
-	public BaseFileHandler getBaseFileHandler() {
+	public BaseFileHandler createBaseFileHandler() {
 		return new FileHandlerImpl();
 	}
 	

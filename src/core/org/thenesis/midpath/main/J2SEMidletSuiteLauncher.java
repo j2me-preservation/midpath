@@ -37,12 +37,10 @@ package org.thenesis.midpath.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import com.sun.midp.installer.ManifestProperties;
+import com.sun.midp.log.Logging;
 import com.sun.midp.main.BaseMIDletSuiteLauncher;
 import com.sun.midp.main.Configuration;
 import com.sun.midp.main.MIDletClassLoader;
@@ -54,7 +52,7 @@ public class J2SEMidletSuiteLauncher {
 	static String repositoryPath;
 	
 	static {
-		repositoryPath = Configuration.getPropertyDefault("org.thenesis.midpath.main.repository", "");
+		repositoryPath = Configuration.getPropertyDefault("org.thenesis.midpath.main.repositoryPath", "");
 		//System.out.println("repositoryPath: " + repositoryPath);
 		repository = new MIDletRespository(repositoryPath);
 	}
@@ -409,11 +407,11 @@ class MIDletRespository {
 				if (dir.exists()) {
 					MIDletSuiteJar jar = new MIDletSuiteJar(files[i]);
 					installedJars.addElement(jar);
-					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): installed "
-							+ files[i].getName());
+//					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): installed "
+//							+ files[i].getName());
 				} else {
-					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): not installed "
-							+ files[i].getName());
+//					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): not installed "
+//							+ files[i].getName());
 					notInstalledJars.add(new MIDletSuiteJar(files[i]));
 				}
 			}
@@ -466,14 +464,13 @@ class MIDletRespository {
 
 	public void installJar(String fileName) throws IOException {
 
-		System.out.println("[DEBUG] J2SEMidletSuiteLauncher.installJar(): " + notInstalledJars.size());
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] J2SEMidletSuiteLauncher.installJar(): " + notInstalledJars.size());
 
 		for (int i = 0; i < notInstalledJars.size(); i++) {
 			MIDletSuiteJar jar = (MIDletSuiteJar) notInstalledJars.elementAt(i);
 			File file = jar.getFile();
-			System.out.println("[DEBUG] J2SEMidletSuiteLauncher.installSuite(): " + file.getName() + "  " + fileName);
 			if (file.getName().equals(fileName)) {
-				System.out.println("[DEBUG] J2SEMidletSuiteLauncher.installSuite() 2");
 				installJar(file);
 				break;
 			}
@@ -488,14 +485,13 @@ class MIDletRespository {
 
 	public void removeJar(String fileName) throws IOException {
 
-		System.out.println("[DEBUG] J2SEMidletSuiteLauncher.removeJar(): " + notInstalledJars.size());
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] J2SEMidletSuiteLauncher.removeJar(): " + notInstalledJars.size());
 
 		for (int i = 0; i < notInstalledJars.size(); i++) {
 			MIDletSuiteJar jar = (MIDletSuiteJar) notInstalledJars.elementAt(i);
 			File file = jar.getFile();
-			System.out.println("[DEBUG] J2SEMidletSuiteLauncher.removeJar(): " + file.getName() + "  " + fileName);
 			if (file.getName().equals(fileName)) {
-				System.out.println("[DEBUG] J2SEMidletSuiteLauncher.removeJar() 2");
 				removeJar(file);
 				break;
 			}

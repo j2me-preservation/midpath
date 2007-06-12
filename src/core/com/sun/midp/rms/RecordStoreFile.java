@@ -1,6 +1,7 @@
 package com.sun.midp.rms;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.microedition.rms.RecordStoreException;
 
@@ -8,16 +9,20 @@ import com.sun.midp.io.IOToolkit;
 import com.sun.midp.io.j2me.file.BaseFileHandler;
 import com.sun.midp.io.j2me.file.RandomAccessStream;
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 
 public class RecordStoreFile implements AbstractRecordStoreFile {
 
+	private static String RMS_ROOT_PATH;
+	
+	static {
+		RMS_ROOT_PATH = Configuration.getPropertyDefault("com.sun.midp.rms.rootPath", "");
+	}
+	
 	private IOToolkit toolkit;
-
 	private RandomAccessStream stream;
-
 	private BaseFileHandler fileHandler;
 
-	private static final String RMS_ROOT_PATH = "";
 
 	public RecordStoreFile(String suiteID, String name, String idx_extension) throws IOException {
 		toolkit = IOToolkit.getToolkit();
@@ -26,7 +31,7 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 		
 		//stream =  toolkit.createRandomAccessStream(suiteID + "-" + name + "." + idx_extension);
 		//stream =  toolkit.getBaseFileHandler().getRandomAccessStream();
-		fileHandler = toolkit.getBaseFileHandler();
+		fileHandler = toolkit.createBaseFileHandler();
 		fileHandler.connect(RMS_ROOT_PATH, buildRecordStoreName(suiteID, name, idx_extension));
 		fileHandler.openForRead();
 		fileHandler.openForWrite();
@@ -84,20 +89,50 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 	}
 
 	public static String[] listRecordStores(String suiteID) {
-		//	TODO
-		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] RecordStoreFile.listRecordStores(): not implemented yet");
-		return null;
+		
+		String[] stores = null;
+		
+		try {
+			BaseFileHandler fileHandler = IOToolkit.getToolkit().createBaseFileHandler();
+			fileHandler.connect(RMS_ROOT_PATH, "");
+			Vector v = fileHandler.list(suiteID + "*", true);
+			stores = new String[v.size()];
+			for (int i = 0; i < stores.length; i++) {
+				stores[i] = getRecordStoreName((String)v.elementAt(i));
+			}
+		} catch (IOException e) {
+			if (Logging.TRACE_ENABLED)
+				Logging.trace(e, "Error while listing record stores");
+		}
+
+		return stores;
 	}
 
-	public static void removeRecordStores(String id) {
-		// TODO
-		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] RecordStoreFile.removeRecordStores(): not implemented yet");
+	public static void removeRecordStores(String suiteID) {
+		try {
+			BaseFileHandler rootHandler = IOToolkit.getToolkit().createBaseFileHandler();
+			rootHandler.connect(RMS_ROOT_PATH, "");
+			Vector v = rootHandler.list(suiteID + "*", true);
+			for (int i = 0; i < v.size(); i++) {
+				BaseFileHandler fileHandler = IOToolkit.getToolkit().createBaseFileHandler();
+				fileHandler.connect(RMS_ROOT_PATH, (String)v.elementAt(i));
+				fileHandler.delete();
+				fileHandler.close();
+			}
+		} catch (IOException e) {
+			if (Logging.TRACE_ENABLED)
+				Logging.trace(e, "Error while removing record stores");
+		}
 	}
 
 	public static String buildRecordStoreName(String suiteID, String name, String idx_extension) {
 		return suiteID + "-" + name + "." + idx_extension;
+	}
+	
+	public static String getRecordStoreName(String fileName) {
+		int indentIndex = fileName.indexOf("-");
+		int pointIndex = fileName.lastIndexOf(".");
+		return fileName.substring(indentIndex + 1, pointIndex);
 	}
 
 	/**
@@ -111,7 +146,7 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 	 * @return true if the file exists, false if it does not.
 	 */
 	static boolean exists(String suiteID, String name, String extension) {
-		BaseFileHandler fileHandler = IOToolkit.getToolkit().getBaseFileHandler();
+		BaseFileHandler fileHandler = IOToolkit.getToolkit().createBaseFileHandler();
 		fileHandler.connect(RMS_ROOT_PATH, buildRecordStoreName(suiteID, name, extension));
 		return fileHandler.exists();
 		//		System.out.println("[DEBUG] RecordStoreUtil.exists(): not implemented yet");
@@ -130,7 +165,7 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 	 *         internally.
 	 */
 	static void deleteFile(String suiteID, String name, String extension) throws RecordStoreException {
-		BaseFileHandler fileHandler = IOToolkit.getToolkit().getBaseFileHandler();
+		BaseFileHandler fileHandler = IOToolkit.getToolkit().createBaseFileHandler();
 		fileHandler.connect(RMS_ROOT_PATH, buildRecordStoreName(suiteID, name, extension));
 		try {
 			fileHandler.delete();
@@ -138,7 +173,7 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 			// e.printStackTrace();
 			throw new RecordStoreException(e.getMessage());
 		}
-		//System.out.println("[DEBUG] RecordStoreUtil.deleteFile(): not implemented yet");
+
 	}
 
 	/**

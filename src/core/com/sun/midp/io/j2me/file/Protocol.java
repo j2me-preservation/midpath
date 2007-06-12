@@ -1055,7 +1055,7 @@ public class Protocol extends ConnectionBaseAdapter implements FileConnection {
      */
     private static BaseFileHandler getFileHandler() {
     	
-    	return IOToolkit.getToolkit().getBaseFileHandler();
+    	return IOToolkit.getToolkit().createBaseFileHandler();
     	
 //        String def = "com.sun.midp.io.j2me.file.DefaultFileHandler";
 //        String n = null;

@@ -72,7 +72,15 @@ public class FileHandlerImpl implements BaseFileHandler, RandomAccessStream {
 	public void connect(String rootName, String absFile) {
 		//this.rootName = rootName;
 		//this.absFile = absFile;
-		file = new File(absFile);
+		if (rootName.equals("")) {
+			file = new File(absFile);
+		} else {
+			file = new File(rootName, absFile);
+		}
+		file = file.getAbsoluteFile();
+		
+		if (Logging.TRACE_ENABLED)
+			System.out.println("[DEBUG] FileHandlerImpl.connect(): " + file.getPath());
 	}
 
 	public void create() throws IOException {
@@ -128,7 +136,9 @@ public class FileHandlerImpl implements BaseFileHandler, RandomAccessStream {
 		
 		FilenameFilter fileFilter = new FilenameFilter() {
 			public boolean accept(File dir, String filename) {
-				return filterAccept(filter, filename);
+				boolean res = filterAccept(filter, filename);
+				//System.out.println("[DEBUG] FileHandlerImpl.list(): filter " + filename + " ? " + res);
+				return res;
 			}
 		};
 		
@@ -136,13 +146,15 @@ public class FileHandlerImpl implements BaseFileHandler, RandomAccessStream {
 		if(filter == null) {
 			filenames = file.list();
 		} else {
-			// TODO Doesn't work yet
 			filenames = file.list(fileFilter);
 		}
 		
 		Vector v = new Vector();
-		for (int i = 0; i < filenames.length; i++) {
-			v.addElement(filenames[i]);
+		
+		if (filenames != null) {
+			for (int i = 0; i < filenames.length; i++) {
+				v.addElement(filenames[i]);
+			}
 		}
 		
 		return v;
