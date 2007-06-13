@@ -25,12 +25,11 @@
 
 package com.sun.midp.midlet;
 
-import java.util.Hashtable;
-
 import com.sun.midp.i18n.Resource;
 import com.sun.midp.i18n.ResourceConstants;
 import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
+import com.sun.midp.util.Properties;
 
 /**
  * Implements a the required MIDletSuite functionality needed by the
@@ -50,8 +49,8 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	private boolean trusted;
 
 	/** Suite properties for this suite. */
-	//private Properties properties;
-	private Hashtable properties = new Hashtable();
+	private Properties properties = new Properties();
+	//private Hashtable properties = new Hashtable();
 
 	/**
 	 * number of midlets in this suite. For a rommized suite assume 1.
@@ -68,7 +67,11 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	 * @return new MIDletSuite object
 	 */
 	public static MIDletSuite create(String theDisplayName, String theId) {
-		return new InternalMIDletSuiteImpl(theDisplayName, theId);
+		return new InternalMIDletSuiteImpl(new Properties(), theDisplayName, theId);
+	}
+	
+	public static MIDletSuite create(Properties properties, String theDisplayName, String theId) {
+		return new InternalMIDletSuiteImpl(properties, theDisplayName, theId);
 	}
 
 	/**
@@ -78,7 +81,7 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	 *        and in the MIDlet proxy list
 	 * @param theId unique identifier for this suite
 	 */
-	private InternalMIDletSuiteImpl(String theDisplayName, String theId) {
+	private InternalMIDletSuiteImpl(Properties properties, String theDisplayName, String theId) {
 		if (theDisplayName != null) {
 			displayName = theDisplayName;
 		} else {
@@ -91,7 +94,7 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 
 		permissions = (Permissions.forDomain(Permissions.MANUFACTURER_DOMAIN_BINDING))[Permissions.CUR_LEVELS];
 
-		//properties = new Properties();
+		this.properties = properties;
 	}
 
 	/**
@@ -126,6 +129,10 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	public String getID() {
 		return id;
 	}
+	
+	public static String buildSuiteID(String suiteName) {
+		return suiteName.replace(' ', '_');
+	}
 
 	/**
 	 * Gets a property of the suite. A property is an attribute from
@@ -137,9 +144,8 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	 *          the key.
 	 */
 	public String getProperty(String key) {
-		//return properties.getProperty(key);
-		// TODO
-		return (String) properties.get(key);
+		return properties.getProperty(key);
+		//return (String) properties.get(key);
 	}
 
 	/**
@@ -162,8 +168,8 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 			current.checkIfPermissionAllowed(Permissions.AMS);
 		}
 
-		//properties.setProperty(key, value);
-		properties.put(key, value);
+		properties.setProperty(key, value);
+		//properties.put(key, value);
 	}
 
 	/**

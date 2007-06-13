@@ -60,7 +60,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 	private static final Command CMD_EXIT = new Command("Exit", Command.EXIT, 1);
 	private static final Command CMD_START_SUITE = new Command("Start", Command.ITEM, 1);
 	private static final Command CMD_START_MIDLET = new Command("Start", Command.ITEM, 1);
-	private static final Command CMD_REMOVE = new Command("Remove", Command.ITEM, 2);
+	private static final Command CMD_UNINSTALL = new Command("Uninstall", Command.ITEM, 2);
 	private static final Command CMD_REMOVE_JAR = new Command("Remove", Command.ITEM, 2);
 	private static final Command CMD_INSTALL = new Command("Install", Command.ITEM, 1);
 
@@ -81,7 +81,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 		display = Display.getDisplay(this);
 		mainForm = new Form("MIDlet Manager");
 		installedGroup = new ChoiceGroup("Installed", Choice.EXCLUSIVE);
-		installedGroup.addCommand(CMD_REMOVE);
+		installedGroup.addCommand(CMD_UNINSTALL);
 		installedGroup.setDefaultCommand(CMD_START_SUITE);
 		installedGroup.setItemCommandListener(this);
 		notInstalledGroup = new ChoiceGroup("Not Installed", Choice.EXCLUSIVE);
@@ -94,7 +94,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 		midletList.setCommandListener(this);  
 		midletList.setSelectCommand(CMD_START_MIDLET);
 
-		repository = J2SEMidletSuiteLauncher.repository;
+		repository = J2SEMIDletLauncher.repository;
 		try {
 			buildUI();
 		} catch (IOException e) {
@@ -187,7 +187,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 						notifyDestroyed();
 					}
 				}
-			} else if (c == CMD_REMOVE) {
+			} else if (c == CMD_UNINSTALL) {
 				String text = "Uninstalling MIDlet Suite...";
 				Alert a = new Alert("Action", text, null, AlertType.INFO);
 				display.setCurrent(a);

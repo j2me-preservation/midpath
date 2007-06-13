@@ -16,7 +16,7 @@ CP=$CP:$MIDPATH_HOME/dist/midpath-tests.jar
 # Path of the SDLJava native libraries
 JLP=$MIDPATH_HOME/dist
 
-CLASS=org.thenesis.midpath.MIDletLauncher
+CLASS=org.thenesis.midpath.main.J2SEMIDletLauncher
 # The classname of the MIDlet (we have to set it manually yet)
 MIDLET=org.thenesis.midpath.test.HelloWorldMidlet
 #MIDLET=org.thenesis.midpath.test.TextFieldTest

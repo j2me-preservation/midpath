@@ -80,9 +80,15 @@ public class BaseMIDletSuiteLauncher {
 	public static void initialize() {
 		DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
 	}
+	
+	public static void launch(MIDletClassLoader classLoader, String midletClassname, String displayName) throws ClassNotFoundException, InstantiationException, IllegalAccessException  {
+		String suiteID = "0";
+		MIDletSuite midletSuite = InternalMIDletSuiteImpl.create(displayName, suiteID);
+		launch(classLoader, midletSuite, midletClassname);
+	}
 
 	/* FIXME temp hack */
-	public static void launch(MIDletClassLoader classLoader, String midletClassname, String displayName)
+	public static void launch(MIDletClassLoader classLoader, MIDletSuite midletSuite, String midletClassname)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		// Throws SecurityException if already called,
 		SecurityToken internalSecurityToken = SecurityInitializer.init();
@@ -137,9 +143,6 @@ public class BaseMIDletSuiteLauncher {
 				midletControllerEventProducer, displayContainer, classLoader);
 
 		//assume a class name of a MIDlet in the classpath
-		MIDletSuite midletSuite = null;
-		String suiteID = "0";
-		midletSuite = InternalMIDletSuiteImpl.create(null, suiteID);
 
 		midletStateHandler.startSuite(midletSuite, 0, midletClassname);
 		//midletStateHandler.startMIDlet(midletClassname, displayName);

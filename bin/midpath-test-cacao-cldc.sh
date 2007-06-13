@@ -17,7 +17,7 @@ BCP=$BCP:$MIDPATH_HOME/dist/midpath-tests.jar
 JLP=$MIDPATH_HOME/dist
 export LD_LIBRARY_PATH=$JLP 
 
-CLASS=org.thenesis.midpath.MIDletLauncher
+CLASS=org.thenesis.midpath.main.StandardMIDletLauncher
 # The classname of the MIDlet (we have to set it manually yet)
 MIDLET=org.thenesis.midpath.test.HelloWorldMidlet
 #MIDLET=org.thenesis.midpath.test.TextFieldTest

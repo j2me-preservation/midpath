@@ -37,6 +37,7 @@ package org.thenesis.midpath.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Vector;
 
 import com.sun.midp.installer.ManifestProperties;
@@ -44,9 +45,11 @@ import com.sun.midp.log.Logging;
 import com.sun.midp.main.BaseMIDletSuiteLauncher;
 import com.sun.midp.main.Configuration;
 import com.sun.midp.main.MIDletClassLoader;
+import com.sun.midp.midlet.InternalMIDletSuiteImpl;
+import com.sun.midp.midlet.MIDletSuite;
 import com.sun.midp.midletsuite.MIDletInfo;
 
-public class J2SEMidletSuiteLauncher {
+public class J2SEMIDletLauncher {
 	
 	static MIDletRespository repository;
 	static String repositoryPath;
@@ -57,7 +60,7 @@ public class J2SEMidletSuiteLauncher {
 		repository = new MIDletRespository(repositoryPath);
 	}
 
-	public J2SEMidletSuiteLauncher() {
+	public J2SEMIDletLauncher() {
 	}
 
 	public void launchManager() throws Exception {
@@ -77,6 +80,7 @@ public class J2SEMidletSuiteLauncher {
 		// Initialize the manager MIDlet 
 		BaseMIDletSuiteLauncher.launch(classLoader, "org.thenesis.midpath.main.SuiteManagerMIDlet", "Suite Manager");
 
+		// Get the launch infos from the MIDlet
 		MIDletInfo info = SuiteManagerMIDlet.launchMidletInfo;
 		final MIDletSuiteJar midletSuiteJar = SuiteManagerMIDlet.launchMidletSuiteJar;
 		
@@ -96,7 +100,11 @@ public class J2SEMidletSuiteLauncher {
 					return midletClass;
 				}
 			};
-			BaseMIDletSuiteLauncher.launch(classLoader, info.classname, info.name);
+			
+			String suiteName = midletSuiteJar.getSuiteName();
+			String suiteId = InternalMIDletSuiteImpl.buildSuiteID(suiteName);
+			MIDletSuite midletSuite = InternalMIDletSuiteImpl.create(midletSuiteJar.getManifestProperties(), suiteName, suiteId);
+			BaseMIDletSuiteLauncher.launch(classLoader, midletSuite, info.classname);
 		}
 
 		// Clean all and stop the VM
@@ -306,7 +314,7 @@ public class J2SEMidletSuiteLauncher {
 	public static void main(String[] args) {
 		
 		try {
-			J2SEMidletSuiteLauncher launcher = new J2SEMidletSuiteLauncher();
+			J2SEMIDletLauncher launcher = new J2SEMIDletLauncher();
 			launcher.launchManager();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -404,8 +412,8 @@ class MIDletRespository {
 		for (int i = 0; i < files.length; i++) {
 			String name = files[i].getName();
 			if (name.toLowerCase().endsWith(".jar") && files[i].isFile()) {
-				File dir = new File(repositoryDir, getInstallDirectory(name));
-				if (dir.exists()) {
+				File jad = new File(repositoryDir, getJadFileName(name));
+				if (jad.exists()) {
 					MIDletSuiteJar jar = new MIDletSuiteJar(files[i]);
 					installedJars.addElement(jar);
 //					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): installed "
@@ -448,8 +456,8 @@ class MIDletRespository {
 
 	private void uninstallSuite(File jarFile) {
 		// Remove the directory matching with the given jar file
-		File dir = new File(repositoryDir, getInstallDirectory(jarFile.getName()));
-		dir.delete();
+		File jad = new File(repositoryDir, getJadFileName(jarFile.getName()));
+		jad.delete();
 	}
 	
 	public MIDletSuiteJar getJarFromSuiteName(String suiteName) throws IOException {
@@ -472,16 +480,33 @@ class MIDletRespository {
 			MIDletSuiteJar jar = (MIDletSuiteJar) notInstalledJars.elementAt(i);
 			File file = jar.getFile();
 			if (file.getName().equals(fileName)) {
-				installJar(file);
+				installJar(jar);
 				break;
 			}
 		}
 	}
 
-	private void installJar(File jarFile) {
-		// Create a directory with the same name of the jar file
-		File dir = new File(repositoryDir, getInstallDirectory(jarFile.getName()));
-		dir.mkdir();
+	private void installJar(MIDletSuiteJar jar) throws IOException {
+		// Create a jad with the same name of the jar file
+		File jad = new File(repositoryDir, getJadFileName(jar.getFile().getName()));
+		PrintWriter writer = new PrintWriter(jad);
+		
+		ManifestProperties properties = jar.getManifestProperties();
+		for (int i =0; i < properties.size(); i++) {
+			String key = properties.getKeyAt(i);
+			String value = properties.getValueAt(i);
+			writer.println(key + ":" + value);
+		}
+		
+		// Add attributes required by JAD specs
+		// References:
+		// - http://developers.sun.com/techtopics/mobility/midp/ttips/getAppProperty/index.html)
+		// - http://www.onjava.com/pub/a/onjava/excerpt/j2menut_3/index2.html?page=3
+		writer.println(ManifestProperties.JAR_URL_PROP + ":" + jar.getFile().getName());
+		writer.println(ManifestProperties.JAR_SIZE_PROP + ":" + jar.getFile().length());
+		writer.flush();
+		writer.close();
+
 	}
 
 	public void removeJar(String fileName) throws IOException {
@@ -503,8 +528,8 @@ class MIDletRespository {
 		jarFile.delete();
 	}
 
-	private String getInstallDirectory(String jarFileName) {
-		return jarFileName.substring(0, jarFileName.length() - 4);
+	private String getJadFileName(String jarFileName) {
+		return (jarFileName.substring(0, jarFileName.length() - 4) + ".jad");
 	}
 
 	public Vector getInstalledJars() {
