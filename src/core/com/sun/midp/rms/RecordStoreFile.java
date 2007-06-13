@@ -130,8 +130,8 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 	}
 	
 	public static String getRecordStoreName(String fileName) {
-		int indentIndex = fileName.indexOf("-");
-		int pointIndex = fileName.lastIndexOf(".");
+		int indentIndex = fileName.indexOf('-');
+		int pointIndex = fileName.lastIndexOf('.');
 		return fileName.substring(indentIndex + 1, pointIndex);
 	}
 

@@ -404,7 +404,7 @@ class MIDletRespository {
 		//			}
 		//		});
 
-		installedJars.clear();
+		installedJars.removeAllElements();
 		notInstalledJars.removeAllElements();
 
 		File[] files = repositoryDir.listFiles();
@@ -421,7 +421,7 @@ class MIDletRespository {
 				} else {
 //					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): not installed "
 //							+ files[i].getName());
-					notInstalledJars.add(new MIDletSuiteJar(files[i]));
+					notInstalledJars.addElement(new MIDletSuiteJar(files[i]));
 				}
 			}
 		}
