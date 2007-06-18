@@ -13,7 +13,7 @@ BCP=$MIDPATH_HOME/dist/cldc1.1.jar:$MIDPATH_HOME/dist/midpath.jar:$MIDPATH_HOME/
 # classloader yet)
 BCP=$BCP:$MIDPATH_HOME/dist/midpath-tests.jar
 
-# Path of the SDLJava native libraries
+# Path of the native libraries
 JLP=$MIDPATH_HOME/dist
 export LD_LIBRARY_PATH=$JLP 
 
