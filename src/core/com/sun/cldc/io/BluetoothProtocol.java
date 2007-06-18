@@ -24,7 +24,7 @@
  * information or have any questions.
  */
 
-package com.sun.midp.io;
+package com.sun.cldc.io;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -33,7 +33,6 @@ import javax.bluetooth.BluetoothConnectionException;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 
-import com.sun.cldc.io.ConnectionBaseInterface;
 import com.sun.midp.midlet.MIDletStateHandler;
 import com.sun.midp.midlet.MIDletSuite;
 import com.sun.midp.security.SecurityToken;

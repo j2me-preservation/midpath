@@ -40,8 +40,8 @@ import org.javabluetooth.stack.hci.HCIException;
 import org.javabluetooth.stack.l2cap.JSR82Channel;
 import org.javabluetooth.stack.l2cap.JSR82ConnectionNotifier;
 
-import com.sun.midp.io.BluetoothProtocol;
-import com.sun.midp.io.BluetoothUrl;
+import com.sun.cldc.io.BluetoothProtocol;
+import com.sun.cldc.io.BluetoothUrl;
 import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
 

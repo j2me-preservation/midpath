@@ -23,7 +23,7 @@
  * Clara, CA 95054 or visit www.sun.com if you need additional
  * information or have any questions.
  */
-package com.sun.midp.io;
+package com.sun.cldc.io;
 
 import java.util.Hashtable;
 
