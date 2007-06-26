@@ -66,14 +66,14 @@ public class SDPRemoteServiceRecord implements ServiceRecord {
         for (int i = 0; i < returnArray.length; i++) { returnArray[i] = ((Integer)keyList.elementAt(i)).intValue(); }
         return returnArray;
     }
-
+    
     /** @see javax.bluetooth.ServiceRecord#populateRecord(int[]) */
-    public boolean populateRecord(int[] attrIDs) throws IOException {
+    public boolean populateRecord(SDPClientChannel sdpChannel, int[] attrIDs) throws IOException {
         BluetoothStack bluetooth;
         try {
             bluetooth = BluetoothStack.getBluetoothStack();
-            SDPClientChannel sdpChannel = new SDPClientChannel(remoteDevice, null);
-            bluetooth.connectL2CAPChannel(sdpChannel, remoteDevice, (short)0x0001);
+//            SDPClientChannel sdpChannel = new SDPClientChannel(remoteDevice, null);
+//            bluetooth.connectL2CAPChannel(sdpChannel, remoteDevice, (short)0x0001);
             //TODO fill propper attrIDs this ignores the parameter and gets all available
             byte[] attributeList = { 0x35, 0x05, 0x0a, 0x00, 0x00, (byte)0xff, (byte)0xff };
             DataElement attributeListElement = new DataElement(attributeList);
@@ -88,12 +88,40 @@ public class SDPRemoteServiceRecord implements ServiceRecord {
                 catch (InterruptedException e) { }
                 if (timeout == 100) throw new IOException("ServiceRecord.populateRecord(attrIDs) timed out.");
             }
-            sdpChannel.close();
+            //sdpChannel.close();
             if (attributes.size() > 0) return true;
             else return false;
         }
         catch (HCIException e) { throw new IOException("ServiceRecord.populateRecord(attrIDs) failed. " + e); }
     }
+
+//    /** @see javax.bluetooth.ServiceRecord#populateRecord(int[]) */
+//    public boolean populateRecord(int[] attrIDs) throws IOException {
+//        BluetoothStack bluetooth;
+//        try {
+//            bluetooth = BluetoothStack.getBluetoothStack();
+//            SDPClientChannel sdpChannel = new SDPClientChannel(remoteDevice, null);
+//            bluetooth.connectL2CAPChannel(sdpChannel, remoteDevice, (short)0x0001);
+//            //TODO fill propper attrIDs this ignores the parameter and gets all available
+//            byte[] attributeList = { 0x35, 0x05, 0x0a, 0x00, 0x00, (byte)0xff, (byte)0xff };
+//            DataElement attributeListElement = new DataElement(attributeList);
+//            isPopulated = false;
+//            sdpChannel.send_SDP_ServiceAttributeRequest((short)0x00, (short)0xff, serviceRecordHandle, attributeListElement);
+//            int timeout = 0;
+//            while (!isPopulated) {
+//                try {
+//                    Thread.sleep(1000);
+//                    timeout++;
+//                }
+//                catch (InterruptedException e) { }
+//                if (timeout == 100) throw new IOException("ServiceRecord.populateRecord(attrIDs) timed out.");
+//            }
+//            sdpChannel.close();
+//            if (attributes.size() > 0) return true;
+//            else return false;
+//        }
+//        catch (HCIException e) { throw new IOException("ServiceRecord.populateRecord(attrIDs) failed. " + e); }
+//    }
 
     /** @see javax.bluetooth.ServiceRecord#getConnectionURL(int, boolean) */
     public String getConnectionURL(int requiredSecurity, boolean mustBeMaster) {

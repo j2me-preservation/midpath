@@ -89,8 +89,13 @@ public class SDPLocalServiceRecord implements ServiceRecord {
         return returnArray;
     }
 
+//    /** @see javax.bluetooth.ServiceRecord#populateRecord(int[]) */
+//    public boolean populateRecord(int[] attrIDs) throws IOException {
+//        throw new RuntimeException("Can't populate a Local Record. Population is only possible for Records obtained from a RemoteDevice.");
+//    }
+    
     /** @see javax.bluetooth.ServiceRecord#populateRecord(int[]) */
-    public boolean populateRecord(int[] attrIDs) throws IOException {
+    public boolean populateRecord(SDPClientChannel sdpChannel, int[] attrIDs) throws IOException {
         throw new RuntimeException("Can't populate a Local Record. Population is only possible for Records obtained from a RemoteDevice.");
     }
 

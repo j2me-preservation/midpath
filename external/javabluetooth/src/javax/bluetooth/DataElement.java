@@ -158,17 +158,28 @@ public class DataElement {
                 break;
             case 6:
                 headerByteSize = 3;
-                dataByteSize = (long)(((long)bytes[offset + 1] & 0xff) << 8 | ((long)bytes[offset + 2] & 0xff));;
+                dataByteSize = (long)(((long)bytes[offset + 1] & 0xff) << 8 | ((long)bytes[offset + 2] & 0xff));
                 break;
             case 7:
                 headerByteSize = 5;
                 dataByteSize = (long)(((long)bytes[offset + 1] & 0xff) << 24 | ((long)bytes[offset + 2] & 0xff) << 16 |
                     ((long)bytes[offset + 3] & 0xff) << 8 | ((long)bytes[offset + 4] & 0xff));
                 break;
+            case 8:
+            	throw new UnsupportedOperationException();
         }
         //for getByteSize()
         dataBytes = new byte[(int)(dataByteSize + headerByteSize)];
-        System.arraycopy(bytes, offset, dataBytes, 0, dataBytes.length);
+        
+        // FIXME ??
+        System.out.println(bytes[offset + 1] + "dataByteSize=" + dataByteSize);
+        System.out.println("dataByteSize=" + dataByteSize);
+        System.out.println("dataElementSizeDesc=" + dataElementSizeDesc);
+        System.out.println("bytes.length=" + bytes.length + " offset=" + offset + " dataBytes.length=" + dataBytes.length);
+        int len = Math.min(bytes.length - offset, dataBytes.length);
+        System.arraycopy(bytes, offset, dataBytes, 0, len);
+        //System.arraycopy(bytes, offset, dataBytes, 0, dataBytes.length);
+        
         //Debug.println(7,"new Data Element:",dataBytes);
         switch (dataElementType) {
             case 0:
@@ -233,6 +244,10 @@ public class DataElement {
             default:
                 throw new IllegalArgumentException("Invalid DataElement Type.");
         }
+        
+        System.out.println("[DEBUG] DataElement.<init>(): valueType=0x" + Integer.toHexString(valueType));
+        //Debug.printASCII(0, "DataElement", dataBytes);
+        
     }
 
     /** Christian Lorenz: Added this Constructor to parse <code>byte[]</code> into <code>Data</code>. */
@@ -556,7 +571,8 @@ public class DataElement {
                     ((long)dataBytes[3] & 0xff) << 40 | ((long)dataBytes[4] & 0xff << 32) | ((long)dataBytes[5] & 0xff) << 24 |
                     ((long)dataBytes[6] & 0xff) << 16 | ((long)dataBytes[7] & 0xff) << 8 | ((long)dataBytes[8] & 0xff));
             default:
-                throw new ClassCastException();
+            	return 0;
+                //throw new ClassCastException("valueType is: " + valueType);
         }
     }
 

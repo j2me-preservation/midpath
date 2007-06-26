@@ -25,11 +25,12 @@ import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
+
 import org.javabluetooth.stack.BluetoothStack;
 import org.javabluetooth.stack.BluetoothStackLocal;
+import org.javabluetooth.stack.hci.BlueZTransport;
 import org.javabluetooth.stack.hci.HCIDriver;
 import org.javabluetooth.stack.hci.HCIException;
-import org.javabluetooth.stack.hci.UARTTransport;
 import org.javabluetooth.stack.sdp.SDPClientChannel;
 import org.javabluetooth.stack.sdp.SDPServer;
 
@@ -40,7 +41,8 @@ public class BluetoothLocalStack implements DiscoveryListener {
 
     public static final void main(String[] args) throws Exception {
         //HCIDriver.init(new UARTTransport("serial0"));
-        HCIDriver.init(new UARTTransport("COM40"));
+        //HCIDriver.init(new UARTTransport("COM40"));
+    	HCIDriver.init(new BlueZTransport(0));
         BluetoothStack.init(new BluetoothStackLocal());
         BluetoothLocalStack blue = new BluetoothLocalStack();
         while (remoteDevice == null) { Thread.sleep(1000); }

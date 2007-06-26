@@ -53,6 +53,9 @@ public class BluetoothStackLocal extends BluetoothStack implements HCIReceiver {
 
     /** @see org.javabluetooth.stack.hci.HCIInquiryResultReceiver#receive_HCI_Event_Inquiry_Result(byte[]) */
     public void receive_HCI_Event_Inquiry_Result(byte[] eventPacket) { super.receive_HCI_Event_Inquiry_Result(eventPacket); }
+    
+    /** @see org.javabluetooth.stack.hci.HCIInquiryResultReceiver#receive_HCI_Event_Inquiry_Result(byte[]) */
+    public void receive_HCI_Event_Inquiry_Result_With_RSSI(byte[] eventPacket) { super.receive_HCI_Event_Inquiry_Result_With_RSSI(eventPacket); }
 
     /** @see org.javabluetooth.stack.hci.HCIInquiryReceiver#receive_HCI_Event_Inquiry_Complete(byte[]) */
     public void receive_HCI_Event_Inquiry_Complete(byte[] eventPacket)

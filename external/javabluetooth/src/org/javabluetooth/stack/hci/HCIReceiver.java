@@ -29,5 +29,7 @@ public interface HCIReceiver {
     public void receive_HCI_Event_Inquiry_Complete(byte[] eventPacket);
 
     public void receive_HCI_Event_Remote_Name_Request_Complete(byte[] packetData);
+
+	public void receive_HCI_Event_Inquiry_Result_With_RSSI(byte[] eventPacket);
 }
 

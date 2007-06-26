@@ -38,6 +38,7 @@ public class RemoteDevice {
     public byte pageScanMode;
     public DeviceClass deviceClass;
     public short clockOffset;
+    public byte rssi;
     public String friendlyName;
     public Hashtable serviceRecords;
 

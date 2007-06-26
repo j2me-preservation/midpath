@@ -28,13 +28,21 @@ package org.javabluetooth.util;
  */
 public class Debug {
     public static boolean debugMessages   = true;
-    public static final int DEBUGLEVELMIN = 1;
+    public static final int DEBUGLEVELMIN = 0;
     public static final int DEBUGLEVELMAX = 10;
 
     public static void println(int level, String label, byte[] packet) {
         if ((level >= DEBUGLEVELMIN) && (level <= DEBUGLEVELMAX)) {
             for (int i = 0; i < packet.length; i++)
                 label += " " + Integer.toString((packet[i] & 0xff) + 0x100, 16).substring(1);
+            System.err.println(label);
+        }
+    }
+    
+    public static void printASCII(int level, String label, byte[] packet) {
+        if ((level >= DEBUGLEVELMIN) && (level <= DEBUGLEVELMAX)) {
+            for (int i = 0; i < packet.length; i++)
+                label += " " + ((char)(packet[i] & 0xff));
             System.err.println(label);
         }
     }

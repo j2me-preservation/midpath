@@ -28,6 +28,10 @@ import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import org.javabluetooth.distributed.BluetoothTCPClient;
 import org.javabluetooth.stack.BluetoothStack;
+import org.javabluetooth.stack.BluetoothStackLocal;
+import org.javabluetooth.stack.hci.BlueZTransport;
+import org.javabluetooth.stack.hci.HCIDriver;
+import org.javabluetooth.stack.hci.UARTTransport;
 import org.javabluetooth.stack.sdp.SDPClientChannel;
 
 /** @author Christian Lorenz */
@@ -77,20 +81,31 @@ public class BluetoothClient implements DiscoveryListener {
         System.out.println("Reparsed Attributes="+reparsed);
         */
 
-        BluetoothStack.init(new BluetoothTCPClient("192.168.10.2", 2600));
+    	//HCIDriver.init(new UARTTransport("/dev/ttyS2"));
+        HCIDriver.init(new BlueZTransport(0));
+        BluetoothStack.init(new BluetoothStackLocal());
+        
+        //BluetoothStack.init(new BluetoothTCPClient("192.168.10.2", 2600));
         BluetoothStack bluetooth = BluetoothStack.getBluetoothStack();
-        bluetooth.send_HCI_HC_Change_Local_Name("TINI BLUE");
-        bluetooth.send_HCI_HC_Write_Event_Filter_Connection_Setup((byte)0x02);
-        bluetooth.send_HCI_HC_Write_Event_Filter_Inquiry_Result();
-        bluetooth.send_HCI_HC_Write_Scan_Enable((byte)0x03);
+        //System.out.println("[DEBUG] BluetoothClient.main(): A");
+        //bluetooth.send_HCI_HC_Change_Local_Name("TINI BLUE");
+       // System.out.println("[DEBUG] BluetoothClient.main(): B");
+//        bluetooth.send_HCI_HC_Write_Event_Filter_Connection_Setup((byte)0x02);
+//        System.out.println("[DEBUG] BluetoothClient.main(): C");
+        //bluetooth.send_HCI_HC_Write_Event_Filter_Inquiry_Result();
+       // bluetooth.send_HCI_HC_Write_Scan_Enable((byte)0x03);
+        System.out.println("[DEBUG] BluetoothClient.main(): D");
         BluetoothClient blue = new BluetoothClient();
+        SDPClientChannel sdpChannel = null;
         while (remoteDevice == null) { Thread.sleep(1000); }
-        if (remoteDevice != null) { //System.out.println("bdAddr:"+remoteDevice.getBluetoothAddress());
-            //System.out.println("Name:"+remoteDevice.getFriendlyName(false));
-            //System.out.println("major dev class :"+remoteDevice.deviceClass.getMajorDeviceClass());
-            //System.out.println("minor dev class :"+remoteDevice.deviceClass.getMinorDeviceClass());
-            //System.out.println("service classes :"+remoteDevice.deviceClass.getServiceClasses());
-            SDPClientChannel sdpChannel = new SDPClientChannel(remoteDevice, blue);
+        if (remoteDevice != null) { System.out.println("bdAddr:"+remoteDevice.getBluetoothAddress());
+            System.out.println("Name:"+remoteDevice.getFriendlyName(false));
+            System.out.println("major dev class :"+remoteDevice.deviceClass.getMajorDeviceClass());
+            System.out.println("minor dev class :"+remoteDevice.deviceClass.getMinorDeviceClass());
+            System.out.println("service classes :"+remoteDevice.deviceClass.getServiceClasses());
+            
+            //Thread.sleep(10000); // for testing. TO REMOVE
+            sdpChannel = new SDPClientChannel(remoteDevice, blue);
             bluetooth.connectL2CAPChannel(sdpChannel, remoteDevice, (short)0x0001);
             byte[] uuidList = { 0x35, 0x03, 0x19, 0x10, 0x02 };
             DataElement uuidListElement = new DataElement(uuidList);
@@ -100,9 +115,11 @@ public class BluetoothClient implements DiscoveryListener {
         for (int i = 0; i < serviceRecords.length; i++) {
             System.out.println("	" + serviceRecords[i]);
             int[] attrIDs = { 0xff00 }; //reversed the values for range... this avoids ranges starting with 00 to be tructated.
-            try { serviceRecords[i].populateRecord(attrIDs); }
+            try { serviceRecords[i].populateRecord(sdpChannel, attrIDs); }
             catch (IOException e) { System.out.print("ServiceRecord.populateRecord(attrIDs) failed. " + e); }
         }
+        
+        sdpChannel.close();
     }
 
     public BluetoothClient() throws BluetoothStateException {

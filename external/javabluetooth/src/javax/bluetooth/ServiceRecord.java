@@ -19,6 +19,8 @@ package javax.bluetooth;
 
 import java.io.IOException;
 
+import org.javabluetooth.stack.sdp.SDPClientChannel;
+
 /** 
  * The <code>ServiceRecord</code> interface describes characteristics of a
  * Bluetooth service.  A <code>ServiceRecord</code> contains a
@@ -165,7 +167,7 @@ public interface ServiceRecord {
      * @exception RuntimeException if this <code>ServiceRecord</code>
      * describes a service on the local device rather than a service on a remote device
      */
-    public boolean populateRecord(int[] attrIDs) throws IOException;
+    public boolean populateRecord(SDPClientChannel sdpChannel, int[] attrIDs) throws IOException;
 
     /**
      * Returns a String including optional parameters that can be used by a client to connect to the service described by this

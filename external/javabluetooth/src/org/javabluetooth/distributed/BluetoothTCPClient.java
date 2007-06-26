@@ -51,6 +51,7 @@ public class BluetoothTCPClient extends BluetoothStack implements L2CAPSender, R
     private static final byte HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE = 0x07;
     private static final byte HCI_EVENT_COMMAND_COMPLETE             = 0x0E;
     private static final byte HCI_EVENT_COMMAND_STATUS               = 0x0F;
+    private static final byte HCI_EVENT_INQUIRY_RESULT_WITH_RSSI     = 0x22;
     private static final byte L2CAP_CREATE_CONNECTION_REQUEST        = (byte)0xf0;
     private static final byte L2CAP_CREATE_CONNECTION_RESPONSE       = (byte)0xf1;
     private static final byte L2CAP_DISCONNECT_CHANNEL_REQUEST       = (byte)0xf2;
@@ -221,6 +222,10 @@ public class BluetoothTCPClient extends BluetoothStack implements L2CAPSender, R
                     case HCI_EVENT_INQUIRY_RESULT:
                         Debug.println(6, "BluetoothTCPClient: Received HCI Inquiry Result Event:", packet);
                         receive_HCI_Event_Inquiry_Result(packet);
+                        break;
+                    case HCI_EVENT_INQUIRY_RESULT_WITH_RSSI:
+                        Debug.println(6, "BluetoothTCPClient: Received HCI Inquiry Result With RSSI Event:", packet);
+                        receive_HCI_Event_Inquiry_Result_With_RSSI(packet);
                         break;
                     case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
                         Debug.println(6, "BluetoothTCPClient: Received HCI Remote Name Request Complete Event:", packet);

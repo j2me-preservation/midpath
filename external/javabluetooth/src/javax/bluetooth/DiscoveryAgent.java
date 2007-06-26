@@ -181,7 +181,7 @@ public class DiscoveryAgent {
             foundRemoteDevices = new Vector();
             bluetoothStack.registerDiscoveryAgent(this);
             try {
-                byte result = bluetoothStack.send_HCI_LC_Inquiry(GIAC, 60, (byte)0x00);
+                byte result = bluetoothStack.send_HCI_LC_Inquiry(GIAC, 10, (byte)0x00);
                 if (result == 0) return true;
                 else return false;
             }
@@ -333,6 +333,36 @@ public class DiscoveryAgent {
             else remoteDevice.deviceClass.record = classOfDevice;
             remoteDevice.clockOffset = (short)((short)(eventPacket[i * 14 + 16] & 0xff) |
                 ((short)(eventPacket[i * 14 + 17] & 0xff) << 8));
+            remoteDevices.put(new Long(bdAddr), remoteDevice);
+            foundRemoteDevices.addElement(remoteDevice);
+            Enumeration discoveryListeners = listeners.elements();
+            while (discoveryListeners.hasMoreElements()) {
+                DiscoveryListener listener = (DiscoveryListener)discoveryListeners.nextElement();
+                if (listener != null) listener.deviceDiscovered(remoteDevice, remoteDevice.deviceClass);
+            }
+        }
+    }
+    
+    /**
+     * Christian Lorenz: This method is called from <code>BluetoothStack.receive_HCI_Event_Inquiry_Result(byte[])</code>.
+     * @param eventPacket
+     */
+    public void receive_HCI_Event_Inquiry_Result_With_RSSI(byte[] eventPacket) {
+        for (int i = 0; i < eventPacket[3]; i++) {
+            long bdAddr = (((long)eventPacket[i * 14 + 4]) & 0xff) | (((long)eventPacket[i * 14 + 5]) & 0xff) << 8 |
+                (((long)eventPacket[i * 14 + 6]) & 0xff) << 16 | (((long)eventPacket[i * 14 + 7]) & 0xff) << 24 |
+                (((long)eventPacket[i * 14 + 8]) & 0xff) << 32 | (((long)eventPacket[i * 14 + 9]) & 0xff) << 40;
+            RemoteDevice remoteDevice = (RemoteDevice)remoteDevices.get(new Long(bdAddr));
+            if (remoteDevice == null) remoteDevice = new RemoteDevice(bdAddr);
+            remoteDevice.pageScanRepMode = eventPacket[i * 14 + 10];
+            remoteDevice.pageScanPeriodMode = eventPacket[i * 14 + 11];
+            int classOfDevice = (int)(eventPacket[i * 14 + 12] & 0xff) | ((int)(eventPacket[i * 14 + 13] & 0xff) << 8) |
+                ((int)(eventPacket[i * 14 + 14] & 0xff) << 16);
+            if (remoteDevice.deviceClass == null) remoteDevice.deviceClass = new DeviceClass(classOfDevice);
+            else remoteDevice.deviceClass.record = classOfDevice;
+            remoteDevice.clockOffset = (short)((short)(eventPacket[i * 14 + 15] & 0xff) |
+                ((short)(eventPacket[i * 14 + 16] & 0xff) << 8));
+            remoteDevice.rssi = eventPacket[i * 14 + 17];
             remoteDevices.put(new Long(bdAddr), remoteDevice);
             foundRemoteDevices.addElement(remoteDevice);
             Enumeration discoveryListeners = listeners.elements();

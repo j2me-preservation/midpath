@@ -100,6 +100,16 @@ public abstract class BluetoothStack {
     protected void receive_HCI_Event_Inquiry_Result(byte[] eventPacket) { //Debug.println("Inquiry Result");
         if (discoveryAgent != null) { discoveryAgent.receive_HCI_Event_Inquiry_Result(eventPacket); }
     }
+    
+    /**
+     * Receives an Inquiry Result With RSSI Event Packet. If a <code>javax.bluetooth.DiscoveryAgent</code>
+     * is registered the packet will be passed along.
+     * @see javax.bluetooth.DiscoveryAgent
+     * @param eventPacket
+     */
+    protected void receive_HCI_Event_Inquiry_Result_With_RSSI(byte[] eventPacket) { //Debug.println("Inquiry Result");
+        if (discoveryAgent != null) { discoveryAgent.receive_HCI_Event_Inquiry_Result_With_RSSI(eventPacket); }
+    }
 
     /**
      * Receives a Remote Name Request Event Packet. If a <code>javax.bluetooth.DiscoveryAgent</code> was registered the

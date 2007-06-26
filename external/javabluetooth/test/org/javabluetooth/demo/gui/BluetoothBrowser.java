@@ -57,6 +57,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.javabluetooth.demo.Connector;
 import org.javabluetooth.stack.BluetoothStack;
 import org.javabluetooth.stack.BluetoothStackLocal;
+import org.javabluetooth.stack.hci.BlueZTransport;
 import org.javabluetooth.stack.hci.HCIDriver;
 import org.javabluetooth.stack.hci.HCIException;
 import org.javabluetooth.stack.hci.UARTTransport;
@@ -82,7 +83,10 @@ public class BluetoothBrowser implements DiscoveryListener {
 	/** Draws all GUI components and assigns event handlers */
 	public BluetoothBrowser(String name) throws BluetoothStateException {
 		ld = LocalDevice.getLocalDevice();
+		 System.out.println("Local Bluetooth Name is " + ld.getFriendlyName());
 		agent = ld.getDiscoveryAgent();
+		//ld.setDiscoverable(DiscoveryAgent.GIAC);
+		
 		// create first the mail Windows
 		mainFrame = new JFrame(name);
 		mainFrame.addWindowListener(new WindowAdapter() {
@@ -179,15 +183,21 @@ public class BluetoothBrowser implements DiscoveryListener {
 	public static void main(String[] args) throws BluetoothStateException, ClassNotFoundException,
 			InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, HCIException {
 		//HCIDriver.init(new UARTTransport("serial0"));
-		HCIDriver.init(new UARTTransport("COM40"));
+		//HCIDriver.init(new UARTTransport("COM40"));
+		HCIDriver.init(new BlueZTransport(0));
 		BluetoothStack.init(new BluetoothStackLocal());
 		//BluetoothStack.init(new BluetoothTCPClient("192.168.10.2", 2600));
 		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // get the native OS look and feel
-		new BluetoothBrowser("Bluetooth Network Neighborhood"); // create and show the app. (window)
+		BluetoothBrowser browser = new BluetoothBrowser("Bluetooth Network Neighborhood"); // create and show the app. (window)
+		
+		browser.inquire();
+		
+		
 	}
 
 	/** @see javax.bluetooth.DiscoveryListener#deviceDiscovered(javax.bluetooth.RemoteDevice, javax.bluetooth.DeviceClass) */
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+		System.out.println("***************** Device Discovered: " + btDevice.bdAddrLong);
 		devList.add(btDevice);
 	}
 
@@ -238,6 +248,8 @@ public class BluetoothBrowser implements DiscoveryListener {
 
 	/** @see javax.bluetooth.DiscoveryListener#inquiryCompleted(int) */
 	public void inquiryCompleted(int discType) {
+		
+		System.out.println("***************** Inquiry Completed");
 		top.removeAll();
 		for (int i = 0; i < devList.size(); i++) {
 			final RemoteDevice remoteDev = (RemoteDevice) devList.get(i);

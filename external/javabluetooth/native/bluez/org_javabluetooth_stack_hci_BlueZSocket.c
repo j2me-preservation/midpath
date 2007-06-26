@@ -1,14 +1,12 @@
 #include <jni.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <errno.h>
+#include <unistd.h>
 
-#include <netdb.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 
 #ifndef _Included_org_javabluetooth_stack_hci_BlueZSocket
 #define _Included_org_javabluetooth_stack_hci_BlueZSocket
@@ -24,8 +22,6 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_org_javabluetooth_stack_hci_BlueZSocket_open0(JNIEnv * env, jobject obj, jint deviceNumber) {
 
 	int sock, retval;
-	int i;
-	unsigned char buf[HCI_MAX_FRAME_SIZE];
 	struct sockaddr_hci addr;
 	struct hci_filter filter;
 	
@@ -77,7 +73,6 @@ JNIEXPORT jint JNICALL Java_org_javabluetooth_stack_hci_BlueZSocket_available0(J
  */
 JNIEXPORT jint JNICALL Java_org_javabluetooth_stack_hci_BlueZSocket_read0(JNIEnv * env, jobject obj, jint handle, jbyteArray byteBuffer, jint offset, jint length) {
 	
-  	jsize arraySize = (*env)->GetArrayLength(env, byteBuffer);
   	jbyte *jarr = (*env)->GetByteArrayElements(env, byteBuffer, 0);
   	
   	/* get pointer to the buffer */
@@ -107,7 +102,6 @@ JNIEXPORT jint JNICALL Java_org_javabluetooth_stack_hci_BlueZSocket_read0(JNIEnv
  */
 JNIEXPORT jint JNICALL Java_org_javabluetooth_stack_hci_BlueZSocket_write0(JNIEnv * env, jobject obj, jint handle, jbyteArray byteBuffer, jint offset, jint length) {
 	
-  	jsize arraySize = (*env)->GetArrayLength(env, byteBuffer);
   	jbyte *jarr = (*env)->GetByteArrayElements(env, byteBuffer, 0);
   	
   	/* get pointer to the buffer */

@@ -260,6 +260,13 @@ public class BluetoothTCPServerThread extends Thread implements HCIReceiver {
         try { sendPacketToBluetoothTCPClient(eventPacket); }
         catch (IOException e) { cleanExit(); }
     }
+    
+    /** @see org.javabluetooth.stack.hci.HCIInquiryResultReceiver#receive_HCI_Event_Inquiry_Result_With_RSSI(byte[]) */
+    public void receive_HCI_Event_Inquiry_Result_With_RSSI(byte[] eventPacket) {
+        Debug.println(7, "BluetoothTCPServer: Sending HCI Inquiry Result With RSSI Event to BluetoothTCPClient.");
+        try { sendPacketToBluetoothTCPClient(eventPacket); }
+        catch (IOException e) { cleanExit(); }
+    }
 
     /** @see org.javabluetooth.stack.hci.HCIInquiryReceiver#receive_HCI_Event_Inquiry_Complete(byte[]) */
     public void receive_HCI_Event_Inquiry_Complete(byte[] eventPacket) {
@@ -274,5 +281,7 @@ public class BluetoothTCPServerThread extends Thread implements HCIReceiver {
         try { sendPacketToBluetoothTCPClient(eventPacket); }
         catch (IOException e) { cleanExit(); }
     }
+
+	
 }
 
