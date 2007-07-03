@@ -145,10 +145,13 @@ public class Protocol extends BluetoothProtocol {
 	protected Connection clientConnection(SecurityToken token, int mode) throws IOException {
 		checkForPermission(token, Permissions.BLUETOOTH_CLIENT);
 
-		Short psmShort = Short.decode(url.uuid);
-		short psm = psmShort.shortValue();
-		Long remoteAddr = Long.decode(url.address);
-		long remoteAddrLong = remoteAddr.longValue();
+//		Short psmShort = Short.decode(url.uuid);
+//		short psm = psmShort.shortValue();
+//		Long remoteAddr = Long.decode(url.address);
+//		long remoteAddrLong = remoteAddr.longValue();
+		
+		short psm = Short.parseShort(url.uuid, 16);
+		long remoteAddrLong = Long.parseLong(url.address, 16);
 
 		try {
 			BluetoothStack bluetooth = BluetoothStack.getBluetoothStack();
