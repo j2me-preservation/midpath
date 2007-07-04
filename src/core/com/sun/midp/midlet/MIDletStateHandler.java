@@ -315,6 +315,15 @@ public class MIDletStateHandler {
             return midlets[0].midlet.getClass().getName();
         }
     }
+    
+    /**
+     * Gets the MIDlet peers.
+     *
+     * @return the MIDlet peers
+     */
+    public MIDletPeer[] getMIDletPeers() {
+            return midlets;
+    }
 
     /**
      * Registers a MIDlet being constructed.

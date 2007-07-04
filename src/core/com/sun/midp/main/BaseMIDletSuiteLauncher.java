@@ -25,8 +25,11 @@
 
 package com.sun.midp.main;
 
+import java.io.InputStream;
+
 import javax.microedition.lcdui.DisplayEventHandlerImpl;
 import javax.microedition.lcdui.UIToolkit;
+import javax.microedition.midlet.MIDlet;
 
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.events.EventQueue;
@@ -159,6 +162,17 @@ public class BaseMIDletSuiteLauncher {
 		UIToolkit.getToolkit().close();
 		EventQueue.getEventQueue().shutdown();
 		System.exit(0);
+	}
+	
+	/**
+	 * Load a resource from the classloader of the midlets
+	 * @param name
+	 * @return an input stream
+	 */
+	public static InputStream getResourceAsStream(String name) {
+		MIDlet midlet = MIDletStateHandler.getMidletStateHandler().getMIDletPeers()[0].getMIDlet();
+		InputStream is = midlet.getClass().getResourceAsStream(name);
+		return is;
 	}
 
 	//

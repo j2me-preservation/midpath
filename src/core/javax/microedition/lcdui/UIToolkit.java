@@ -28,6 +28,7 @@ import org.thenesis.midpath.ui.backend.sdl.SDLToolkit;
 import org.thenesis.midpath.ui.virtual.VirtualToolkit;
 
 import com.sun.midp.events.EventMapper;
+import com.sun.midp.main.BaseMIDletSuiteLauncher;
 import com.sun.midp.main.Configuration;
 
 public abstract class UIToolkit {
@@ -70,8 +71,15 @@ public abstract class UIToolkit {
 	public abstract Image createImage(byte[] imageData, int imageOffset, int imageLength) throws IOException;
 
 	public abstract Image createImage(InputStream stream) throws IOException;
-
-	public abstract Image createImage(String name) throws IOException;
+	
+	public Image createImage(String name) throws IOException {
+		
+		// Load the image from the MIDlet classloader.
+		// FIXME Use a better mechanism (?)
+		InputStream is = BaseMIDletSuiteLauncher.getResourceAsStream(name);
+		//System.out.println("[DEBUG] UIToolkit.createImage(String name): " + is.read());
+		return createImage(is);
+	}
 
 	public abstract Image createRGBImage(int[] rgb, int width, int height, boolean processAlpha) throws IOException;
 
@@ -89,6 +97,8 @@ public abstract class UIToolkit {
 	public abstract FontPeer createFontPeer(int face, int style, int size);
 	
 	public abstract EventMapper getEventMapper();
+	
+	
 
 	
 }

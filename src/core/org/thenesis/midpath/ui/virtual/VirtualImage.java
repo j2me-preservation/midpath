@@ -24,18 +24,25 @@ package org.thenesis.midpath.ui.virtual;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.UIToolkit;
 import javax.microedition.lcdui.game.Sprite;
 
+import org.thenesis.midpath.image.png.ColorModel;
+import org.thenesis.midpath.image.png.ImageConsumer;
 import org.thenesis.midpath.image.png.PngImage;
 
 import com.sun.midp.log.Logging;
 
 public class VirtualImage extends Image {
 
+	static {
+		PngImage.setProgressiveDisplay(false);
+	}
+	
 	VirtualSurface surface;
 	private boolean isMutable = false;
 
@@ -64,37 +71,35 @@ public class VirtualImage extends Image {
 		// Read PNG image from file
 		PngImage png = new PngImage(is);
 
-		int w = png.getWidth();
-		int h = png.getHeight();
-		surface = createSurface(w, h);
+		final int pngWidth = png.getWidth();
+		int pngHeight = png.getHeight();
+		surface = createSurface(pngWidth, pngHeight);
 		png.setBuffer(surface.data);
+		
+		png.startProduction(new ImageConsumer() {
+			private ColorModel cm;
+			public void imageComplete(int status) {
+				for (int i = 0; i < surface.data.length; i++) {
+					surface.data[i] = cm.getRGB(surface.data[i]);
+					//System.out.print(Integer.toHexString(surface.data[i]) + " ");
+				}
+			}
+			public void setColorModel(ColorModel model) { cm = model; }
+			public void setDimensions(int width, int height) {}
+			public void setHints(int flags) {}
+			public void setProperties(Hashtable props) {}
+			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int offset, int scansize) {}
+			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int offset, int scansize) {}
+			
+		});
+		
 
-		// Ensures that entire PNG image has been read
-		png.getEverything();
-
-		setDimensions(w, h);
+		setDimensions(pngWidth, pngHeight);
 		isMutable = false;
 
 		if (Logging.TRACE_ENABLED) {
 			System.out.println("[DEBUG] VirtualImage.<init>(InputStream stream): errors while loading ? " + png.hasErrors());
-
-			//			Enumeration e = png.getProperties();
-			//			while(e.hasMoreElements()) {
-			//				String property = (String)e.nextElement();
-			//				System.out.println(property + "=" + png.getProperty(property));
-			//			}
-			//		
-			//			print(surface.data, w, h);
 		}
-
-	}
-
-	private void print(int[] buffer, int w, int h) {
-
-		for (int i = 0; i < buffer.length; i++) {
-			System.out.print(Integer.toHexString(buffer[i]));
-		}
-		System.out.println();
 
 	}
 

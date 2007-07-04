@@ -132,13 +132,6 @@ public class VirtualToolkit extends UIToolkit {
 		return new VirtualImage(stream);
 	}
 
-	public Image createImage(String name) throws IOException {
-		//System.out.println("[DEBUG] SDLToolkit.createImage(String name): " + name);
-		InputStream is = getClass().getResourceAsStream(name);
-		//System.out.println("[DEBUG] SDLToolkit.createImage(String name): " + is.read());
-		return createImage(is);
-	}
-
 	public Image createRGBImage(int[] rgb, int width, int height, boolean processAlpha) throws IOException {
 		return new VirtualImage(rgb, width, height, processAlpha);
 	}
