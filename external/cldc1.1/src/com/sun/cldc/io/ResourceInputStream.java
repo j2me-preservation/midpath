@@ -33,7 +33,7 @@ import java.util.Vector;
 /**
  * Input stream class for accessing resource files in classpath.
  */
-public class ResourceInputStream_DEFAULT extends InputStream {
+public class ResourceInputStream extends InputStream {
     private Object fileDecoder;
     private Object savedDecoder; // used for mark/reset functionality
 
@@ -111,9 +111,15 @@ public class ResourceInputStream_DEFAULT extends InputStream {
      *              name must not have a leading '/'.
      * @exception  IOException  if an I/O error occurs.
      */
-    public ResourceInputStream_DEFAULT(String name) throws IOException {
+    public ResourceInputStream(String name) throws IOException {
         String fixedName = fixResourceName(name);
         fileDecoder = open(fixedName);
+        
+//        int[] t = (int[])fileDecoder;
+//        System.out.println("from native: " + t[0] + " " + t[1] + " " + t[2]);
+//        FileDescriptor fd = (FileDescriptor)fileDecoder;
+//        System.out.println("from native: " + fd.handle);
+        
         if (fileDecoder == null) {
             throw new IOException();
         }
@@ -200,6 +206,10 @@ public class ResourceInputStream_DEFAULT extends InputStream {
         if (fileDecoder == null || savedDecoder == null) {
             throw new IOException();
         }
+        
+//      int[] t = (int[])savedDecoder;
+//      System.out.println("from native: " + t[0] + " " + t[1]);
+        
         fileDecoder = clone(savedDecoder);
     }
 
