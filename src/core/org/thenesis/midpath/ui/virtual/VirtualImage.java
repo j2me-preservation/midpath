@@ -365,7 +365,7 @@ public class VirtualImage extends Image {
 			return rotate(destSurface, 0, 0, width, height, transform);
 		}
 
-		return null;
+		return srcSurface;
 	}
 
 	public VirtualSurface rotate(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform) {
