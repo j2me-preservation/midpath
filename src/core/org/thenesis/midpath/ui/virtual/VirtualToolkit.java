@@ -32,6 +32,7 @@ import javax.microedition.lcdui.UIToolkit;
 import org.thenesis.midpath.ui.backend.awt.AWTBackend;
 import org.thenesis.midpath.ui.backend.awt.AWTGrabberBackend;
 import org.thenesis.midpath.ui.backend.gtk.GTKBackend;
+import org.thenesis.midpath.ui.backend.qt.QTBackend;
 import org.thenesis.midpath.ui.backend.sdl.SDLBackend;
 import org.thenesis.midpath.ui.backend.swt.SWTBackend;
 import org.thenesis.midpath.ui.backend.x11.X11Backend;
@@ -70,6 +71,8 @@ public class VirtualToolkit extends UIToolkit {
 			backend = new X11Backend(w, h);
 		} else if (backendName.equalsIgnoreCase("GTK")) {
 			backend = new GTKBackend(w, h);
+		} else if (backendName.equalsIgnoreCase("QT")) {
+				backend = new QTBackend(w, h);
 		}else {
 			backend = new NullBackend(w, h);
 		}
