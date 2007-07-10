@@ -1,5 +1,5 @@
 #
-# Makefile created at Tue Jul  3 14:37:58 2007, by mmake
+# Makefile created at Tue Jul 10 12:37:04 2007, by mmake
 #
 
 # Programs (with common options):
@@ -126,6 +126,7 @@ PACKAGES = \
 	com.sun.midp.io \
 	com.sun.midp.i18n \
 	com.sun.midp.io.j2me.serversocket \
+	org.thenesis.midpath.sound.backend.esd \
 	org.thenesis.midpath.sound \
 	com.sun.midp.main \
 	com.sun.midp.io.j2me.socket \
@@ -139,6 +140,7 @@ PACKAGES = \
 	com.sun.midp.chameleon.input \
 	javax.microedition.media \
 	org.thenesis.midpath.ui.backend.x11 \
+	org.thenesis.midpath.ui.backend.qt \
 	org.thenesis.midpath.main \
 	com.sun.midp.io.j2me.http \
 	com.sun.midp.log \
@@ -503,6 +505,7 @@ javax.microedition.lcdui : $(call PACKAGE_OBJS,javax.microedition.lcdui)
 com.sun.midp.io : $(call PACKAGE_OBJS,com.sun.midp.io)
 com.sun.midp.i18n : $(call PACKAGE_OBJS,com.sun.midp.i18n)
 com.sun.midp.io.j2me.serversocket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.serversocket)
+org.thenesis.midpath.sound.backend.esd : $(call PACKAGE_OBJS,org.thenesis.midpath.sound.backend.esd)
 org.thenesis.midpath.sound : $(call PACKAGE_OBJS,org.thenesis.midpath.sound)
 com.sun.midp.main : $(call PACKAGE_OBJS,com.sun.midp.main)
 com.sun.midp.io.j2me.socket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.socket)
@@ -516,6 +519,7 @@ javax.microedition.io.file : $(call PACKAGE_OBJS,javax.microedition.io.file)
 com.sun.midp.chameleon.input : $(call PACKAGE_OBJS,com.sun.midp.chameleon.input)
 javax.microedition.media : $(call PACKAGE_OBJS,javax.microedition.media)
 org.thenesis.midpath.ui.backend.x11 : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.x11)
+org.thenesis.midpath.ui.backend.qt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.qt)
 org.thenesis.midpath.main : $(call PACKAGE_OBJS,org.thenesis.midpath.main)
 com.sun.midp.io.j2me.http : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.http)
 com.sun.midp.log : $(call PACKAGE_OBJS,com.sun.midp.log)
