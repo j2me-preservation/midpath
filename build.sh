@@ -33,6 +33,7 @@ while getopts "haesgq-:" option ; do
 		    echo " Targets :"
 		    echo "  generic (default)"
 		    echo "  maemo (compile libmidpathgtk with hildon libraries)"
+		    exit 0
 		    ;;
 		a ) ALSA_ENABLED=yes
 			echo "ALSA enabled" ;;
