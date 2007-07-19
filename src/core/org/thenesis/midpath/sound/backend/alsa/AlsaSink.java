@@ -42,8 +42,8 @@ import com.sun.cldchi.jvm.JVM;
 public class AlsaSink {
 	
 	static {
-		JVM.loadLibrary("libalsasink.so");
-		//System.loadLibrary("alsabackend");
+		JVM.loadLibrary("libmidpathalsa.so");
+		//System.loadLibrary("midpathalsa");
 	}
 	
 	public static final int BYTE_PER_FRAME = 4;

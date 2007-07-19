@@ -1,8 +1,19 @@
 
-CC = gcc 
-CFLAGS = `pkg-config --cflags alsa`
-LDFLAGS = `pkg-config --libs alsa`
+CFLAGS = `pkg-config --cflags alsa` -I/usr/include/classpath
+LDFLAGS = `pkg-config --libs alsa` 
 
-alsasink: org_thenesis_midpath_sound_backend_alsa_AlsaSink.c
-	$(CC) org_thenesis_midpath_sound_backend_alsa_AlsaSink.c -o libalsasink.so $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,libalsasink.so -I/usr/include/classpath -static -lc
-	
+SOURCES = org_thenesis_midpath_sound_backend_alsa_AlsaSink.c
+
+OBJECTS=$(patsubst %.c, %.o, $(SOURCES))
+
+all: libmidpathalsa.so
+
+%.o : %.c
+	$(CC) $(CFLAGS) -fPIC -g -c -Wall -o $(patsubst %.c, %.o, $<) $<
+
+%.so: $(OBJECTS)
+	$(CC) $(LDFLAGS) -shared -Wl,-soname,$@ -lc -o $@ $^
+
+clean:
+	rm -f *.so *.o
+
