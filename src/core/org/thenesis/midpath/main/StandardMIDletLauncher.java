@@ -36,7 +36,6 @@
 package org.thenesis.midpath.main;
 
 import com.sun.midp.main.BaseMIDletSuiteLauncher;
-import com.sun.midp.main.MIDletClassLoader;
 
 public class StandardMIDletLauncher  {
 
@@ -74,30 +73,9 @@ public class StandardMIDletLauncher  {
 		BaseMIDletSuiteLauncher.close();
 	}
 
-	//	public void launch(String className, String midletName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-	//		
-	//		BaseMIDletSuiteLauncher.launch(className, midletName);
-	//		
-	//		// Clean and exit
-	//		UIToolkit.getToolkit().close();
-	//		EventQueue.getEventQueue().shutdown();
-	//		System.exit(0);
-	//	}
 
 	void launch(String className, String midletName) throws Exception {
-
-		MIDletClassLoader classLoader = new MIDletClassLoader() {
-			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
-				Class midletClass = Class.forName(className);
-				if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
-					throw new InstantiationException("Class not a MIDlet");
-				}
-				return midletClass;
-			}
-		};
-
-		BaseMIDletSuiteLauncher.launch(classLoader, className, midletName);
-
+		BaseMIDletSuiteLauncher.launch(className, midletName);
 	}
 
 	

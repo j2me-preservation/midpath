@@ -76,6 +76,8 @@ public class BaseMIDletSuiteLauncher {
 
 	/** The class name of the last MIDlet to run. */
 	static String lastMidletToRun;
+	
+	private static MIDletClassLoader classLoader = new BaseMIDletClassLoader();
 
 	/** This class is not meant to be instantiated. */
 	//	private BaseMIDletSuiteLauncher() {
@@ -84,14 +86,14 @@ public class BaseMIDletSuiteLauncher {
 		DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
 	}
 	
-	public static void launch(MIDletClassLoader classLoader, String midletClassname, String displayName) throws ClassNotFoundException, InstantiationException, IllegalAccessException  {
+	public static void launch(String midletClassname, String displayName) throws ClassNotFoundException, InstantiationException, IllegalAccessException  {
 		String suiteID = "0";
 		MIDletSuite midletSuite = InternalMIDletSuiteImpl.create(displayName, suiteID);
-		launch(classLoader, midletSuite, midletClassname);
+		launch(midletSuite, midletClassname);
 	}
 
 	/* FIXME temp hack */
-	public static void launch(MIDletClassLoader classLoader, MIDletSuite midletSuite, String midletClassname)
+	public static void launch(MIDletSuite midletSuite, String midletClassname)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		// Throws SecurityException if already called,
 		SecurityToken internalSecurityToken = SecurityInitializer.init();
@@ -170,8 +172,9 @@ public class BaseMIDletSuiteLauncher {
 	 * @return an input stream
 	 */
 	public static InputStream getResourceAsStream(String name) {
-		MIDlet midlet = MIDletStateHandler.getMidletStateHandler().getMIDletPeers()[0].getMIDlet();
-		InputStream is = midlet.getClass().getResourceAsStream(name);
+		//MIDlet midlet = MIDletStateHandler.getMidletStateHandler().getMIDletPeers()[0].getMIDlet();
+		//InputStream is = midlet.getClass().getResourceAsStream(name);
+		InputStream is = classLoader.getResourceAsStream(name);
 		return is;
 	}
 
@@ -784,6 +787,26 @@ public class BaseMIDletSuiteLauncher {
 	static public void vmEndStartUp(SecurityToken token, int midletIsolateId) {
 		//		token.checkIfPermissionAllowed(Permissions.AMS);
 		//		vmEndStartUp(midletIsolateId);
+	}
+	
+	public static void setMIDletClassLoader(MIDletClassLoader classLoader) {
+		BaseMIDletSuiteLauncher.classLoader = classLoader;
+	}
+	
+	private static class BaseMIDletClassLoader implements MIDletClassLoader {
+
+		public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
+			Class midletClass = Class.forName(className);
+			if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
+				throw new InstantiationException("Class not a MIDlet");
+			}
+			return midletClass;
+		}
+
+		public InputStream getResourceAsStream(String name) {
+			return getClass().getResourceAsStream(name);
+		}
+		
 	}
 
 }

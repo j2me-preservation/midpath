@@ -1,5 +1,7 @@
 package com.sun.midp.main;
 
+import java.io.InputStream;
+
 public interface MIDletClassLoader {
 	
 	/**
@@ -12,5 +14,7 @@ public interface MIDletClassLoader {
      * @throws InstantiationException 
      */
     public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException;
+    
+    public InputStream getResourceAsStream(String name);
 
 }
