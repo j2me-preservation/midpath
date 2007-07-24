@@ -51,10 +51,10 @@ import com.sun.midp.midlet.MIDletSuite;
 import com.sun.midp.midletsuite.MIDletInfo;
 
 public class J2SEMIDletLauncher {
-	
+
 	static MIDletRespository repository;
 	static String repositoryPath;
-	
+
 	static {
 		repositoryPath = Configuration.getPropertyDefault("org.thenesis.midpath.main.repositoryPath", "");
 		//System.out.println("repositoryPath: " + repositoryPath);
@@ -65,48 +65,24 @@ public class J2SEMIDletLauncher {
 	}
 
 	public void launchManager() throws Exception {
-		
+
 		BaseMIDletSuiteLauncher.initialize();
-		
+
 		// Initialize the manager MIDlet 
 		BaseMIDletSuiteLauncher.launch("org.thenesis.midpath.main.SuiteManagerMIDlet", "Suite Manager");
 
 		// Get the launch infos from the MIDlet
 		final MIDletInfo info = SuiteManagerMIDlet.launchMidletInfo;
 		final MIDletSuiteJar midletSuiteJar = SuiteManagerMIDlet.launchMidletSuiteJar;
-		
+
 		if (info != null) {
 
 			// Launch the MIDlet returned by the manager
-			//MIDletInfo info = new MIDletInfo("TextFieldDemo", null, "org.thenesis.midpath.test.ui.textfield.TextFieldDemo");
-			// File file = new File("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
-			// final MIDletSuiteJar midletSuiteJar = new MIDletSuiteJar(file);
-			BaseMIDletSuiteLauncher.setMIDletClassLoader(new MIDletClassLoader() {
-				public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
-					Class midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
-					if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
-						throw new InstantiationException("Class not a MIDlet");
-					}
-					return midletClass;
-				}
-
-				public InputStream getResourceAsStream(String name) {
-					try {
-						Class clazz = midletSuiteJar.getURLClassLoader().loadClass(info.classname);
-						InputStream is = clazz.getResourceAsStream(name);
-						//System.out.println(name + " : " + is);
-						return is;
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-						return null;
-					}
-				}
-				
-			});
-			
+			BaseMIDletSuiteLauncher.setMIDletClassLoader(new J2SEMIDletClassLoader(midletSuiteJar));
 			String suiteName = midletSuiteJar.getSuiteName();
 			String suiteId = InternalMIDletSuiteImpl.buildSuiteID(suiteName);
-			MIDletSuite midletSuite = InternalMIDletSuiteImpl.create(midletSuiteJar.getManifestProperties(), suiteName, suiteId);
+			MIDletSuite midletSuite = InternalMIDletSuiteImpl.create(midletSuiteJar.getManifestProperties(), suiteName,
+					suiteId);
 			BaseMIDletSuiteLauncher.launch(midletSuite, info.classname);
 		}
 
@@ -121,7 +97,7 @@ public class J2SEMIDletLauncher {
 
 		final MIDletSuiteJar midletSuiteJar = new MIDletSuiteJar(file);
 		MIDletInfo[] infos = midletSuiteJar.getMIDletInfo();
-		
+
 		ManifestProperties manifestProperties = midletSuiteJar.getManifestProperties();
 		int size = manifestProperties.size();
 		for (int i = 0; i < size; i++) {
@@ -133,86 +109,41 @@ public class J2SEMIDletLauncher {
 			System.out.println("No MIDlet found");
 			return;
 		}
-		
-		BaseMIDletSuiteLauncher.setMIDletClassLoader(new MIDletClassLoader() {
-			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
-				Class midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
-				if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
-					throw new InstantiationException("Class not a MIDlet");
-				}
-				return midletClass;
-			}
 
-			public InputStream getResourceAsStream(String name) {
-				try {
-					Class clazz = midletSuiteJar.getURLClassLoader().loadClass(info.classname);
-					InputStream is = clazz.getResourceAsStream(name);
-					//System.out.println(name + " : " + is);
-					return is;
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-					return null;
-				}
-			}
-		});
+		BaseMIDletSuiteLauncher.setMIDletClassLoader(new J2SEMIDletClassLoader(midletSuiteJar));
 
 		BaseMIDletSuiteLauncher.launch(info.classname, info.name);
 		BaseMIDletSuiteLauncher.close();
-
-		//		MIDletSuiteInfo[] suiteInfos = getMidletSuiteInfo();
-		//		
-		//		if (suiteInfos.length > 0) {
-		//			MIDletInfo info = suiteInfos[0].midletInfo[0];
-		//			
-		//			DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
-		//			MIDletSuiteLoader.init(info.classname, info.name);
-		//		} else {
-		//			System.out.println("No MIDlet found");
-		//		}
 
 	}
 
 	void launch(File file, String className, String midletName) throws Exception {
 
 		BaseMIDletSuiteLauncher.initialize();
-		
+
 		final MIDletSuiteJar midletSuiteJar = new MIDletSuiteJar(file);
 		MIDletInfo[] infos = midletSuiteJar.getMIDletInfo();
-		
-		ManifestProperties manifestProperties = midletSuiteJar.getManifestProperties();
-		int size = manifestProperties.size();
-		for (int i = 0; i < size; i++) {
-			System.out.println(manifestProperties.getKeyAt(i) + "=" + manifestProperties.getValueAt(i));
+
+		//		ManifestProperties manifestProperties = midletSuiteJar.getManifestProperties();
+		//		int size = manifestProperties.size();
+		//		for (int i = 0; i < size; i++) {
+		//			System.out.println(manifestProperties.getKeyAt(i) + "=" + manifestProperties.getValueAt(i));
+		//		}
+
+		int index = -1;
+		for (int i = 0; i < infos.length; i++) {
+			if (className.equals(infos[i].classname)) {
+				index = i;
+				break;
+			}
 		}
 
-		final MIDletInfo info = infos[0];
-		if (infos.length == 0) {
-			System.out.println("No MIDlet found");
+		if (index == -1) {
+			System.out.println("No MIDlet with class name " + className + " was found");
 			return;
 		}
-		
-		BaseMIDletSuiteLauncher.setMIDletClassLoader(new MIDletClassLoader() {
-			public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
-				Class midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
-				if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
-					throw new InstantiationException("Class not a MIDlet");
-				}
-				return midletClass;
-			}
 
-			public InputStream getResourceAsStream(String name) {
-				try {
-					Class clazz = midletSuiteJar.getURLClassLoader().loadClass(info.classname);
-					InputStream is = clazz.getResourceAsStream(name);
-					//System.out.println(name + " : " + is);
-					return is;
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-					return null;
-				}
-			}
-		});
-
+		BaseMIDletSuiteLauncher.setMIDletClassLoader(new J2SEMIDletClassLoader(midletSuiteJar));
 		BaseMIDletSuiteLauncher.launch(className, midletName);
 		BaseMIDletSuiteLauncher.close();
 	}
@@ -353,7 +284,7 @@ public class J2SEMIDletLauncher {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		try {
 			J2SEMIDletLauncher launcher = new J2SEMIDletLauncher();
 			launcher.launchManager();
@@ -363,17 +294,17 @@ public class J2SEMIDletLauncher {
 
 		//File file = new File("ext/games/MobileSudoku/MobileSudoku.jar");
 		//File file = new File("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/mipd2-sdl-test.jar");
-//		try {
-//			J2SEMidletSuiteLauncher launcher = new J2SEMidletSuiteLauncher();
-//			launcher.launchManager();
-//			//launcher.launchFirstMIDlet(file.toURL());
-//			//launcher.launchManager("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
-//
-//			//			MIDletRespository rep = new MIDletRespository("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
-//			//			System.out.println(rep.getInstallDirectory("mipd2-sdl-test.jar"));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		//		try {
+		//			J2SEMidletSuiteLauncher launcher = new J2SEMidletSuiteLauncher();
+		//			launcher.launchManager();
+		//			//launcher.launchFirstMIDlet(file.toURL());
+		//			//launcher.launchManager("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
+		//
+		//			//			MIDletRespository rep = new MIDletRespository("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
+		//			//			System.out.println(rep.getInstallDirectory("mipd2-sdl-test.jar"));
+		//		} catch (Exception e) {
+		//			e.printStackTrace();
+		//		}
 
 		//		File file = new File("ext/games/MobileSudoku/MobileSudoku.jar");
 		//		System.out.println(file.exists());
@@ -405,23 +336,47 @@ public class J2SEMIDletLauncher {
 
 	}
 
-//	class MIDletSuiteInfo {
-//
-//		MIDletInfo[] midletInfo;
-//		ManifestProperties manifestProperties;
-//
-//		public MIDletSuiteInfo(ManifestProperties p, MIDletInfo[] infos) {
-//			manifestProperties = p;
-//			midletInfo = infos;
-//		}
-//
-//		public String getId() {
-//			String id = manifestProperties.getProperty(ManifestProperties.SUITE_NAME_PROP);
-//			id.replace(' ', '_');
-//			return id;
-//		}
-//	}
+	//	class MIDletSuiteInfo {
+	//
+	//		MIDletInfo[] midletInfo;
+	//		ManifestProperties manifestProperties;
+	//
+	//		public MIDletSuiteInfo(ManifestProperties p, MIDletInfo[] infos) {
+	//			manifestProperties = p;
+	//			midletInfo = infos;
+	//		}
+	//
+	//		public String getId() {
+	//			String id = manifestProperties.getProperty(ManifestProperties.SUITE_NAME_PROP);
+	//			id.replace(' ', '_');
+	//			return id;
+	//		}
+	//	}
 
+}
+
+class J2SEMIDletClassLoader implements MIDletClassLoader {
+
+	private MIDletSuiteJar midletSuiteJar;
+	private Class midletClass;
+
+	public J2SEMIDletClassLoader(MIDletSuiteJar midletSuiteJar) {
+		this.midletSuiteJar = midletSuiteJar;
+	}
+
+	public synchronized Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
+		midletClass = midletSuiteJar.getURLClassLoader().loadClass(className);
+		if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
+			throw new InstantiationException("Class not a MIDlet");
+		}
+		return midletClass;
+	}
+
+	public synchronized InputStream getResourceAsStream(String name) {
+		InputStream is = midletClass.getResourceAsStream(name);
+		//System.out.println(name + " : " + is);
+		return is;
+	}
 }
 
 class MIDletRespository {
@@ -457,11 +412,11 @@ class MIDletRespository {
 				if (jad.exists()) {
 					MIDletSuiteJar jar = new MIDletSuiteJar(files[i]);
 					installedJars.addElement(jar);
-//					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): installed "
-//							+ files[i].getName());
+					//					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): installed "
+					//							+ files[i].getName());
 				} else {
-//					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): not installed "
-//							+ files[i].getName());
+					//					System.out.println("[DEBUG] J2SEMidletSuiteLauncher.scanRepository(): not installed "
+					//							+ files[i].getName());
 					notInstalledJars.addElement(new MIDletSuiteJar(files[i]));
 				}
 			}
@@ -500,7 +455,7 @@ class MIDletRespository {
 		File jad = new File(repositoryDir, getJadFileName(jarFile.getName()));
 		jad.delete();
 	}
-	
+
 	public MIDletSuiteJar getJarFromSuiteName(String suiteName) throws IOException {
 		for (int i = 0; i < installedJars.size(); i++) {
 			MIDletSuiteJar jar = (MIDletSuiteJar) installedJars.elementAt(i);
@@ -510,7 +465,6 @@ class MIDletRespository {
 		}
 		return null;
 	}
-	
 
 	public void installJar(String fileName) throws IOException {
 
@@ -531,14 +485,14 @@ class MIDletRespository {
 		// Create a jad with the same name of the jar file
 		File jad = new File(repositoryDir, getJadFileName(jar.getFile().getName()));
 		PrintWriter writer = new PrintWriter(jad);
-		
+
 		ManifestProperties properties = jar.getManifestProperties();
-		for (int i =0; i < properties.size(); i++) {
+		for (int i = 0; i < properties.size(); i++) {
 			String key = properties.getKeyAt(i);
 			String value = properties.getValueAt(i);
 			writer.println(key + ":" + value);
 		}
-		
+
 		// Add attributes required by JAD specs
 		// References:
 		// - http://developers.sun.com/techtopics/mobility/midp/ttips/getAppProperty/index.html)
@@ -580,37 +534,5 @@ class MIDletRespository {
 	public Vector getNotInstalledJars() {
 		return notInstalledJars;
 	}
-	
-//	public J2SEMidletSuiteLauncher() {
-	//
-	//	}
-
-	//	public void start() throws Exception {
-	//
-	//		ManifestProperties manifestProperties = getManifestProperties();
-	//
-	//		MIDletInfo[] infos = getMIDletInfo(manifestProperties);
-	//
-	//		if (infos.length > 0) {
-	//			MIDletInfo info = infos[0];
-	//
-	//			DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
-	//			launchAndClose(info.classname, info.name);
-	//		} else {
-	//			System.out.println("No MIDlet found");
-	//		}
-	//
-	//		//		MIDletSuiteInfo[] suiteInfos = getMidletSuiteInfo();
-	//		//		
-	//		//		if (suiteInfos.length > 0) {
-	//		//			MIDletInfo info = suiteInfos[0].midletInfo[0];
-	//		//			
-	//		//			DisplayEventHandlerFactory.SetDisplayEventHandlerImpl(new DisplayEventHandlerImpl());
-	//		//			MIDletSuiteLoader.init(info.classname, info.name);
-	//		//		} else {
-	//		//			System.out.println("No MIDlet found");
-	//		//		}
-	//
-	//	}
 
 }

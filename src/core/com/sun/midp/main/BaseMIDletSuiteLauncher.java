@@ -794,17 +794,19 @@ public class BaseMIDletSuiteLauncher {
 	}
 	
 	private static class BaseMIDletClassLoader implements MIDletClassLoader {
+		
+		private Class midletClass;
 
-		public Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
-			Class midletClass = Class.forName(className);
+		public synchronized Class getMIDletClass(String className) throws ClassNotFoundException, InstantiationException {
+			midletClass = Class.forName(className);
 			if (!Class.forName("javax.microedition.midlet.MIDlet").isAssignableFrom(midletClass)) {
 				throw new InstantiationException("Class not a MIDlet");
 			}
 			return midletClass;
 		}
 
-		public InputStream getResourceAsStream(String name) {
-			return getClass().getResourceAsStream(name);
+		public synchronized InputStream getResourceAsStream(String name) {
+			return midletClass.getResourceAsStream(name);
 		}
 		
 	}
