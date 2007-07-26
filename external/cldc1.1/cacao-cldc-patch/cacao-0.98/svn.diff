@@ -1,18 +1,20 @@
 Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 ===================================================================
---- src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c	(revision 7934)
+--- src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c	(revision 8235)
 +++ src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c	(working copy)
-@@ -26,25 +26,53 @@
+@@ -26,25 +26,42 @@
  
  */
  
 +#include <sys/stat.h>
-+#include <stdlib.h>
++#include <sys/mman.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <zlib.h>
  
  #include "config.h"
 -#include "vm/types.h"
  
-+#include "arch.h"
 +#include "mm/memory.h"
 +
  #include "native/jni.h"
@@ -21,31 +23,18 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
  #include "native/include/java_lang_Object.h"
  #include "native/include/java_lang_String.h"
 -
-+#include "native/include/java_lang_Integer.h"
++#include "native/include/java_lang_Long.h"
  #include "native/include/com_sun_cldc_io_ResourceInputStream.h"
-+#include "native/include/com_sun_cldchi_jvm_FileDescriptor.h"
  
 +#include "vm/types.h"
 +#include "vm/builtin.h"
  #include "vm/vm.h" /* REMOVE ME: temporarily */
 +#include "vm/exceptions.h"
-+#include "vm/initialize.h"
 +#include "vm/stringlocal.h"
-+#include "vm/properties.h"
  
-+#include "vmcore/class.h"
-+#include "vmcore/classcache.h"
-+#include "vmcore/linker.h"
-+#include "vmcore/loader.h"
-+#include "vmcore/options.h"
-+#include "vmcore/statistics.h"
-+#include "vmcore/suck.h"
 +#include "vmcore/zip.h"
  
-+#include "toolbox/list.h"
-+#include "toolbox/logging.h"
-+#include "toolbox/util.h"
-+
++#include "threads/lock-common.h"
 +
  /* native methods implemented by this file ************************************/
   
@@ -58,7 +47,153 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
  };
   
  /* _Jv_com_sun_cldc_io_ResourceInputStream_init ********************************
-@@ -68,15 +96,211 @@
+@@ -62,21 +79,333 @@
+ 	native_method_register(u, methods, NATIVE_METHODS_COUNT);
+ }
+ 
++#define LFH_HEADER_SIZE              30
++#define LFH_SIGNATURE                0x04034b50
++#define LFH_FILE_NAME_LENGTH         26
++#define LFH_EXTRA_FIELD_LENGTH       28
+ 
++typedef struct lfh lfh;
++
++struct lfh {
++	u2 compressionmethod;
++	u4 compressedsize;
++	u4 uncompressedsize;
++	u2 filenamelength;
++	u2 extrafieldlength;
++};
++
++
++#define FILE_INFOS 3
++#define FILE_POINTER 0
++#define FILE_LENGTH 1
++#define FILE_POS 2
++
++static struct java_longarray* zip_read_resource(list_classpath_entry *lce, utf *name)
++{
++	hashtable_zipfile_entry *htzfe;
++	lfh                      lfh;
++	u1                      *indata;
++	u1                      *outdata;
++	z_stream                 zs;
++	int                      err;
++	java_longarray  *fhandler;
++	
++	/* try to find the class in the current archive */
++
++	htzfe = zip_find(lce, name);
++
++	if (htzfe == NULL)
++		return NULL;
++
++	/* read stuff from local file header */
++
++	lfh.filenamelength   = SUCK_LE_U2(htzfe->data + LFH_FILE_NAME_LENGTH);
++	lfh.extrafieldlength = SUCK_LE_U2(htzfe->data + LFH_EXTRA_FIELD_LENGTH);
++
++	indata = htzfe->data +
++		LFH_HEADER_SIZE +
++		lfh.filenamelength +
++		lfh.extrafieldlength;
++
++	/* allocate buffer for uncompressed data */
++
++	outdata = MNEW(u1, htzfe->uncompressedsize);
++
++	/* how is the file stored? */
++
++	switch (htzfe->compressionmethod) {
++	case Z_DEFLATED:
++		/* fill z_stream structure */
++
++		zs.next_in   = indata;
++		zs.avail_in  = htzfe->compressedsize;
++		zs.next_out  = outdata;
++		zs.avail_out = htzfe->uncompressedsize;
++
++		zs.zalloc = Z_NULL;
++		zs.zfree  = Z_NULL;
++		zs.opaque = Z_NULL;
++
++		/* initialize this inflate run */
++
++		if (inflateInit2(&zs, -MAX_WBITS) != Z_OK)
++			vm_abort("zip_get: inflateInit2 failed: %s", strerror(errno));
++
++		/* decompress the file into buffer */
++
++		err = inflate(&zs, Z_SYNC_FLUSH);
++
++		if ((err != Z_STREAM_END) && (err != Z_OK))
++			vm_abort("zip_get: inflate failed: %s", strerror(errno));
++
++		/* finish this inflate run */
++
++		if (inflateEnd(&zs) != Z_OK)
++			vm_abort("zip_get: inflateEnd failed: %s", strerror(errno));
++		break;
++
++	case 0:
++		/* uncompressed file, just copy the data */
++		MCOPY(outdata, indata, u1, htzfe->compressedsize);
++		break;
++
++	default:
++		vm_abort("zip_get: unknown compression method %d",
++				 htzfe->compressionmethod);
++	}
++	
++	/* Create a file handler object (currently an int array) */
++	if (!(fhandler = (java_longarray *) builtin_newarray_long(FILE_INFOS)))
++		return NULL;
++	fhandler->data[FILE_POINTER] = (int)outdata; /* data pointer */
++	fhandler->data[FILE_LENGTH] = htzfe->uncompressedsize; /* File size */
++	fhandler->data[FILE_POS] = (int) 0; /* File Access position */
++	return fhandler;
++	
++}
++
++static struct java_longarray* file_read_resource(char *path) 
++{
++	int len;
++	struct stat statBuffer;
++	u1 *filep;
++	java_longarray  *fhandler;
++	int fd;
++	
++	fd = open(path, O_RDONLY);
++	
++	if (fd > 0) {
++		
++		if (fstat(fd, &statBuffer) != -1) {
++			len = statBuffer.st_size;
++		} else {
++			return NULL;
++		}
++		
++		/* Map file into the memory */
++		filep = mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
++		
++		/* Create a file handler object (currently an int array) */
++		if (!(fhandler = (java_longarray *) builtin_newarray_long(FILE_INFOS)))
++			return NULL;
++		fhandler->data[FILE_POINTER] = (int)filep; /* File pointer */
++		fhandler->data[FILE_LENGTH] = (int) len; /* File size */
++		fhandler->data[FILE_POS] = (int) 0; /* File Access position */
++		return fhandler;
++		
++		
++	} else {
++		return NULL;
++	}
++	
++}
++
+ /*
+  * Class:     com/sun/cldc/io/ResourceInputStream
   * Method:    open
   * Signature: (Ljava/lang/String;)Ljava/lang/Object;
   */
@@ -68,17 +203,11 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 -	vm_abort("Java_com_sun_cldc_io_ResourceInputStream_open: IMPLEMENT ME!");
 +	
 +	list_classpath_entry *lce;
-+	char                 *filename;
-+	s4                    filenamelen;
-+	char                 *path;
-+	FILE                 *classfile;
-+	/*struct stat           statBuffer;
-+	int bufferSize = -1;*/
++	char *filename;
++	s4 filenamelen;
++	char *path;
 +	utf *uname;
-+	/*java_lang_Integer *fhandler;*/
-+	com_sun_cldchi_jvm_FileDescriptor *fileDescriptor; 
-+	classinfo *ci;
-+	
++	java_longarray  *fhandler;
 +	
 +	/* get the classname as char string (do it here for the warning at
 +       the end of the function) */
@@ -88,38 +217,52 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 +	filenamelen = utf_bytes(uname) + strlen("0");
 +	filename = MNEW(char, filenamelen);
 +	utf_copy(filename, uname);
-+	classfile = NULL;
 +	
-+
 +	/* walk through all classpath entries */
 +
 +	for (lce = list_first(list_classpath_entries); lce != NULL;
 +		 lce = list_next(list_classpath_entries, lce)) {
++		 	
++#if defined(ENABLE_ZLIB)
++		if (lce->type == CLASSPATH_ARCHIVE) {
 +
++			/* enter a monitor on zip/jar archives */
++			LOCK_MONITOR_ENTER(lce);
++
++			/* try to get the file in current archive */
++			fhandler = zip_read_resource(lce, uname);
++
++			/* leave the monitor */
++			LOCK_MONITOR_EXIT(lce);
++			
++			if (fhandler != NULL) { /* file exists */
++				break;
++			}
++
++		} else {
++#endif
++			
 +			path = MNEW(char, lce->pathlen + filenamelen);
 +			strcpy(path, lce->path);
-+			strcat(path, filename);  
++			strcat(path, filename);
 +
-+			classfile = fopen(path, "r");
++			fhandler = file_read_resource(path);
 +			
 +			MFREE(path, char, lce->pathlen + filenamelen);
 +
-+			if (classfile) { /* file exists */
++			if (fhandler != NULL) { /* file exists */
 +				break;
 +			}
++			
++#if defined(ENABLE_ZLIB)
++		}
++#endif	
++			
 +	}
 +
 +	MFREE(filename, char, filenamelen);
 +
-+	if (classfile) {
-+		ci = load_class_bootstrap(utf_new_char("com/sun/cldchi/jvm/FileDescriptor"));
-+		fileDescriptor = (com_sun_cldchi_jvm_FileDescriptor *) native_new_and_init(ci);
-+		fileDescriptor->handle = (int) classfile;
-+		fileDescriptor->valid = (int) 0;
-+		return (java_lang_Object*) fileDescriptor;
-+	} else {
-+		return NULL;
-+	}
++	return (java_lang_Object*) fhandler;
 +	
  }
  
@@ -131,30 +274,10 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 + */
 +JNIEXPORT s4 JNICALL Java_com_sun_cldc_io_ResourceInputStream_bytesRemain(JNIEnv *env, jclass clazz, struct java_lang_Object* jobj) {
 +	
-+	com_sun_cldchi_jvm_FileDescriptor *fileDescriptor;
-+	struct stat statBuffer;
-+	FILE *file;
-+	int fd;
-+	int position;
-+	int hposition;
++	java_longarray  *fhandler;
++	fhandler = (java_longarray *) jobj;
 +	
-+	fileDescriptor = (com_sun_cldchi_jvm_FileDescriptor *) jobj;
-+	file = (FILE *)fileDescriptor->handle;
-+	
-+	/* Change access position if needed */
-+	hposition = fileDescriptor->valid;
-+	position = ftell(file);
-+	if (position != hposition) {
-+		fseek(file, hposition, SEEK_SET);
-+	}
-+	
-+	fd = fileno(file);
-+	if (fstat(fd, &statBuffer) != -1) {
-+		return (statBuffer.st_size - hposition);
-+	} else {
-+		/* TODO Throw an IOException */
-+		return 0; 
-+	}
++	return fhandler->data[FILE_LENGTH] - fhandler->data[FILE_POS];
 +
 +}
 +
@@ -165,36 +288,26 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 + */
 +JNIEXPORT s4 JNICALL Java_com_sun_cldc_io_ResourceInputStream_readByte(JNIEnv *env, jclass clazz, struct java_lang_Object* jobj) {
 +	
-+	com_sun_cldchi_jvm_FileDescriptor *fileDescriptor;
-+	int readBytes = -1;
-+	char byte;
-+	FILE * file;
-+	int position;
-+	int hposition;
++	java_longarray  *fhandler;
++	u1 byte;
++	s8 len;
++	s8 position;
++	u1 *filep;
 +	
-+	fileDescriptor = (com_sun_cldchi_jvm_FileDescriptor *) jobj;
-+	file = (FILE *)fileDescriptor->handle;
++	fhandler = (java_longarray *) jobj;
++	position = fhandler->data[FILE_POS];
++	len = fhandler->data[FILE_LENGTH];
++	filep = (u1*)(int)fhandler->data[FILE_POINTER];
 +	
-+	/* Change access position if needed */
-+	hposition = fileDescriptor->valid;
-+	position = ftell(file);
-+	if (position != hposition) {
-+		fseek(file, hposition, SEEK_SET);
-+	}
-+	
-+	readBytes = fread(&byte, 1, 1, file);
-+	
-+	/* Check if EOF or an error occurred */
-+	if (readBytes != 1) {
-+		if (feof(file)) {
-+			return -1;
-+		} else if (ferror(file)) {
-+			/* TODO: throw an IOException */
-+		}
++	if (position < len) {
++		byte = (u1)filep[position];
++		position++;
++	} else {
++		return -1; /* EOF */
 +	}
 +	
 +	/* Update access position */
-+	fileDescriptor->valid =  ftell(file); 
++	fhandler->data[FILE_POS] = position;
 +	
 +	return (byte & 0xFF);
 +
@@ -207,39 +320,37 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 + */
 +JNIEXPORT s4 JNICALL Java_com_sun_cldc_io_ResourceInputStream_readBytes(JNIEnv *env, jclass clazz, struct java_lang_Object* jobj, java_bytearray* byteArray, s4 off, s4 len) {
 +	
-+	com_sun_cldchi_jvm_FileDescriptor *fileDescriptor;
++	java_longarray  *fhandler;
 +	int readBytes = -1;
-+	FILE * file;
-+	int position;
-+	int hposition;
-+	void  *buf;
++	s8 fileLength;
++	s8 position;
++	s8 available;
++	u1 *filep;
++	void *buf;
 +
 +	/* get pointer to the buffer */
 +	buf = &(byteArray->data[off]);
 +	
-+	fileDescriptor = (com_sun_cldchi_jvm_FileDescriptor *) jobj;
-+	file = (FILE *)fileDescriptor->handle;
++	fhandler = (java_longarray *) jobj;
++	position = fhandler->data[FILE_POS];
++	fileLength = fhandler->data[FILE_LENGTH];
++	filep = (u1*)(int)fhandler->data[FILE_POINTER];
 +	
-+	/* Change access position if needed */
-+	hposition = fileDescriptor->valid;
-+	position = ftell(file);
-+	if (position != hposition) {
-+		fseek(file, hposition, SEEK_SET);
-+	}
-+	
-+	readBytes = fread(buf, 1, len, file);
-+	
-+	/* Check if EOF or an error occurred */
-+	if (readBytes != len) {
-+		if ((readBytes == 0) && feof(file)) {
-+			return -1;
-+		} else if (ferror(file)) {
-+			/* TODO: throw an IOException */
++	if (position < fileLength) {
++		available = fileLength - position;
++		if (available < len) {
++			readBytes = available;
++		} else {
++			readBytes = len;
 +		}
++		memcpy(buf, (filep + position), readBytes * sizeof(u1));
++		position += readBytes;
++	} else {
++		return -1; /* EOF */
 +	}
-+	
++
 +	/* Update access position */
-+	fileDescriptor->valid = ftell(file);
++	fhandler->data[FILE_POS] = position;
 +	
 +	return readBytes;
 +}
@@ -251,49 +362,25 @@ Index: src/native/vm/cldc1.1/com_sun_cldc_io_ResourceInputStream.c
 + */
 +JNIEXPORT struct java_lang_Object* JNICALL Java_com_sun_cldc_io_ResourceInputStream_clone(JNIEnv *env, jclass clazz, struct java_lang_Object* jobj) {
 +	
-+	classinfo *ci;
-+	com_sun_cldchi_jvm_FileDescriptor *srcFileDescriptor;
-+	com_sun_cldchi_jvm_FileDescriptor *dstFileDescriptor;
++	java_longarray *srcArray;
++	java_longarray *dstArray;
++	int i;
 +	
-+	srcFileDescriptor = (com_sun_cldchi_jvm_FileDescriptor *) jobj;
++	srcArray = (java_longarray *) jobj;
 +	
-+	ci = load_class_bootstrap(utf_new_char("com/sun/cldchi/jvm/FileDescriptor"));
-+	dstFileDescriptor = (com_sun_cldchi_jvm_FileDescriptor *) native_new_and_init(ci);
-+	dstFileDescriptor->handle = srcFileDescriptor->handle;
-+	dstFileDescriptor->valid = srcFileDescriptor->valid;
++	if (!(dstArray = (java_longarray *) builtin_newarray_int(FILE_INFOS)))
++			return NULL;
++
++	for (i = 0; i < FILE_INFOS; i++) {
++		dstArray->data[i] = srcArray->data[i];
++	}
 +	
-+	return (java_lang_Object*) dstFileDescriptor;
++	return (java_lang_Object*) dstArray;
 +
 +}
-+
-+
 +
 +
 +/*
   * These are local overrides for various environment variables in Emacs.
   * Please do not remove this and leave it at the end of the file, where
   * Emacs will automagically detect them.
-Index: src/native/vm/cldc1.1/Makefile.am
-===================================================================
---- src/native/vm/cldc1.1/Makefile.am	(revision 7934)
-+++ src/native/vm/cldc1.1/Makefile.am	(working copy)
-@@ -38,6 +38,7 @@
- 	com_sun_cldc_io_j2me_socket_Protocol.c \
- 	com_sun_cldchi_io_ConsoleOutputStream.c \
- 	com_sun_cldchi_jvm_JVM.c \
-+	com_sun_cldchi_jvm_FileDescriptor.c \
- 	java_lang_Class.c \
- 	java_lang_Double.c \
- 	java_lang_Float.c \
-Index: src/native/include/Makefile.am
-===================================================================
---- src/native/include/Makefile.am	(revision 7934)
-+++ src/native/include/Makefile.am	(working copy)
-@@ -74,6 +74,7 @@
- 	com_sun_cldc_io_j2me_socket_Protocol.h \
- 	com_sun_cldchi_io_ConsoleOutputStream.h \
- 	com_sun_cldchi_jvm_JVM.h \
-+	com_sun_cldchi_jvm_FileDescriptor.h \
- 	java_lang_Math.h \
- 	java_lang_Runtime.h \
- 	java_lang_System.h
