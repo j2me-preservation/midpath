@@ -275,7 +275,7 @@ JNIEXPORT jint JNICALL Java_org_thenesis_midpath_ui_backend_qt_QTCanvas_initiali
     if (argv == NULL) env->ThrowNew(env->FindClass("java/lang/OutOfMemoryError"), "malloc");
     argv[0] = "java";
     argv[argc] = NULL;
-  	QApplication *app = new QApplication(argc, argv);
+  	app = new QApplication(argc, argv);
   	
   	nativeQtCanvas = new CustomCanvas (NULL, "Canvas", imageWidth, imageHeight);
   	nativeQtCanvas->setMouseTracking(TRUE);

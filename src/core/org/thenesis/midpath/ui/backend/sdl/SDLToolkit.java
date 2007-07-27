@@ -57,7 +57,7 @@ public class SDLToolkit extends UIToolkit {
 		long flags = videoMode.equalsIgnoreCase("HW") ? SDLVideo.SDL_HWSURFACE : SDLVideo.SDL_SWSURFACE;
 
 		try {
-			SDLMain.initSubSystem(SDLMain.SDL_INIT_VIDEO);
+			SDLMain.init(SDLMain.SDL_INIT_VIDEO);
 			screenSurface = SDLVideo.setVideoMode(w, h, bitsPerPixel, flags);
 			rootARGBSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, w, h, 32, 0x00ff0000L,
 					0x0000ff00L, 0x000000ffL, 0xff000000L);
