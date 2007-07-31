@@ -68,7 +68,7 @@ public class RandomAccessArray {
 	public void write(byte[] bytes, int offset, int length) throws IOException {
 
 		if ((currentPos + length) > data.length) {
-			grow();
+			grow(currentPos + length);
 		}
 
 		System.arraycopy(bytes, offset, data, currentPos, length);
@@ -76,8 +76,8 @@ public class RandomAccessArray {
 
 	}
 
-	public void grow() {
-		byte[] newData = new byte[data.length * 2];
+	public void grow(int size) {
+		byte[] newData = new byte[size];
 		System.arraycopy(data, 0, newData, 0, data.length);
 		data = newData;
 	}

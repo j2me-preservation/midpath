@@ -81,7 +81,7 @@ public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 		}
 		
 		fileSystem.put(rootName+ absFile, this);
-		randomAccessArray = new RandomAccessArray();
+		randomAccessArray = new RandomAccessArray(0);
 		
 		setTimeStamp();
 		
@@ -140,11 +140,10 @@ public class MemoryFileHandler implements BaseFileHandler, RandomAccessStream {
 			String node = (String)e.nextElement();
 			MemoryFileHandler fileHandler = (MemoryFileHandler)fileSystem.get(node);
 			
-			if (!fileHandler.isDirectory()) {
-				String filename = node.substring(directoryPath.length());
-				if (filterAccept(filter, filename))
-					filteredList.addElement(filename);
-			}
+			String filename = node.substring(rootName.length());
+			if (filterAccept(filter, filename))
+				filteredList.addElement(filename);
+			
 		}
 		
 		return filteredList;
