@@ -256,14 +256,14 @@ static QApplication *app;
  * Method:    initialize
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_org_thenesis_midpath_ui_backend_qt_QTCanvas_initialize(JNIEnv * env, jobject obj, jint width, jint height) {
+JNIEXPORT jboolean JNICALL Java_org_thenesis_midpath_ui_backend_qt_QTCanvas_initialize(JNIEnv * env, jobject obj, jint width, jint height) {
 
   	/* Get VM and current object pointers for use in callbacks */
 	if (env->GetJavaVM (&vm) < 0)
-		return FALSE;
+		return JNI_FALSE;
 	javaQtCanvasObject = env->NewGlobalRef(obj);
     if (javaQtCanvasObject == NULL)
-    	return FALSE;
+    	return JNI_FALSE;
 
 	/* Create image buffer */
 	imageWidth = width;
@@ -283,7 +283,7 @@ JNIEXPORT jint JNICALL Java_org_thenesis_midpath_ui_backend_qt_QTCanvas_initiali
   	nativeQtCanvas->show();
   	
   	free(argv);
-  	return TRUE;
+  	return JNI_TRUE;
   	
 }
 
@@ -342,7 +342,4 @@ JNIEXPORT void JNICALL Java_org_thenesis_midpath_ui_backend_qt_QTCanvas_quit(JNI
 #ifdef __cplusplus
 }
 #endif
-
-
-
 

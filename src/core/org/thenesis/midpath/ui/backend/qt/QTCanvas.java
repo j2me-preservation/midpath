@@ -38,13 +38,17 @@ public class QTCanvas {
 
 	public void open() {
 
-		// Initialize QT.
-		initialize(width, height);
-
 		Runnable runnable = new Runnable() {
 			public void run() {
-				// Start main loop and block
-				startMainLoop();
+				
+				// Initialize QT.
+				if(initialize(width, height)) {
+					// Start main loop and block
+					startMainLoop();
+				} else {
+					System.err.println("Can't initialize QTCanvas");
+				}
+				
 			}
 		};
 
@@ -90,7 +94,7 @@ public class QTCanvas {
 
 	/* Native methods */
 
-	native private int initialize(int width, int height);
+	native private boolean initialize(int width, int height);
 
 	native private void writeARGB(int[] argbBuffer, int x_src, int y_src, int width, int height);
 
