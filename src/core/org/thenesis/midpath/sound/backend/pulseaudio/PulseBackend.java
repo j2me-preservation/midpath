@@ -33,53 +33,50 @@
  * obligated to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package org.thenesis.midpath.sound;
+package org.thenesis.midpath.sound.backend.pulseaudio;
 
-import org.thenesis.midpath.sound.backend.alsa.AlsaBackend;
-import org.thenesis.midpath.sound.backend.esd.EsdBackend;
-import org.thenesis.midpath.sound.backend.pulseaudio.PulseBackend;
+import java.io.IOException;
 
-import com.sun.midp.main.Configuration;
+import org.thenesis.midpath.sound.AudioFormat;
+import org.thenesis.midpath.sound.Mixer;
+import org.thenesis.midpath.sound.SoftMixer;
+import org.thenesis.midpath.sound.SoundBackend;
+import org.thenesis.midpath.sound.SoundToolkit;
 
-public class SoundToolkit {
-
-	private static int bufferSize;
-	private static String deviceName;
-	public static SoundBackend soundBackend;
-	private static AudioFormat audioFormat;
-
-	static {
-		int sampleRate = com.sun.midp.main.Configuration.getIntProperty("org.thenesis.midpath.sound.sampleRate", 44100);
-		bufferSize = com.sun.midp.main.Configuration.getIntProperty("org.thenesis.midpath.sound.bufferSize", 8192);
-		deviceName = com.sun.midp.main.Configuration.getPropertyDefault("org.thenesis.midpath.sound.device", "default");
-		audioFormat = new AudioFormat(sampleRate, AudioFormat.BITS_16, AudioFormat.STEREO, true, false);
-
-		String backendName = Configuration.getPropertyDefault("org.thenesis.midpath.sound.backend", "NULL");
-		if (backendName.equalsIgnoreCase("ALSA")) {
-			soundBackend = new AlsaBackend();
-		} else if (backendName.equalsIgnoreCase("ESD")) {
-			soundBackend = new EsdBackend();
-		} else if (backendName.equalsIgnoreCase("PulseAudio")) {
-			soundBackend = new PulseBackend();
-		} else {
-			soundBackend = new NullSoundBackend();
+public class PulseBackend extends PulseSink implements SoundBackend {
+	
+	public static final String DEFAULT_DEVICE_NAME = "default"; //"plughw:0,0";
+	public static final int DEFAULT_BUFFER_SIZE = 8192;
+	private SoftMixer mixer;
+	private AudioFormat audioFormat;
+	private int bufferSize;
+	
+	public void open() throws IOException {
+		
+		if (!isOpen) {
+			
+			audioFormat = SoundToolkit.getAudioFormat();
+			bufferSize = SoundToolkit.getBufferSize();
+			mixer = new SoftMixer(this);
+			
+			//System.out.println("audioFormat: " + audioFormat);
+			open(SoundToolkit.getDeviceName(), SoundToolkit.getBufferSize(), SoundToolkit.getAudioFormat().sampleRate);
+			isOpen = true;
 		}
+		
 	}
 
-	public static SoundBackend getBackend() {
-		return soundBackend;
+	public Mixer getMixer() {
+		return mixer;
 	}
-
-	public static AudioFormat getAudioFormat() {
+	
+	public AudioFormat getAudioFormat() {
 		return audioFormat;
 	}
-
-	public static int getBufferSize() {
+	
+	public int getBufferSize() {
 		return bufferSize;
 	}
 
-	public static String getDeviceName() {
-		return deviceName;
-	}
 
 }
