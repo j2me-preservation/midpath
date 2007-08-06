@@ -25,7 +25,6 @@
 
 package javax.microedition.lcdui;
 
-import org.thenesis.midpath.ui.backend.sdl.SDLGraphics;
 
 /**
  * Provides simple 2D geometric rendering capability.
@@ -1735,8 +1734,6 @@ public class Graphics {
 
 
     // private implementation //
-    
-    private SDLGraphics sdlGraphics;
 
     /**
      * The clip values are in the translated
@@ -1903,8 +1900,12 @@ public class Graphics {
         // the systemClip values.
         systemClipX1 = clipX1;
         systemClipY1 = clipY1;
-        systemClipX2 = clipX2;
-        systemClipY2 = clipY2;
+        
+        // FIXME Temporary hack to prevent clipping bug in VirtualGraphics.
+        systemClipX2 = (short)(clipX2 - 1);
+        systemClipY2 = (short)(clipY2 - 1);
+//        systemClipX2 = clipX2;
+//        systemClipY2 = clipY2;
 
         // Preserve the translation system
         translate(systemX, systemY);

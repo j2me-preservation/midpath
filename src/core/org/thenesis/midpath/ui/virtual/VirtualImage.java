@@ -42,7 +42,7 @@ public class VirtualImage extends Image {
 	static {
 		PngImage.setProgressiveDisplay(false);
 	}
-	
+
 	VirtualSurface surface;
 	private boolean isMutable = false;
 
@@ -75,30 +75,44 @@ public class VirtualImage extends Image {
 		int pngHeight = png.getHeight();
 		surface = createSurface(pngWidth, pngHeight);
 		png.setBuffer(surface.data);
-		
+
 		png.startProduction(new ImageConsumer() {
 			private ColorModel cm;
+
 			public void imageComplete(int status) {
 				for (int i = 0; i < surface.data.length; i++) {
 					surface.data[i] = cm.getRGB(surface.data[i]);
 					//System.out.print(Integer.toHexString(surface.data[i]) + " ");
 				}
 			}
-			public void setColorModel(ColorModel model) { cm = model; }
-			public void setDimensions(int width, int height) {}
-			public void setHints(int flags) {}
-			public void setProperties(Hashtable props) {}
-			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int offset, int scansize) {}
-			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int offset, int scansize) {}
-			
+
+			public void setColorModel(ColorModel model) {
+				cm = model;
+			}
+
+			public void setDimensions(int width, int height) {
+			}
+
+			public void setHints(int flags) {
+			}
+
+			public void setProperties(Hashtable props) {
+			}
+
+			public void setPixels(int x, int y, int w, int h, ColorModel model, byte[] pixels, int offset, int scansize) {
+			}
+
+			public void setPixels(int x, int y, int w, int h, ColorModel model, int[] pixels, int offset, int scansize) {
+			}
+
 		});
-		
 
 		setDimensions(pngWidth, pngHeight);
 		isMutable = false;
 
 		if (Logging.TRACE_ENABLED) {
-			System.out.println("[DEBUG] VirtualImage.<init>(InputStream stream): errors while loading ? " + png.hasErrors());
+			System.out.println("[DEBUG] VirtualImage.<init>(InputStream stream): errors while loading ? "
+					+ png.hasErrors());
 		}
 
 	}
@@ -143,13 +157,13 @@ public class VirtualImage extends Image {
 		isMutable = false;
 
 	}
-	
+
 	/**
 	 * Create a VirtualImage from a pre-existing surface (doesn't copy it)
 	 * @param surface
 	 */
 	VirtualImage(VirtualSurface surface) {
-		this.surface = surface; 
+		this.surface = surface;
 		setDimensions(surface.getWidth(), surface.getHeight());
 		isMutable = false;
 	}
@@ -255,10 +269,10 @@ public class VirtualImage extends Image {
 			dxmin = clipRect.xmin;
 		if (dymin < clipRect.ymin)
 			dymin = clipRect.ymin;
-		if (dxmax > clipRect.xmax)
-			dxmax = clipRect.xmax;
-		if (dymax > clipRect.ymax)
-			dymax = clipRect.ymax;
+		if (dxmax > clipRect.xmax - 1)
+			dxmax = clipRect.xmax - 1;
+		if (dymax > clipRect.ymax - 1)
+			dymax = clipRect.ymax - 1;
 
 		// New source rectangle.
 		sxmin = dxmin - x + x_src;
@@ -280,16 +294,7 @@ public class VirtualImage extends Image {
 					destSurface.data[i + dstPosition] = surface.data[i + srcPosition];
 			}
 
-			//			for (int i=0, sp=srcPosition, dp=dstPosition; i<length; i++, sp+=4, dp+=4) {
-			//				for (int c=0; c<4; c++) dst[dp+c]=src[sp+c];
-			//			}
-			//drawSpan(byte src[], int srcPosition, byte dst[], int dstPosition, int length) {
-			//drawSpan(img.data, (symin+ry)*img.width+sxmin, image.data, (dymin+ry)*image.width+dxmin, w);
 		}
-
-		//		for (int i = 0; i < destSurface.data.length; i++) {
-		//			destSurface.data[i] = 0xFF00FF00;
-		//		}
 
 		return true;
 	}
@@ -326,24 +331,26 @@ public class VirtualImage extends Image {
 		return true;
 
 	}
-	
-	private void copy(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, VirtualSurface destSurface, int x_dest, int y_dest) {
-		
+
+	private void copy(VirtualSurface srcSurface, int x_src, int y_src, int width, int height,
+			VirtualSurface destSurface, int x_dest, int y_dest) {
+
 		int srcOffset = y_src * srcSurface.width + x_src;
 		int destOffset = y_dest * destSurface.width + x_dest;
-		
+
 		for (int y = 0; y < height; y++) {
-			
-			int srcPosition = srcOffset +  y * srcSurface.width;
+
+			int srcPosition = srcOffset + y * srcSurface.width;
 			int destPosition = destOffset + y * destSurface.width;
-			
+
 			for (int x = 0; x < width; x++) {
 				destSurface.data[destPosition + x] = srcSurface.data[srcPosition + x];
 			}
 		}
 	}
 
-	public VirtualSurface transform(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform) {
+	public VirtualSurface transform(VirtualSurface srcSurface, int x_src, int y_src, int width, int height,
+			int transform) {
 
 		switch (transform) {
 
@@ -390,7 +397,7 @@ public class VirtualImage extends Image {
 			}
 
 			return destSurface;
-		
+
 		case Sprite.TRANS_MIRROR_ROT180:
 		case Sprite.TRANS_ROT180:
 
@@ -403,7 +410,7 @@ public class VirtualImage extends Image {
 			for (int y = 0; y < height; y++) {
 
 				int srcPosition = srcOffset + y * srcSurface.width;
-				int destPosition = destOffset - y  * width;
+				int destPosition = destOffset - y * width;
 
 				for (int x = 0; x < width; x++) {
 					destData[destPosition - x] = srcSurface.data[srcPosition + x];
@@ -412,7 +419,7 @@ public class VirtualImage extends Image {
 			}
 
 			return destSurface;
-		
+
 		case Sprite.TRANS_MIRROR_ROT270:
 		case Sprite.TRANS_ROT270:
 
@@ -449,9 +456,9 @@ public class VirtualImage extends Image {
 		int offset = y_src * srcSurface.width + x_src;
 
 		for (int y = 0; y < height; y++) {
-			
+
 			offset = y * srcSurface.width;
-			
+
 			for (int x = 0; x < width / 2; x++) {
 				int tmp = buffer[offset + x];
 				buffer[offset + x] = buffer[offset + width - 1 - x];
