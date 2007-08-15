@@ -70,8 +70,9 @@ public class BasicTextInputSession implements
             new KeyboardInputMode(),
             new NumericInputMode(),
             new AlphaNumericInputMode(),
-            new PredictiveTextInputMode(),
-            new SymbolInputMode()
+            //new PredictiveTextInputMode(),
+            new SymbolInputMode(),
+            new VirtualKeyboardInputMode()
         };
 
     }
