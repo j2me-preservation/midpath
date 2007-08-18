@@ -436,7 +436,6 @@ public class VirtualKeyboardInputMode implements InputMode {
 				int posX = (w - VirtualKeyboard.WIDTH) / 2;
 				int posY = (h - VirtualKeyboard.HEIGHT) / 2;
 				
-				// g.drawRGB(rgbData, offset, scanlength, x, y, width, height, processAlpha);
 				g.drawRGB(buffer, 0, VirtualKeyboard.WIDTH, posX, posY, VirtualKeyboard.WIDTH, VirtualKeyboard.HEIGHT, false);
 
 			}
@@ -494,7 +493,6 @@ public class VirtualKeyboardInputMode implements InputMode {
 	                int viewportWidth,
 	                int viewportHeight,
 	                int[] visRect_inout) {
-				System.out.println("traverse: " + dir);
 				
 				switch (dir) {
 				case Canvas.UP:

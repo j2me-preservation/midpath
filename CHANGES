@@ -1,3 +1,28 @@
+0.1 (18/08/2006)
+----------------
+
+* Added an internal virtual keyboard (useful for devices without native hard/soft keyboard) 
+* Fixed clipping bugs
+* Added PulseAudio backend 
+* Added Qt backend
+* Added ESounD backend
+* Fixed problem with palettized PNG images 
+* Improved build system (Robert Schuster)
+* Added graphical MIDlet manager
+* Added Maemo support in the GTK backend (Sebastian Mancke)
+* Improved event infrastructure (in particular window closing) 
+* New sound infrastructure with embedded resampler, audio format converter and mixer
+* Added an ALSA backend
+* Added MP3/OGG support with help of JLayerME and JOrbis 
+* Added GTK backend
+
+Contributions/help:
+- Sebastian Mancke
+- Robert Schuster
+- Henning Heinold
+
+Special thanks to Christian Thalinger for having helped to make MIDPath 
+working out-of-the-box with cacao-cldc.
 
 0.1-alpha2 (11/04/2006)
 -----------------------

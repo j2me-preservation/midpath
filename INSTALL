@@ -31,19 +31,24 @@ Step 3: Install Classpath (not needed if you use Kaffe or cacao-cldc)
 ---------------------------------------------------------------------
 	
 	# apt-get install classpath-common
+	
+Step 4: Compile the native backends
+-----------------------------------
 
- Step 4 (optional): SDL installation
-------------------------------------
+Compile the native part for the chosen backends ($MIDPATH_HOME/native directory)
 
-# apt-get install libsdl1.2debian-all libsdl-gfx1.2 libsdl-image1.2 libsdl-mixer1.2 libsdl-ttf1.2 libsdl1.2-dev 
+For GTK:
 
-* SDLJava installation
-
-Compile SDLJava native part:
-
-# cd $MIDPATH_HOME/external/sdljava/native
+# cd $MIDPATH_HOME/native/gtk
 # make
 # cp *.so $MIDPATH_HOME/dist
+
+Note:
+
+* The SDL backend native part is in a specific directory: $MIDPATH_HOME/external/sdljava/native
+* There is no native part for the AWT backend because it's provided by Classpath
+* Maybe you have to adapt the Makefile to your compilation environment and set cflags at hand instead of using pkg-config if it's not available to you.
+* If you use cross-compilation, set your CC variable adequately in the Makefile or in the make command line. 
 
 Step 5: Configure your MIDP2 environment
 ----------------------------------------
@@ -54,36 +59,66 @@ Set the screen size and choose your backend (see below).
 
 (note: do not modify the parameter javax.microedition.lcdui.toolkit. Let it to "virtual" value)
 
-##========================================
-## Graphics parameters
-##========================================
-javax.microedition.lcdui.screenWidth:176
-javax.microedition.lcdui.screenHeight:210
-# Possible toolkit values: SDL, virtual
-javax.microedition.lcdui.toolkit:virtual
+Default configuration file:
 
-##======================================
-## Parameters for the Virtual Toolkit
-##====================================== 
-# Possible backend values: SDL, AWT, AWT_GRABBER, SWT, X11
-org.thenesis.midpath.ui.backend:AWT
-# SDL backend configuration. 
-# Possible bitsPerPixels values: 8, 16, 32
-# Possible video mode values: SW, HW (i.e software, hardware)
-org.thenesis.midpath.ui.backend.sdl.bitsPerPixel:32
-org.thenesis.midpath.ui.backend.sdl.videoMode:SW
-# X11 backend configuration. 
-# Display value examples: :0.0, 192.168.0.1:1.0 
-org.thenesis.midpath.ui.backend.x11.Display::0.0
-# Possible fontRenderer values: raw, BDF
-org.thenesis.midpath.ui.fontRenderer:raw
-org.thenesis.midpath.font.bdf.filename:VeraMono-12-8.bdf
-
-##======================================
-## Event parameters
-##====================================== 
-javax.microedition.lcdui.pointerSupported:true
-javax.microedition.lcdui.pointerMotionSupported:true
+	##========================================
+	## Graphics parameters
+	##========================================
+	javax.microedition.lcdui.screenWidth:176
+	javax.microedition.lcdui.screenHeight:210
+	# Toolkit configuration (possible values: SDL, virtual)
+	# The toolkit parameter should be set to "virtual" unless you know what you do.
+	# (to change the UI backend, see the backend parameter of the virtual toolkit below)
+	javax.microedition.lcdui.toolkit:virtual
+	
+	##======================================
+	## Parameters for the Virtual UI Toolkit
+	##======================================
+	# Possible backend values: NULL, SDL, AWT, AWT_GRABBER, SWT, X11, GTK, QT
+	org.thenesis.midpath.ui.backend:AWT
+	# SDL backend configuration.
+	# Possible bitsPerPixels values: 8, 16, 32
+	# Possible video mode values: SW, HW (i.e software, hardware)
+	org.thenesis.midpath.ui.backend.sdl.bitsPerPixel:32
+	org.thenesis.midpath.ui.backend.sdl.videoMode:SW
+	# X11 backend configuration.
+	# Display value examples: :0.0, 192.168.0.1:1.0
+	org.thenesis.midpath.ui.backend.x11.Display::0.0
+	# Possible fontRenderer values: raw, BDF
+	org.thenesis.midpath.ui.fontRenderer:raw
+	org.thenesis.midpath.font.bdf.filename:VeraMono-12-8.bdf
+	
+	##==========================
+	## Parameters for the sound
+	##==========================
+	# Sound configuration (possible values: SDL, virtual)
+	# The "player" parameter should be set to "virtual" unless you know what you do.
+	# The virtual engine requires this hardware configuration: 16 bits, stereo, little endian
+	org.thenesis.midpath.sound.engine:virtual
+	# Possible sound backend values: NULL, ALSA, ESD, PulseAudio
+	org.thenesis.midpath.sound.backend:NULL
+	org.thenesis.midpath.sound.device:default
+	org.thenesis.midpath.sound.sampleRate:44100
+	# Buffer size MUST be a power of two
+	org.thenesis.midpath.sound.bufferSize:8192
+	
+	##======================================
+	## Event parameters
+	##======================================
+	javax.microedition.lcdui.pointerSupported:true
+	javax.microedition.lcdui.pointerMotionSupported:true
+	
+	##======================================
+	## Filesystem parameters
+	##======================================
+	# The RMS root path (if not defined, records are read/written in the current directory)
+	com.sun.midp.rms.rootPath:
+	
+	##======================================
+	## MIDlet Manager (J2SE only)
+	##======================================
+	# The MIDlet repository path (if not defined, MIDlets are searched in the current directory)
+	org.thenesis.midpath.main.repositoryPath:
 
 Step 6: Start the test MIDlet
 -----------------------------
@@ -118,7 +153,7 @@ Step C : Build
 # chmod u+x build.sh
 # ./build.sh
 
-Now complete steps 2,5 and 6
+Now complete steps 2, 4, 5 and 6
 
 How to compile cacao-cldc for MIDPath
 =====================================
@@ -126,7 +161,7 @@ How to compile cacao-cldc for MIDPath
 Compile CDLC classes
 --------------------
 
-The MIDPath build script (build.sh) compile cldc automatically with needed patches (see external/cldc1.1/README)
+The MIDPath build script (build.sh) compile cldc automatically
 
 Compile cacao-cldc
 ------------------
@@ -135,16 +170,11 @@ Compile cacao-cldc
 
 # svn co svn://c1.complang.tuwien.ac.at/ahome/cacao/svn/cacao/trunk cacao
 
-* Replace com_sun_cldc_io_ResourceInputStream.c in cacao sources by the patched file 
-
-# cd cacao
-# cp com_sun_cldc_io_ResourceInputStream.c src/native/vm/cldc1.1/
-
 * Compile cacao-cldc 
 
 # ./configure --prefix=/install/cacao-cldc --enable-java=cldc1.1 \
  --with-classpath=cldc1.1 --with-classpath-classes=$MIDPATH_HOME/dist/cldc1.1.jar \
- --with-classpath-includedir=/install/classpath-0.93/include --enable-jni
+ --with-classpath-includedir=/install/classpath/include --enable-jni
 # make
 # make install
 
