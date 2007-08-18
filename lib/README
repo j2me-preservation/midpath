@@ -1,0 +1,7 @@
+This directory contains libraries needed by MIDPath:
+
+* swt.jar (needed at build time): swt-3.2.2-gtk-linux-x86.zip, http://www.eclipse.org/swt/
+* RXTXcomm.jar (needed at build time): rxtx-2.1-7-bins-r2.zip, http://users.frii.com/jarvi/rxtx/
+* kxml2-2.3.0.jar (required at run time) : http://kxml.sourceforge.net/kxml2/
+
+
