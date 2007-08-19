@@ -26,18 +26,23 @@ See the LICENSE file.
 Repository structure:
 -----------------------
 	
-	|-- src: Java sources
 	|-- bin: script files
+	|-- external: sources of external libraries
 	|-- lib: libraries needed by MIDPath's core library
-	|-- external: sources of external libraries 
 	|-- native: native code (JNI)
 	|-- resources-embedded: resources required by MIDPath's core library
+	|-- src: Java sources
+	|-- test: Sources of the test classes
+	. AUTHORS
+	. CHANGES
+	. COPYING
+	. INSTALL
+	. LICENSE
+	. README
+	. THANKYOU
 	. build.sh: the build script
-    . CHANGES
-    . COPYING
-    . INSTALL
-    . LICENSE
-    . README
+	
+	
     
 
     
