@@ -97,7 +97,7 @@ A port of JOrbis to CLDC
 	License along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-* lib/kxml2-2.3.0.jar
+* File lib/kxml2-2.3.0.jar
 kXML 2 is XmlPull library.
 
 	Copyright (c) 2002,2003, Stefan Haustein, Oberhausen, Rhld., Germany
