@@ -77,15 +77,9 @@ jar cvf  $DIST_HOME/dist/cldc1.1.jar -C $DIST_HOME/external/cldc1.1/classes .
 
 CLDC_PATH=$DIST_HOME/dist/cldc1.1.jar
 
-# Build SDLJava for J2SE
-cd $DIST_HOME/external/sdljava/java
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $GNU_CLASSPATH_PATH -sourcepath $DIST_HOME/external/sdljava/java" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $GNU_CLASSPATH_PATH" JAR_FILE="sdljava-j2se.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/sdljava/java/sdljava-j2se.jar $DIST_HOME/dist
-
 # Build SDLJava for CLDC
 cd $DIST_HOME/external/sdljava-cldc
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -sourcepath $DIST_HOME/external/sdljava-cldc -source 1.3 -target 1.1" || exit 1
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -sourcepath $DIST_HOME/external/sdljava-cldc/java -source 1.3 -target 1.1" || exit 1
 make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -source 1.3 -target 1.1" JAR_FILE="sdljava-cldc.jar" JAR_FLAGS="cvf" || exit 1
 cp $DIST_HOME/external/sdljava-cldc/sdljava-cldc.jar $DIST_HOME/dist
 
@@ -171,7 +165,7 @@ fi
 
 if [ "$SDL_ENABLED" = "yes" ]; then
 # Build the SDLJava native part
-cd $DIST_HOME/external/sdljava/native
+cd $DIST_HOME/external/sdljava-cldc/native
 make || exit 1
 cp *.so $DIST_HOME/dist
 fi
