@@ -78,10 +78,10 @@ jar cvf  $DIST_HOME/dist/cldc1.1.jar -C $DIST_HOME/external/cldc1.1/classes .
 CLDC_PATH=$DIST_HOME/dist/cldc1.1.jar
 
 # Build SDLJava for CLDC
-cd $DIST_HOME/external/sdljava-cldc
+cd $DIST_HOME/external/sdljava-cldc/java
 make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -sourcepath $DIST_HOME/external/sdljava-cldc/java -source 1.3 -target 1.1" || exit 1
 make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -source 1.3 -target 1.1" JAR_FILE="sdljava-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/sdljava-cldc/sdljava-cldc.jar $DIST_HOME/dist
+cp $DIST_HOME/external/sdljava-cldc/java/sdljava-cldc.jar $DIST_HOME/dist
 
 # Build Escher X11 library
 cd $DIST_HOME/external/escher-cldc/core
