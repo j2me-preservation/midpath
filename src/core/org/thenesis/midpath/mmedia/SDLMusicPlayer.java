@@ -18,7 +18,6 @@
 package org.thenesis.midpath.mmedia;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 import javax.microedition.media.Control;
 import javax.microedition.media.MediaException;
@@ -32,18 +31,12 @@ import sdljava.mixer.SDLMixer;
 
 public class SDLMusicPlayer extends SDLPlayer {
 
-	private InputStream stream;
-	private String type;
 	private MixMusic music;
 	private EndOfMediaChecker eomChecker;
 
 	public SDLMusicPlayer() {
 	}
 
-	public SDLMusicPlayer(InputStream stream, String type) {
-		this.stream = stream;
-		this.type = type;
-	}
 
 	protected void doClose() {
 		try {
@@ -82,24 +75,20 @@ public class SDLMusicPlayer extends SDLPlayer {
 
 	protected void doRealize() throws MediaException {
 		try {
-			//SDLMixer.openAudio(22050, SDLAudio.AUDIO_S16SYS, 1, 8192);
 
 			// FIXME Remove copy of audio data
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] buffer = new byte[1000];
 			int len = 0;
-			while ((len = stream.read(buffer)) != -1) {
+			while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
 				baos.write(buffer, 0, len);
 			}
 
 			music = SDLMixer.loadMUS(baos.toByteArray());
 
-			//music = SDLMixer.loadMUS(stream);
-			//music = SDLMixer.loadMUS("Recome.wav");
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new MediaException(e.getMessage());
-			//e.printStackTrace();
 		}
 
 	}
@@ -152,7 +141,6 @@ public class SDLMusicPlayer extends SDLPlayer {
 			if ((state == Player.PREFETCHED) || (state == Player.STARTED))
 				throw new IllegalStateException("Prefetched or Started");
 
-			// TODO Auto-generated method stub
 		}
 
 	}
@@ -208,14 +196,6 @@ public class SDLMusicPlayer extends SDLPlayer {
 
 		}
 
-	}
-
-	public void setStream(InputStream stream) {
-		this.stream = stream;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	protected boolean isEndOfMediaReached() {

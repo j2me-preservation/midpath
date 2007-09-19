@@ -18,7 +18,6 @@
 package org.thenesis.midpath.mmedia;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 import javax.microedition.media.Control;
 import javax.microedition.media.MediaException;
@@ -32,15 +31,14 @@ import sdljava.mixer.SDLMixer;
 
 public class SDLWavPlayer extends SDLPlayer {
 
-	private InputStream stream;
-	private String type;
+	
 	private MixChunk mixChunk;
 	private int channel;
 	private EndOfMediaChecker eomChecker;
 	
 	static {
 		try {
-			int allocatedChannels = SDLMixer.allocateChannels(4);
+			/*int allocatedChannels =*/ SDLMixer.allocateChannels(4);
 		} catch (SDLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -48,11 +46,6 @@ public class SDLWavPlayer extends SDLPlayer {
 	}
 
 	public SDLWavPlayer() {
-	}
-
-	public SDLWavPlayer(InputStream stream, String type) {
-		this.stream = stream;
-		this.type = type;
 	}
 
 	protected void doClose() {
@@ -97,15 +90,12 @@ public class SDLWavPlayer extends SDLPlayer {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] buffer = new byte[1000];
 			int len = 0;
-			while ((len = stream.read(buffer)) != -1) {
+			while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
 				baos.write(buffer, 0, len);
 			}
 
 			mixChunk = SDLMixer.loadWAV(baos.toByteArray());
-
-
-			//music = SDLMixer.loadMUS(stream);
-			//music = SDLMixer.loadMUS("Recome.wav");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new MediaException(e.getMessage());
@@ -115,8 +105,7 @@ public class SDLWavPlayer extends SDLPlayer {
 	}
 
 	protected long doSetMediaTime(long now) throws MediaException {
-		return 0;
-		//throw new MediaException("Can't set position on this media");	
+		throw new MediaException("Can't set position on this media");	
 	}
 
 	protected boolean doStart() {
@@ -222,15 +211,5 @@ public class SDLWavPlayer extends SDLPlayer {
 		}
 
 	}
-
-	public void setStream(InputStream stream) {
-		this.stream = stream;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-	
-	
 
 }

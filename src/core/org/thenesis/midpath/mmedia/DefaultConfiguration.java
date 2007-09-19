@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.media.Configuration;
+import javax.microedition.media.Manager;
 
 /**
  * The default configuration module for MIDP.
@@ -505,6 +506,30 @@ public class DefaultConfiguration extends Configuration {
 //    public ImageAccess getImageAccessor() {
 //        return imageAccessor;
 //    }
+    
+    /**
+     * Get content type helper function
+     */
+    public static String getContentType(String locator) {
+        if (locator != null) {
+            // device://midi
+            if (locator.equals(Manager.MIDI_DEVICE_LOCATOR)) {
+                return DefaultConfiguration.MIME_AUDIO_MIDI;
+            // device://tone
+            } else if (locator.equals(Manager.TONE_DEVICE_LOCATOR)) {
+                return DefaultConfiguration.MIME_AUDIO_TONE;
+            // capture://audio
+            } else if (locator.equals(Configuration.AUDIO_CAPTURE_LOCATOR)) {
+                return DefaultConfiguration.MIME_AUDIO_WAV;
+            // capture://video
+            } else if (locator.equals(Configuration.VIDEO_CAPTURE_LOCATOR)) {
+                return DefaultConfiguration.MIME_IMAGE_PNG;
+            }
+        }    
+
+        return "";
+    }
+
 
     /**
      *  Gets the tonePlayer attribute of the DefaultConfiguration object

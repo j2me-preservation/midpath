@@ -1,52 +1,161 @@
 /*
- * Copyright  1990-2006 Sun Microsystems, Inc. All Rights Reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version
- * 2 only, as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License version 2 for more details (a copy is
- * included at /legal/license.txt). 
- * 
- * You should have received a copy of the GNU General Public License
- * version 2 along with this work; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA 
- * 
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 or visit www.sun.com if you need additional
- * information or have any questions. 
- */
-/*
- * MIDPath - Copyright (C) 2006 Guillaume Legris, Mathieu Legris
+ *
+ *  Copyright  1990-2007 Sun Microsystems, Inc. All Rights Reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+ *  
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License version
+ *  2 only, as published by the Free Software Foundation.
+ *  
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  General Public License version 2 for more details (a copy is
+ *  included at /legal/license.txt).
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  version 2 along with this work; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ *  02110-1301 USA
+ *  
+ *  Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
+ *  Clara, CA 95054 or visit www.sun.com if you need additional
+ *  information or have any questions.
  */
 package org.thenesis.midpath.mmedia;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.media.Configuration;
 import javax.microedition.media.Control;
+import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
+import javax.microedition.media.TimeBase;
+import javax.microedition.media.control.StopTimeControl;
+import javax.microedition.media.control.VolumeControl;
+import javax.microedition.media.protocol.DataSource;
+import javax.microedition.media.protocol.SourceStream;
 
-//import com.sun.mmedia.PermissionAccessor;
+///**
+// * Event listener for events delivered from native layer
+// */
+//class MMEventListener implements EventListener {
+//
+//    /**
+//     *  the following constants must be consistent 
+//     *  with javacall_media_notification_type enum values
+//     *  JAVACALL_EVENT_MEDIA_***, defined in javacall_multimedia.h
+//     */
+//    private static final int EVENT_MEDIA_END_OF_MEDIA       =  1;
+//    private static final int EVENT_MEDIA_DURATION_UPDATED	=  2;
+//    private static final int EVENT_MEDIA_RECORD_SIZE_LIMIT	=  3;
+//    private static final int EVENT_MEDIA_RECORD_ERROR		=  4;
+//    private static final int EVENT_MEDIA_DEVICE_AVAILABLE	=  5;
+//    private static final int EVENT_MEDIA_DEVICE_UNAVAILABLE	=  6;
+//    private static final int EVENT_MEDIA_BUFFERING_STARTED	=  7;
+//    private static final int EVENT_MEDIA_BUFFERING_STOPPED	=  8;
+//    private static final int EVENT_MEDIA_VOLUME_CHANGED		=  9;
+//    private static final int EVENT_MEDIA_SNAPSHOT_FINISHED	= 10;
+//    private static final int EVENT_MEDIA_ERROR				= 11;
+//
+//    MMEventListener() {
+//        MMEventHandler.setListener(this);
+//    }
+//
+//    public boolean preprocess(Event event, Event waitingEvent) {
+//        return true;
+//    }
+//
+//    /**
+//     * Process an event.
+//     * This method will get called in the event queue processing thread.
+//     *
+//     * @param event event to process
+//     */
+//    public void process(Event event) {
+//        NativeEvent nevt = (NativeEvent)event;
+//        BasicPlayer p;
+//
+//		if( EventTypes.MMAPI_EVENT != nevt.getType() ) return;
+//		
+//        switch ( nevt.intParam4 ) {
+//        case EVENT_MEDIA_END_OF_MEDIA:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if (p != null) {
+//                p.sendEvent(PlayerListener.END_OF_MEDIA, new Long(nevt.intParam2 * 1000));
+//            }
+//            break;
+//
+//        case EVENT_MEDIA_DURATION_UPDATED:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if (p != null) {
+//                p.sendEvent(PlayerListener.DURATION_UPDATED, new Long(nevt.intParam2 * 1000));
+//            }
+//            break;
+//
+//        /* Extern volume event handler - Send to the all players in this isolate */
+//        case EVENT_MEDIA_VOLUME_CHANGED:
+//            if (nevt.intParam2 < 0) {
+//                nevt.intParam2 = 0;
+//            }
+//            if (nevt.intParam2 > 100) {
+//                nevt.intParam2 = 100;
+//            }
+//            BasicPlayer.sendExternalVolumeChanged(PlayerListener.VOLUME_CHANGED, nevt.intParam2);
+//            break;
+//
+//        case EVENT_MEDIA_RECORD_SIZE_LIMIT:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if(p != null) {
+//                p.doReceiveRSL();
+//			}	
+//            break;
+//        
+//        case EVENT_MEDIA_RECORD_ERROR:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if (p != null) {
+//                p.sendEvent(PlayerListener.RECORD_ERROR, new String("Unexpected Record Error"));
+//            }
+//            break;
+//
+//        case EVENT_MEDIA_BUFFERING_STARTED:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if (p != null) {
+//                p.sendEvent(PlayerListener.BUFFERING_STARTED, new Long(nevt.intParam2 * 1000));
+//            }
+//            break;
+//        
+//        case EVENT_MEDIA_BUFFERING_STOPPED:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if (p != null) {
+//                p.sendEvent(PlayerListener.BUFFERING_STOPPED, new Long(nevt.intParam2 * 1000));
+//            }
+//            break;
+//
+//        case EVENT_MEDIA_ERROR:
+//            p = BasicPlayer.get(nevt.intParam1);
+//            if (p != null) {
+//                p.sendEvent(PlayerListener.RECORD_ERROR, new String("Unexpected Media Error"));
+//            }
+//            break;
+//        }
+//    }
+//}
 
 /**
  * BasicPlayer provides basic implementation for the Player methods.
  * Many of the methods call do<method> to do the actual work that can
  * be overridden by subclasses.
  *
- * @created    January 13, 2005
  */
-public abstract class BasicPlayer implements Player {
+public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
+
+	private final static boolean debug = true;
 
 	/**
 	 * global player id
@@ -61,7 +170,7 @@ public abstract class BasicPlayer implements Player {
 	/**
 	 * the state of this player
 	 */
-	public int state = UNREALIZED;
+	int state = UNREALIZED;
 
 	/**
 	 * the loopCount of this player
@@ -86,15 +195,9 @@ public abstract class BasicPlayer implements Player {
 	Vector listeners = new Vector(2);
 
 	/**
-	 * flag shows that "listeners" have been modified while 
-	 * player is executing callbacks from "listeners".
-	 */
-	boolean listenersModified = false;
-
-	/**
 	 * Asynchronous event mechanism.
 	 */
-	PlayerEventQueue eventQueue = null;
+	EvtQ evtQ = null;
 
 	/**
 	 * event queue lock obj
@@ -149,14 +252,7 @@ public abstract class BasicPlayer implements Player {
 	 * @see    #allCtrls
 	 */
 
-	/**
-	 *  Description of the Field
-	 */
 	protected final static String fpcName = "FramePositioningControl";
-	/**
-	 *  Description of the Field
-	 */
-	protected final static String guiName = "GUIControl";
 	/**
 	 *  Description of the Field
 	 */
@@ -188,7 +284,7 @@ public abstract class BasicPlayer implements Player {
 	/**
 	 *  Description of the Field
 	 */
-	protected final static String tocName = "ToneControl";
+	protected final static String guiName = "GUIControl";
 	/**
 	 *  Description of the Field
 	 */
@@ -196,58 +292,52 @@ public abstract class BasicPlayer implements Player {
 	/**
 	 *  Description of the Field
 	 */
-	protected final static String vocName = "VolumeControl";
-	/**
-	 *  This one is not among public JSR135 controls, 
-	 *  seems that this is used only for RTSP PLayer.
-	 *  But its participation in "search-by-name" slows down 
-	 *  all players that use this array for "getControls()".
-	 */
 	protected final static String rtspName = "RtspControl";
+
+	/**
+	 *  Description of the Field
+	 */
+	protected final static String tocName = "ToneControl";
+	/**
+	 *  Description of the Field
+	 */
+	protected final static String vocName = "VolumeControl";
 
 	/**
 	 * An array containing all available controls in Players
 	 * extending BasicPlayer.
-	 * A player can overwrite this array in order to change the list.
 	 */
-	private static final String[] allCtrls = { fpcName, /*FramePositioningControl*/
-	guiName, /*GUIControl*/
-	mdcName, /*MetaDataControl*/
-	micName, /*MIDIControl*/
-	picName, /*PitchControl*/
-	racName, /*RateControl*/
-	recName, /*RecordControl*/
-	stcName, /*StopTimeControl*/
-	tecName, /*TempoControl*/
-	tocName, /*ToneControl*/
-	vicName, /*VideoControl*/
-	vocName, /*VolumeControl*/
-	rtspName, /*(non-standard) RtspControl*/
-	};
+	private final static String[] allCtrls = { fpcName, mdcName, micName, picName, racName, recName, stcName, tecName,
+			guiName, vicName, rtspName, tocName, vocName, };
 
 	/**
-	 * An array containing all needed permissions in Players
-	 * extending BasicPlayer.
-	 * A player can overwrite this array in order to change the list.
-	 *
-	 * By default it is empty.
+	 * Locator string
 	 */
-	private static final int[] allPermissions = {};
+	protected String locator;
 
 	/**
-	 * is set by checkPermissions() to bypass further checks
+	 * The input DataSource
 	 */
-	private boolean isTrusted;
+	protected DataSource source;
 
 	/**
-	 * array of controls for a given player
+	 * The input SourceStream from the DataSource
 	 */
-	private String control_names[];
+	protected SourceStream stream;
 
+	// #ifndef ABB [
 	/**
-	 * array of permissions for a given player
+	 * The Player's TimeBase.
 	 */
-	private int permissions[];
+	private TimeBase timeBase = this;
+	// #endif ]
+
+	// #ifndef ABB [
+	/**
+	 * For StopTimeControl - initially reset
+	 */
+	protected long stopTime = StopTimeControl.RESET;
+	// #endif ]
 
 	/**
 	 * the default size of the event queue
@@ -261,112 +351,26 @@ public abstract class BasicPlayer implements Player {
 	private boolean closedDelivered;
 
 	/**
-	 * listener for media events while the midlet is in paused state.
+	 * VM paused?
 	 */
-	private static MIDletPauseListener pauseListener = null;
 	private static boolean vmPaused = false;
 
-	/* Source data for player */
-	InputStream source;
-
 	/**
-	 * Sets the listener for media activity notifications.
-	 *
-	 * This interface can only be set once and shall only be used
-	 * by MIDletState.
-	 */
-	public static void setMIDletPauseListener(MIDletPauseListener listener) {
-		//System.out.println("DEBUG: about to BP.setMIDletPauseListener(" + listener + ")");
-		// Only set the listener once!
-		// If the listener is aleady set then return witout waring.
-		if (pauseListener == null) {
-			pauseListener = listener;
-		}
-	}
-
-	/**
-	 * Informs the BasicPlayer that the VM has been paused if
-	 * paused is set to true - or resumed if paused is set to false
-	 */
-	public static void pauseStateEntered(MIDletPauseListener listener, boolean paused) {
-		//System.out.println("DEBUG: about to BP.pauseStateEntered(" + listener + "," + paused + ")");
-		// if the listeners don't match then simply return
-		if (listener != pauseListener)
-			return;
-
-		vmPaused = paused;
-
-		if (vmPaused) {
-			for (Enumeration e = mplayers.elements(); e.hasMoreElements();) {
-				BasicPlayer p = (BasicPlayer) e.nextElement();
-
-				if (p.getState() == STARTED) {
-					notifyPauseListener("Player");
-				}
-			}
-			/*pauseAll();
-			 } else {
-			 resumeAll();*/
-		}
-	}
-
-	public static void notifyPauseListener(String msg) {
-		if (vmPaused && pauseListener != null) {
-			pauseListener.reportActivity(msg);
-		}
-	}
-
-	/**
-	 *Constructor for the ABBBasicPlayer object
+	 *Constructor for the BasicPlayer object
 	 */
 	public BasicPlayer() {
-		init();
-		control_names = allCtrls;
-		permissions = allPermissions;
-	}
-
-	protected BasicPlayer(String[] n, int[] p) {
-		init();
-		control_names = (n == null) ? allCtrls : n;
-		permissions = (p == null) ? allPermissions : p;
-	}
-
-	private void init() {
+		// Initialize sysOffset to the current time.
+		// This is used for TimeBase calculations.
+		sysOffset = System.currentTimeMillis() * 1000L;
 
 		synchronized (idLock) {
 			pcount = (pcount + 1) % 32767;
 			pID = pcount;
 		}
 		mplayers.put(new Integer(pID), this);
-	}
 
-	/**
-	 * Initializes Player by Media Encodings obtained from URI and parsed.
-	 * To be called by Manager when new player (from URI) is being created.
-	 *
-	 * @param encodings media encodings in form "key=value", separated by '&'.
-	 *
-	 * @returns true if initialization was successful, false otherwise
-	 */
-	public boolean initFromURL(String encodings) {
-		return true;
-	}
-	
-	public boolean initFromStream(InputStream stream, String type) {
-		return true;
-	}
-
-	/**
-	 * Checks if user application has all permissions needed to access player
-	 */
-	protected final void checkPermissions() throws SecurityException {
-		/*
-		 if (isTrusted) return;
-		 //TBD: check locator-specific permissions ?
-		 for (int i = 0; i < permissions.length; ++i)
-		 PermissionAccessor.checkPermissions(permissions[i]);
-		 isTrusted = true;
-		 */
+		// Set event listener
+		//new MMEventListener();
 	}
 
 	/**
@@ -376,25 +380,53 @@ public abstract class BasicPlayer implements Player {
 	 *
 	 * @param  unrealized  Description of the Parameter
 	 */
-	protected final void chkClosed(boolean unrealized) {
-		/*
-		 * This method is indended to be called from synchronized methods
-		 * (that change player's state), but in fact 
-		 * it is invoked from unsynchronized methods too, 
-		 * so, as a temporary solution,  
-		 * it shall eliminate access to player's state: 
-		 * it must get the state only once and then work with a local variable.
-		 */
-		int theState = this.state;
-		if (theState == CLOSED || (unrealized && theState == UNREALIZED)) {
+	protected void chkClosed(boolean unrealized) {
+		if (state == CLOSED || (unrealized && state == UNREALIZED)) {
 			throw new IllegalStateException("Can't invoke the method at the "
-					+ (theState == CLOSED ? "closed" : "unrealized") + " state ");
+					+ (state == CLOSED ? "closed" : "unrealized") + " state");
 		}
 	}
 
-	// JAVADOC COMMENT ELIDED
-	public synchronized void setLoopCount(int count) {
-		//System.out.println("DEBUG: about to BP.setLoopCount(" + count + ") for player=" + this);
+	/**
+	 * Set the number of times the <code>Player</code> will loop
+	 * and play the content.
+	 * <p>
+	 * By default, the loop count is one.  That is, once started,
+	 * the <code>Player</code> will start playing from the current
+	 * media time to the end of media once.
+	 * <p>
+	 * If the loop count is set to N where N is bigger than one,
+	 * starting the <code>Player</code> will start playing the
+	 * content from the current media time to the end of media.
+	 * It will then loop back to the beginning of the content
+	 * (media time zero) and play till the end of the media.
+	 * The number of times it will loop to the beginning and
+	 * play to the end of media will be N-1.
+	 * <p>
+	 * Setting the loop count to 0 is invalid.  An
+	 * <code>IllegalArgumentException</code> will be thrown.
+	 * <p>
+	 * Setting the loop count to -1 will loop and play the content
+	 * indefinitely.
+	 * <p>
+	 * If the <code>Player</code> is stopped before the preset loop
+	 * count is reached either because <code>stop</code> is called or
+	 * a preset stop time (set with the <code>StopTimeControl</code>)
+	 * is reached, calling <code>start</code> again will
+	 * resume the looping playback from where it was stopped until it
+	 * fully reaches the preset loop count.
+	 * <p>
+	 * An <i>END_OF_MEDIA</i> event will be posted
+	 * every time the <code>Player</code> reaches the end of media.
+	 * If the <code>Player</code> loops back to the beginning and
+	 * starts playing again because it has not completed the loop
+	 * count, a <i>STARTED</i> event will be posted.
+	 *
+	 * @param  count                         indicates the number of times the content will be
+	 * played.  1 is the default.  0 is invalid.  -1 indicates looping
+	 * indefintely.
+	 */
+	public void setLoopCount(int count) {
 		chkClosed(false);
 
 		if (state == STARTED) {
@@ -407,8 +439,6 @@ public abstract class BasicPlayer implements Player {
 
 		loopCountSet = count;
 		loopCount = count;
-
-		doSetLoopCount(count);
 	}
 
 	/**
@@ -419,38 +449,52 @@ public abstract class BasicPlayer implements Player {
 	protected void doSetLoopCount(int count) {
 	}
 
-	public static final int AUDIO_NONE = 0;
-	public static final int AUDIO_PCM = 1;
-	public static final int AUDIO_MIDI = 2;
-
-	public int getAudioType() {
-		return AUDIO_NONE;
+	protected void doReceiveRSL() {
+		System.out.println("[basic] received RSL");
 	}
 
-	public void setOutput(Object output) {
-	}
-
-	public Object getOutput() {
-		return null;
-	}
-
-//	public void setSource(InputStream source) throws IOException, MediaException {
-//		this.source = source;
-//	}
-
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Constructs portions of the <code>Player</code> without
+	 * acquiring the scarce and exclusive resources.
+	 * This may include examining media data and may
+	 * take some time to complete.
+	 * <p>
+	 * When <code>realize</code> completes successfully,
+	 * the <code>Player</code> is in the
+	 * <i>REALIZED</i> state.
+	 * <p>
+	 * If <code>realize</code> is called when the <code>Player</code> is in
+	 * the <i>REALIZED</i>, <i>PREFETCHTED</i> or <i>STARTED</i> state,
+	 * the request will be ignored.
+	 *
+	 * @exception  MediaException         Thrown if the <code>Player</code> cannot
+	 * be realized.
+	 */
 	public synchronized void realize() throws MediaException {
-		//System.out.println("DEBUG: about to BP.realize() for player=" + this);
 		chkClosed(false);
 
 		if (state >= REALIZED) {
 			return;
 		}
 
+		// BasicPlayer only handles the first stream from
+		// a DataSource.
+		if ((source != null) && (stream == null)) {
+			stream = source.getStreams()[0];
+		} else {
+			if (hasDataSource) {
+				state = UNREALIZED;
+				throw new MediaException("Unable to realize");
+			}
+		}
+
 		doRealize();
 
 		state = REALIZED;
 	}
+
+	protected boolean hasDataSource = true;
+	protected boolean hasToneSequenceSet = false;
 
 	/**
 	 * Subclasses need to implement this to realize
@@ -460,10 +504,47 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract void doRealize() throws MediaException;
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Acquires the scarce and exclusive resources
+	 * and processes as much data as necessary
+	 * to reduce the start latency.
+	 * <p>
+	 * When <code>prefetch</code> completes successfully,
+	 * the <code>Player</code> is in
+	 * the <i>PREFETCHED</i> state.
+	 * <p>
+	 * If <code>prefetch</code> is called when the <code>Player</code>
+	 * is in the <i>UNREALIZED</i> state,
+	 * it will implicitly call <code>realize</code>.
+	 * <p>
+	 * If <code>prefetch</code> is called when the <code>Player</code>
+	 * is already in the <i>PREFETCHED</i> state, the <code>Player</code>
+	 * may still process data necessary to reduce the start
+	 * latency.  This is to guarantee that start latency can
+	 * be maintained at a minimum.
+	 * <p>
+	 * If <code>prefetch</code> is called when the <code>Player</code>
+	 * is in the <i>STARTED</i> state,
+	 * the request will be ignored.
+	 * <p>
+	 * If the <code>Player</code> cannot obtain all
+	 * of the resources it needs, it throws a <code>MediaException</code>.
+	 * When that happens, the <code>Player</code> will not be able to
+	 * start.  However, <code>prefetch</code> may be called again when
+	 * the needed resource is later released perhaps by another
+	 * <code>Player</code> or application.
+	 *
+	 * @exception  MediaException         Thrown if the <code>Player</code> cannot
+	 * be prefetched.
+	 */
 	public synchronized void prefetch() throws MediaException {
-		//System.out.println("DEBUG: about to BP.prefetch() for player=" + this);
 		chkClosed(false);
+
+		if (vmPaused) {
+			if (debug)
+				System.out.println("ERROR: Try to prefetch player during paused state");
+			return;
+		}
 
 		if (state >= PREFETCHED) {
 			return;
@@ -471,9 +552,6 @@ public abstract class BasicPlayer implements Player {
 
 		if (state < REALIZED) {
 			realize();
-		} else {
-			//if realize has been called the permission will be checked from there
-			checkPermissions();
 		}
 
 		doPrefetch();
@@ -489,32 +567,81 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract void doPrefetch() throws MediaException;
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Starts the <code>Player</code> as soon as possible.
+	 * If the <code>Player</code> was previously stopped
+	 * by calling <code>stop</code> or reaching a preset
+	 * stop time, it will resume playback
+	 * from where it was previously stopped.  If the
+	 * <code>Player</code> has reached the end of media,
+	 * calling <code>start</code> will automatically
+	 * start the playback from the start of the media.
+	 * <p>
+	 * When <code>start</code> returns successfully,
+	 * the <code>Player</code> must have been started and
+	 * a <code>STARTED</code> event will
+	 * be delivered to the registered <code>PlayerListener</code>s.
+	 * However, the <code>Player</code> is not guaranteed to be in
+	 * the <i>STARTED</i> state.  The <code>Player</code> may have
+	 * already stopped (in the <i>PREFETCHED</i> state) because
+	 * the media has 0 or a very short duration.
+	 * <p>
+	 * If <code>start</code> is called when the <code>Player</code>
+	 * is in the <i>UNREALIZED</i> or <i>REALIZED</i> state,
+	 * it will implicitly call <code>prefetch</code>.
+	 * <p>
+	 * If <code>start</code> is called when the <code>Player</code>
+	 * is in the <i>STARTED</i> state,
+	 * the request will be ignored.
+	 *
+	 * @exception  MediaException         Thrown if the <code>Player</code> cannot
+	 * be started.
+	 */
 	public synchronized void start() throws MediaException {
-		//System.out.println("DEBUG: about to BP.start() for player=" + this + " at time=" + getMediaTime());
 		chkClosed(false);
+
+		if (vmPaused) {
+			if (debug)
+				System.out.println("ERROR: Try to start player during paused state");
+			return;
+		}
 
 		if (state >= STARTED) {
 			return;
 		}
 
+		if (state < REALIZED) {
+			realize();
+		}
+
 		if (state < PREFETCHED) {
 			prefetch();
-		} else {
-			//If prefetch has been called the permission will be checked from there
-			if (!EOM && !loopAfterEOM) {
-				checkPermissions();
+		}
+
+		// Update the time base to use the player's
+		// media time before starting.
+		updateTimeBase(true);
+
+		// #ifndef ABB [
+		// Check for any preset stop time.
+		if (stopTime != StopTimeControl.RESET) {
+			if (stopTime <= getMediaTime()) {
+				satev();
+				// Send STOPPED_AT_TIME event
+				return;
 			}
 		}
+		// #endif ]
 
 		// If it's at the EOM, it will automatically
 		// loop back to the beginning.
-		if (EOM)
+		if (EOM) {
 			try {
 				setMediaTime(0);
-			} catch (MediaException me) {
-				// Ignore, if setting media time is not supported
+			} catch (Exception e) {
+				// do nothing...
 			}
+		}
 
 		if (!doStart()) {
 			throw new MediaException("start");
@@ -523,11 +650,17 @@ public abstract class BasicPlayer implements Player {
 		state = STARTED;
 		sendEvent(PlayerListener.STARTED, new Long(getMediaTime()));
 
+		boolean has_capture_locator = (null != locator)
+				&& (locator.startsWith(Configuration.AUDIO_CAPTURE_LOCATOR) || locator
+						.startsWith(Configuration.VIDEO_CAPTURE_LOCATOR));
+
+		if (!this.hasDataSource && !hasToneSequenceSet && !has_capture_locator)
+			sendEvent(PlayerListener.END_OF_MEDIA, new Long(getMediaTime()));
+
 		// Finish any pending startup stuff in subclass
 		// Typically used to start any threads that might potentially
 		// generate events before the STARTED event is delivered
 		doPostStart();
-		//System.out.println("DEBUG: finished BP.start() for player=" + this);
 	}
 
 	/**
@@ -545,9 +678,22 @@ public abstract class BasicPlayer implements Player {
 	protected void doPostStart() {
 	}
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Stops the <code>Player</code>.  It will pause the playback at
+	 * the current media time.
+	 * <p>
+	 * When <code>stop</code> returns, the <code>Player</code> is in the
+	 * <i>PREFETCHED</i> state.
+	 * A <code>STOPPED</code> event will be delivered to the registered
+	 * <code>PlayerListener</code>s.
+	 * <p>
+	 * If <code>stop</code> is called on
+	 * a stopped <code>Player</code>, the request is ignored.
+	 *
+	 * @exception  MediaException         Thrown if the <code>Player</code>
+	 * cannot be stopped.
+	 */
 	public synchronized void stop() throws MediaException {
-		//System.out.println("DEBUG: about to BP.stop() for player=" + this + " at time=" + getMediaTime());
 		chkClosed(false);
 
 		loopAfterEOM = false;
@@ -556,11 +702,15 @@ public abstract class BasicPlayer implements Player {
 			return;
 		}
 
+		doPreStop();
 		doStop();
+
+		// Update the time base to use the system time
+		// before stopping.
+		updateTimeBase(false);
 
 		state = PREFETCHED;
 		sendEvent(PlayerListener.STOPPED, new Long(getMediaTime()));
-		//System.out.println("DEBUG: finished BP.stop() for player=" + this);
 	}
 
 	/**
@@ -571,9 +721,36 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract void doStop() throws MediaException;
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Subclasses can override this method to do pre stop works
+	 */
+	protected void doPreStop() {
+	}
+
+	/**
+	 * Release the scarce or exclusive
+	 * resources like the audio device acquired by the <code>Player</code>.
+	 * <p>
+	 * When <code>deallocate</code> returns, the <code>Player</code>
+	 * is in the <i>UNREALIZED</i> or <i>REALIZED</i> state.
+	 * <p>
+	 * If the <code>Player</code> is blocked at
+	 * the <code>realize</code> call while realizing, calling
+	 * <code>deallocate</code> unblocks the <code>realize</code> call and
+	 * returns the <code>Player</code> to the <i>UNREALIZED</i> state.
+	 * Otherwise, calling <code>deallocate</code> returns the
+	 * <code>Player</code> to  the <i>REALIZED</i> state.
+	 * <p>
+	 * If <code>deallocate</code> is called when the <code>Player</code>
+	 * is in the <i>UNREALIZED</i> or <i>REALIZED</i>
+	 * state, the request is ignored.
+	 * <p>
+	 * If the <code>Player</code> is <code>STARTED</code>
+	 * when <code>deallocate</code> is called, <code>deallocate</code>
+	 * will implicitly call <code>stop</code> on the <code>Player</code>.
+	 *
+	 */
 	public synchronized void deallocate() {
-		//System.out.println("DEBUG: about to BP.deallocate() for player=" + this);
 		chkClosed(false);
 
 		loopAfterEOM = false;
@@ -587,14 +764,10 @@ public abstract class BasicPlayer implements Player {
 				stop();
 			} catch (MediaException e) {
 				// Not much we can do here.
-				// e.printStackTrace();
 			}
 		}
 
 		doDeallocate();
-
-		EOM = true;
-
 		state = REALIZED;
 	}
 
@@ -604,9 +777,18 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract void doDeallocate();
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Close the <code>Player</code> and release its resources.
+	 * <p>
+	 * When the method returns, the <code>Player</code> is in the
+	 * <i>CLOSED</i> state and can no longer be used.
+	 * A <code>CLOSED</code> event will be delivered to the registered
+	 * <code>PlayerListener</code>s.
+	 * <p>
+	 * If <code>close</code> is called on a closed <code>Player</code>
+	 * the request is ignored.
+	 */
 	public synchronized void close() {
-		//System.out.println("DEBUG: about to BP.close() for player=" + this);
 		if (state == CLOSED) {
 			return;
 		}
@@ -615,6 +797,10 @@ public abstract class BasicPlayer implements Player {
 		doClose();
 
 		state = CLOSED;
+
+		if (source != null) {
+			source.disconnect();
+		}
 
 		sendEvent(PlayerListener.CLOSED, null);
 		mplayers.remove(new Integer(pID));
@@ -626,10 +812,39 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract void doClose();
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Sets the <code>Player</code>'s&nbsp;<i>media time</i>.
+	 * <p>
+	 * For some media types, setting the media time may not be very
+	 * accurate.  The returned value will indicate the
+	 * actual media time set.
+	 * <p>
+	 * Setting the media time to negative values will effectively
+	 * set the media time to zero.  Setting the media time to
+	 * beyond the duration of the media will set the time to
+	 * the end of media.
+	 * <p>
+	 * There are some media types that cannot support the setting
+	 * of media time.  Calling <code>setMediaTime</code> will throw
+	 * a <code>MediaException</code> in those cases.
+	 *
+	 * @param  now                        The new media time in microseconds.
+	 * @return                            The actual media time set in microseconds.
+	 * @exception  MediaException         Thrown if the media time
+	 * cannot be set.
+	 * @see                               #getMediaTime
+	 */
 	public synchronized long setMediaTime(long now) throws MediaException {
-		//System.out.println("DEBUG: about to BP.setMediaTime(" + now + ") for player=" + this);
 		chkClosed(true);
+
+		if (now < 0) {
+			now = 0;
+		}
+
+		// Time-base-time needs to be updated if player is started.
+		if (state == STARTED) {
+			origin = getTime();
+		}
 
 		long theDur = doGetDuration();
 		if ((theDur != TIME_UNKNOWN) && (now > theDur)) {
@@ -639,7 +854,11 @@ public abstract class BasicPlayer implements Player {
 		long rtn = doSetMediaTime(now);
 		EOM = false;
 
-		//System.out.println("DEBUG: finished BP.setMediaTime(" + now + ")=" + rtn + " for player=" + this);
+		// Time-base-time needs to be updated if player is started.
+		if (state == STARTED) {
+			offset = rtn;
+		}
+
 		return rtn;
 	}
 
@@ -653,9 +872,16 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract long doSetMediaTime(long now) throws MediaException;
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Gets this <code>Player</code>'s current <i>media time</i>.
+	 * If the <i>media time</i> cannot be determined,
+	 * <code>getMediaTime</code> returns <code>TIME_UNKNOWN</code>.
+	 *
+	 * @return                            The current <i>media time</i> in microseconds or
+	 * <code>TIME_UNKNOWN</code>.
+	 * @see                               #setMediaTime
+	 */
 	public long getMediaTime() {
-		//System.out.println("DEBUG: about to BP.getMediaTime() for player=" + this);
 		chkClosed(false);
 		return doGetMediaTime();
 	}
@@ -668,14 +894,29 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract long doGetMediaTime();
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Gets the current state of this <code>Player</code>.
+	 * The possible states are: <i>UNREALIZED</i>,
+	 * <i>REALIZED</i>, <i>PREFETCHED</i>, <i>STARTED</i>, <i>CLOSED</i>.
+	 *
+	 * @return    The <code>Player</code>'s current state.
+	 */
 	public int getState() {
 		return state;
 	}
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Get the duration of the media.
+	 * The value returned is the media's duration
+	 * when played at the default rate.
+	 * <br>
+	 * If the duration cannot be determined (for example, the
+	 * <code>Player</code> is presenting live
+	 * media)  <CODE>getDuration</CODE> returns <CODE>TIME_UNKNOWN</CODE>.
+	 *
+	 * @return                            The duration in microseconds or <code>TIME_UNKNOWN</code>.
+	 */
 	public long getDuration() {
-		//System.out.println("DEBUG: about to BP.getDuration() for player=" + this);
 		chkClosed(false);
 		return doGetDuration();
 	}
@@ -688,75 +929,45 @@ public abstract class BasicPlayer implements Player {
 	 */
 	protected abstract long doGetDuration();
 
-	// JAVADOC COMMENT ELIDED
+	/**
+	 * Add a player listener for this player.
+	 *
+	 * @param  playerListener             the listener to add.
+	 * If <code>null</code> is used, the request will be ignored.
+	 * @see                               #removePlayerListener
+	 */
 	public void addPlayerListener(PlayerListener playerListener) {
 		chkClosed(false);
 		if (playerListener != null) {
-			/* 
-			 * Excplicit "sync" is needed to raise "modified" flag. 
-			 * Implicit "sync" is already inside addElemet() method, 
-			 * so second sync from the same thread will do nothing ...
-			 */
-			synchronized (listeners) {
-				listenersModified = true;
-				listeners.addElement(playerListener);
-			}
+			listeners.addElement(playerListener);
 		}
-	}
-
-	// JAVADOC COMMENT ELIDED
-	public void removePlayerListener(PlayerListener playerListener) {
-		chkClosed(false);
-		if (playerListener != null) {
-			/* 
-			 * Excplicit "sync" is needed to raise "modified" flag. 
-			 * Implicit "sync" is already inside removeElemet() method, 
-			 * so second sync from the same thread will do nothing ...
-			 */
-			synchronized (listeners) {
-				listenersModified = true;
-				listeners.removeElement(playerListener);
-			}
-		}
-	}
-
-	final void notifyListeners(String message, Object obj) {
-		Object copy[];
-		synchronized (listeners) {
-			copy = new Object[listeners.size()];
-			listeners.copyInto(copy);
-			listenersModified = false;
-		}
-		/*
-		 * TBD: raise a flag to show that we are in callbacks 
-		 * to detect re-entrance ...
-		 * (syncState object can also be used, 
-		 * however it protects state changes too) 
-		 */
-		for (int i = 0; i < copy.length; i++) {
-			PlayerListener listener = (PlayerListener) copy[i];
-			listener.playerUpdate(this, message, obj);
-		}
-		/*
-		 * TBD: need to check for "listenersModified == true", 
-		 * this means that one of callbacks updated listeners ->
-		 * need some actions ...
-		 */
 	}
 
 	/**
-	 *  Description of the Method
+	 * Remove a player listener for this player.
 	 *
-	 * @param  evtName  Description of the Parameter
-	 * @param  evtData  Description of the Parameter
+	 * @param  playerListener             the listener to remove.
+	 * If <code>null</code> is used or the given
+	 * <code>playerListener</code> is not a listener for this
+	 * <code>Player</code>, the request will be ignored.
+	 * @see                               #addPlayerListener
 	 */
-	public void sendEvent(String evtName, Object evtData) {
-		//System.out.println("DEBUG: about to BP.sendEvent(" + evtName + "," + evtData +") for player=" + this);
-		//  There's always one listener for EOM - itself (for loop procesing).
-		//  "Deliver" the CLOSED/ERROR events 
-		//  so that the eventQueue thread may terminate
-		if (listeners.size() == 0 && evtName != PlayerListener.END_OF_MEDIA && evtName != PlayerListener.CLOSED
-				&& evtName != PlayerListener.ERROR) {
+	public void removePlayerListener(PlayerListener playerListener) {
+		chkClosed(false);
+		listeners.removeElement(playerListener);
+	}
+
+	/**
+	 * Send event to player
+	 *
+	 * @param  evt      event type
+	 * @param  evtData  event data
+	 */
+	public void sendEvent(String evt, Object evtData) {
+		//  There's always one listener for EOM -- itself.
+		//  "Deliver" the CLOSED event so that the evtQ thread may terminate
+		if (listeners.size() == 0 && evt != PlayerListener.END_OF_MEDIA && evt != PlayerListener.CLOSED
+				&& evt != PlayerListener.ERROR) {
 			return;
 		}
 
@@ -766,67 +977,47 @@ public abstract class BasicPlayer implements Player {
 			return;
 		}
 
-		//System.out.println("DEBUG: about to BP.sendEvent(" + evtName + "," + evtData +") for player=" + this + "  2");
-
 		// Deliver the event to the listeners.
 		synchronized (evtLock) {
-			if (eventQueue == null) {
-				eventQueue = new PlayerEventQueue(this);
+			if (evtQ == null) {
+				evtQ = new EvtQ(this);
 			}
-			// TBD: attempt to ensure "eventQueue" existence 
-			// in eventQueue.sentEvent() call ...
-			eventQueue.sendEvent(evtName, evtData);
+			evtQ.sendEvent(evt, evtData);
+			// try to let listener run
+			Thread.currentThread().yield();
 		}
 
-		//System.out.println("DEBUG: about to BP.sendEvent(" + evtName + "," + evtData +") for player=" + this + "  3");
-
-		if (evtName == PlayerListener.CLOSED || evtName == PlayerListener.ERROR) {
+		if (evt == PlayerListener.CLOSED || evt == PlayerListener.ERROR) {
 			closedDelivered = true;
 		}
-	}
-
-	synchronized void doFinishLoopIteration() {
-		//System.out.println("DEBUG: about to BP.doFinishLoopIteration() for player=" + this + " loopAfterEOM=" + loopAfterEOM);
-		EOM = true;
-		loopAfterEOM = false;
-		if (state > Player.PREFETCHED) {
-
-			state = Player.PREFETCHED;
-			if (loopCount > 1 || loopCount == -1) {
-				loopAfterEOM = true;
-			}
-		}
-		//System.out.println("DEBUG: finished BP.doFinishLoopIteration() for player=" + this + " loopAfterEOM=" + loopAfterEOM);
 	}
 
 	/**
 	 *  Description of the Method
 	 */
-	synchronized void doNextLoopIteration() {
-		//System.out.println("DEBUG: about to BP.doNextLoopIteration() for player=" + this + " loopCount=" + loopCount + " loopAfterEOM=" + loopAfterEOM);
-		if (loopAfterEOM) {
-			// If a loop count is set, we'll loop back to the beginning.
-			if ((loopCount > 1) || (loopCount == -1)) {
-				try {
-					if (setMediaTime(0) == 0) {
-						if (loopCount > 1) {
-							loopCount--;
-						}
-						//System.out.println("DEBUG: about to BP.doNextLoopIteration() for player=" + this + " call start()");
-						start();
-					} else {
-						loopCount = 1;
-					}
-				} catch (MediaException ex) {
-					loopCount = 1;
-				}
-			} else if (loopCountSet > 1) {
-				loopCount = loopCountSet;
+	synchronized void doLoop() {
+		// If a loop count is set, we'll loop back to the beginning.
+		if ((loopCount > 1) || (loopCount == -1)) {
+			try {
+				setMediaTime(0);
+			} catch (MediaException e) {
+				// Do nothing...
 			}
-
-			loopAfterEOM = false;
+			try {
+				if (loopCount > 1) {
+					loopCount--;
+				}
+				start();
+			} catch (MediaException ex) {
+				if (debug)
+					System.out.println("[basic] doLoop exception " + ex.getMessage());
+				loopCount = 1;
+			}
+		} else if (loopCountSet > 1) {
+			loopCount = loopCountSet;
 		}
-		//System.out.println("DEBUG: finished BP.doNextLoopIteration() for player=" + this + " loopCount=" + loopCount);
+
+		loopAfterEOM = false;
 	}
 
 	// "final" to verify that no subclass overrides getControls.
@@ -841,8 +1032,8 @@ public abstract class BasicPlayer implements Player {
 
 		Vector v = new Vector(3);
 		// average maximum number of controls
-		for (int i = 0; i < control_names.length; i++) {
-			Object c = getControl(control_names[i]);
+		for (int i = 0; i < allCtrls.length; i++) {
+			Object c = getControl(allCtrls[i]);
 			if ((c != null) && !v.contains(c)) {
 				v.addElement(c);
 			}
@@ -863,7 +1054,7 @@ public abstract class BasicPlayer implements Player {
 	 * @return       <code>Control</code> for the class or interface
 	 * name.
 	 */
-	public final Control getControl(String type) {
+	public Control getControl(String type) {
 		chkClosed(true);
 
 		if (type == null) {
@@ -910,6 +1101,29 @@ public abstract class BasicPlayer implements Player {
 	}
 
 	/**
+	 * Send external volume changed event to all of the player from this VM
+	 */
+	public static void sendExternalVolumeChanged(String evt, int volume) {
+		if (mplayers == null) {
+			return;
+		}
+
+		/* Send event to player if this player is in realized state (or above) */
+		for (Enumeration e = mplayers.elements(); e.hasMoreElements();) {
+			BasicPlayer p = (BasicPlayer) e.nextElement();
+			int state = p.getState();
+			if (state >= Player.REALIZED) {
+				if (debug)
+					System.out.println("Send [" + evt + "] to Player " + p.toString());
+				VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
+				if (vc != null) {
+					vc.setLevel(volume);
+				}
+			}
+		}
+	}
+
+	/**
 	 *  Pauses and deallocates all media players.
 	 *
 	 *  After this call all players are either in realized
@@ -918,7 +1132,8 @@ public abstract class BasicPlayer implements Player {
 	 *  Resources are being released during deallocation.
 	 */
 	public static void pauseAll() {
-		//System.out.println("DEBUG: about to BP.pauseAll()");
+		vmPaused = true;
+
 		if (mplayers == null) {
 			return;
 		}
@@ -931,16 +1146,18 @@ public abstract class BasicPlayer implements Player {
 
 			// save the player's state
 			pstates.put(p, new Integer(state));
-
 			// save the player's media time
 			mtimes.put(p, new Long(time));
 
-			// deallocate the player
-			//
-			// this will implicitly stop all players
-			// and release scarce resources such as
-			// the audio device
-			p.deallocate();
+			try {
+				// Stop the player
+				if (state == Player.STARTED) {
+					p.stop();
+				}
+			} catch (MediaException ex) {
+			}
+			if (debug)
+				System.out.println("*** pause MMAPI : " + p + "(" + state + ") ***");
 		}
 	}
 
@@ -952,7 +1169,8 @@ public abstract class BasicPlayer implements Player {
 	 *  they were stopped and deallocated.
 	 */
 	public static void resumeAll() {
-		//System.out.println("DEBUG: about to BP.resumeAll()");
+		vmPaused = false;
+
 		if (mplayers == null || pstates.size() == 0) {
 			return;
 		}
@@ -963,22 +1181,27 @@ public abstract class BasicPlayer implements Player {
 			int state = ((Integer) pstates.get(p)).intValue();
 			long time = ((Long) mtimes.get(p)).longValue();
 
+			if (debug)
+				System.out.println("MMAPI resumeAll state: " + state);
+
 			switch (state) {
-			case Player.PREFETCHED:
-				try {
-					//System.out.println("DEBUG: BP.resumeAll() for PREFETCHED player=" + p);
-					p.prefetch();
-					p.setMediaTime(time);
-				} catch (MediaException ex) {
-				}
-				break;
+			/*
+			 case Player.PREFETCHED:
+			 try {
+			 p.prefetch();
+			 p.setMediaTime(time);
+			 } catch (MediaException ex) {
+			 }
+			 break;
+			 */
 			case Player.STARTED:
 				try {
-					//System.out.println("DEBUG: BP.resumeAll() for STARTED player=" + p);
-					p.realize();
-					p.prefetch();
-					p.setMediaTime(time);
-					p.start();
+					//p.realize();
+					//p.prefetch();
+					if (p.getState() != Player.STARTED) {
+						p.setMediaTime(time);
+						p.start();
+					}
 				} catch (MediaException ex) {
 				}
 				break;
@@ -996,18 +1219,390 @@ public abstract class BasicPlayer implements Player {
 	 * @param  ll  Description of the Parameter
 	 * @return     Description of the Return Value
 	 */
-	public int doSetLevel(int ll) {
+	int doSetLevel(int ll) {
 		return ll;
 	}
 
-	// JAVADOC COMMENT ELIDED
-	public String getContentType() {
-		chkClosed(true);
-		return "";
+	/**
+	 * MMAPI Full specific methods.
+	 *
+	 * @param  source              The new source value
+	 * @exception  IOException     Description of the Exception
+	 * @exception  MediaException  Description of the Exception
+	 */
+
+	/**
+	 * Sets the media source
+	 *
+	 * @param  source              The new source value
+	 * @exception  IOException     Description of the Exception
+	 * @exception  MediaException  Description of the Exception
+	 */
+	public void setSource(DataSource source) throws IOException, MediaException {
+		this.source = source;
 	}
 
-	
+	/**
+	 * Sets the media locator
+	 * 
+	 * @param locator               The new source locator
+	 */
+	public void setLocator(String locator) {
+		if (locator != null) {
+			if (locator.equals(Manager.TONE_DEVICE_LOCATOR)) {
+				this.hasDataSource = false;
+			}
+			// #ifndef ABB [
+			else if (locator.startsWith(Configuration.AUDIO_CAPTURE_LOCATOR)) {
+				this.hasDataSource = false;
+			} else if (locator.startsWith(Configuration.VIDEO_CAPTURE_LOCATOR)) {
+				this.hasDataSource = false;
+			} else if (locator.equals(Manager.MIDI_DEVICE_LOCATOR)) {
+				this.hasDataSource = false;
+			}
+			// #endif ]
+		}
+		this.locator = locator;
+	}
 
+	// #ifndef ABB [
+	/**
+	 * Sets the <code>TimeBase</code> for this <code>Player</code>.
+	 * <p>
+	 * A <code>Player</code> has a default <code>TimeBase</code> that
+	 * is determined by the implementation.
+	 * To reset a <code>Player</code> to its default
+	 * <code>TimeBase</code>, call <code>setTimeBase(null)</code>.
+	 *
+	 * @param  master                     The new <CODE>TimeBase</CODE> or
+	 * <CODE>null</CODE> to reset the <code>Player</code>
+	 * to its default <code>TimeBase</code>.
+	 * @exception  MediaException         Thrown if
+	 * the specified <code>TimeBase</code> cannot be set on the
+	 * <code>Player</code>.
+	 * @see                               #getTimeBase
+	 */
+	public void setTimeBase(TimeBase master) throws MediaException {
+		chkClosed(true);
+		if (state == STARTED) {
+			throw new IllegalStateException("Cannot call setTimeBase on a player in the STARTED state");
+		}
+
+		if (master == null) {
+			return;
+		}
+		if (master != this) {
+			throw new MediaException("Incompatible TimeBase");
+		}
+	}
+
+	/**
+	 * Gets the <code>TimeBase</code> that this <code>Player</code> is using.
+	 *
+	 * @return                            The <code>TimeBase</code> that this <code>Player</code> is using.
+	 * @see                               #setTimeBase
+	 */
+	public TimeBase getTimeBase() {
+		chkClosed(true);
+		return timeBase;
+	}
+
+	// #endif ]
+
+	/**
+	 * Get the content type of the media that's
+	 * being played back by this <code>Player</code>.
+	 * <p>
+	 * See <a href="Manager.html#content-type">content type</a>
+	 * for the syntax of the content type returned.
+	 *
+	 * @return                            The content type being played back by this
+	 * <code>Player</code>.
+	 */
+	public String getContentType() {
+		chkClosed(true);
+
+		if (source == null) {
+			// Call helper function to get a content type
+			return DefaultConfiguration.getContentType(this.locator);
+		} else {
+			return source.getContentType();
+		}
+	}
+
+	/**
+	 * StopTimeControl base implementation
+	 *
+	 * @return    The stopTime value
+	 */
+
+	// NOTE: Right now, BasicPlayer implements StopTimeControl, but only
+	// provides partial implementation. That means each individual player
+	// must complete the implementation. I.E., somehow it must keep polling
+	// current media time and compare it to the set stop time. If the time
+	// is reached, it should call doStop and satev.
+	/**
+	 * Returns the current stop time
+	 *
+	 * @return    The stopTime value
+	 */
+	public long getStopTime() {
+		return stopTime;
+	}
+
+	/**
+	 * Sets the stop time
+	 *
+	 * @param  time  The new stopTime value
+	 */
+	public synchronized void setStopTime(long time) {
+		if (state == STARTED) {
+			/*
+			 *  If the stop time has already been set and its being set again,
+			 *  throw an exception
+			 */
+			if (stopTime != StopTimeControl.RESET && time != StopTimeControl.RESET) {
+				throw new IllegalStateException("StopTime already set");
+			}
+			/*
+			 *  If the new stop time is before the current media time,
+			 *  stop the player and send an event
+			 */
+			if (time < getMediaTime()) {
+				try {
+					doPreStop();
+					doStop();
+				} catch (MediaException e) {
+					// Not much we can do here.
+				}
+				satev();
+				/*
+				 *  Send STOPPED_AT_TIME event
+				 */
+				return;
+			}
+		}
+		stopTime = time;
+		doSetStopTime(stopTime);
+	}
+
+	/**
+	 * Subclasses can override this to be notified of a change
+	 * in the stop time
+	 *
+	 * @param  time  Description of the Parameter
+	 */
+	protected void doSetStopTime(long time) {
+	}
+
+	/**
+	 * Send STOPPED_AT_TIME event. Call this after stopping the player
+	 */
+	protected void satev() {
+		// Update the time base to use the system time
+		// before stopping.
+		updateTimeBase(false);
+		state = PREFETCHED;
+		stopTime = StopTimeControl.RESET;
+		sendEvent(PlayerListener.STOPPED_AT_TIME, new Long(getMediaTime()));
+	}
+
+	// #endif ]
+
+	/**
+	 * TimeBase related functions.
+	 */
+	private long origin = 0;
+	private long offset = 0;
+	private long time = 0;
+	private long sysOffset = 0;
+	private boolean useSystemTime = true;
+	private Object timeLock = new Object();
+
+	/**
+	 * Get the current time of this <code>TimeBase</code>.  The values
+	 * returned must be non-negative and non-decreasing over time.
+	 *
+	 * @return    the current <code>TimeBase</code> time in microseconds.
+	 */
+	public long getTime() {
+		synchronized (timeLock) {
+			if (useSystemTime) {
+
+				time = origin + (System.currentTimeMillis() * 1000L - sysOffset) - offset;
+			} else {
+
+				time = origin + getMediaTime() - offset;
+			}
+			return time;
+		}
+	}
+
+	/**
+	 * This method needs to be called when the Player transitions
+	 * back and forth the STARTED and STOPPED states.  This is
+	 * to make sure that the correct time base time can be computed.
+	 *
+	 * @param  started  Description of the Parameter
+	 */
+	public void updateTimeBase(boolean started) {
+		synchronized (timeLock) {
+			origin = getTime();
+			useSystemTime = !started;
+			if (started) {
+				// Computes the starting offset based on the media time.
+				offset = getMediaTime();
+			} else {
+				// Computes the starting offset based on the system time.
+				offset = System.currentTimeMillis() * 1000L - sysOffset;
+			}
+		}
+	}
+
+	/**
+	 * Stream reading support
+	 * MMAPI uses DataSource while ABB uses InputStream.
+	 */
+
+	/**
+	 * The value returned by <code>getSeekType</code> indicating that this
+	 * <code>SourceStream</code> is not seekable.
+	 * <p>
+	 * Value 0 is assigned to <code>NOT_SEEKABLE</code>.
+	 */
+	int NOT_SEEKABLE = SourceStream.NOT_SEEKABLE;
+
+	/**
+	 * The value returned by <code>getSeekType</code> indicating that this
+	 * <code>SourceStream</code> can be seeked only to the beginning
+	 * of the media stream.
+	 * <p>
+	 * Value 1 is assigned to <code>SEEKABLE_TO_START</code>.
+	 */
+	int SEEKABLE_TO_START = SourceStream.SEEKABLE_TO_START;
+
+	/**
+	 * The value returned by <code>getSeekType</code> indicating that this
+	 * <code>SourceStream</code> can be seeked anywhere within the media.
+	 * <p>
+	 * Value 2 is assigned to <code>RANDOM_ACCESSIBLE</code>.
+	 */
+	int RANDOM_ACCESSIBLE = SourceStream.RANDOM_ACCESSIBLE;
+
+	/**
+	 * Reads <code>len</code>
+	 * bytes from the first StreamSource of the DataSource (member
+	 * variable <code>stream</code>.
+	 * <p>
+	 * This method
+	 * blocks until one of the following conditions
+	 * occurs:<p>
+	 * <ul>
+	 * <li><code>len</code> bytes
+	 * of input data are available, in which case
+	 * a normal return is made.
+	 *
+	 * <li>End of file
+	 * is detected, in which case an <code>MediaException</code>
+	 * is thrown.
+	 *
+	 * <li>An I/O error occurs, in
+	 * which case an <code>IOException</code> is thrown.
+	 * </ul>
+	 * <p>
+	 * If <code>len</code> is zero,
+	 * then no bytes are read. Otherwise, the first
+	 * byte read is stored into element <code>b[off]</code>,
+	 * the next one into <code>b[off+1]</code>,
+	 * and so on. The number of bytes read is,
+	 * at most, equal to <code>len</code>.
+	 *
+	 * @param  b                the buffer into which the data is read.
+	 * @param  off              an int specifying the offset into the data.
+	 * @param  len              an int specifying the number of bytes to read.
+	 * @return                  Description of the Return Value
+	 * @exception  IOException  if an I/O error occurs.
+	 */
+	protected int readFully(byte b[], int off, int len) throws IOException {
+		int n = 0;
+		while (n < len) {
+			int count = stream.read(b, off + n, len - n);
+			if (count < 0) {
+				throw new IOException("premature end of stream");
+			}
+			n += count;
+		}
+		return len;
+	}
+
+	private final static int MAX_SKIP = 2048;
+	private static byte[] skipArray;
+
+	/**
+	 *  Description of the Method
+	 *
+	 * @param  numBytes         Description of the Parameter
+	 * @return                  Description of the Return Value
+	 * @exception  IOException  Description of the Exception
+	 */
+	protected long skipFully(int numBytes) throws IOException {
+		long target = stream.tell() + numBytes;
+		if (stream.getSeekType() == SourceStream.RANDOM_ACCESSIBLE) {
+			if (stream.seek(target) != target) {
+				throw new IOException("skipped past end");
+			}
+			return numBytes;
+		}
+
+		if (numBytes < 0) {
+			throw new IOException("bad param");
+		}
+
+		// Allocate memory for skip array
+		int toSkip = numBytes;
+		int min = numBytes;
+		if (min > MAX_SKIP) {
+			min = MAX_SKIP;
+		}
+		if (skipArray == null || skipArray.length < min) {
+			skipArray = new byte[min];
+		}
+
+		// Skip over numBytes
+		while (toSkip > 0) {
+			min = toSkip;
+			if (min > MAX_SKIP) {
+				min = MAX_SKIP;
+			}
+
+			if (stream.read(skipArray, 0, min) < min) {
+				throw new IOException("skipped past end");
+			}
+			toSkip -= min;
+		}
+
+		return numBytes;
+	}
+
+	/**
+	 * In source stream, seek to a particular position
+	 *
+	 * @param  where            the position intended to seek to.
+	 * @return                  the actual position seeked to.
+	 * @exception  IOException  Description of the Exception
+	 */
+	protected long seekStrm(long where) throws IOException {
+		return stream.seek(where);
+	}
+
+	/**
+	 *  Gets the seekType attribute of the BasicPlayer object
+	 *
+	 * @return    The seekType value
+	 */
+	protected int getSeekType() {
+		return stream.getSeekType();
+	}
 }
 
 /**
@@ -1017,15 +1612,23 @@ public abstract class BasicPlayer implements Player {
  *
  * @created    January 13, 2005
  */
-class PlayerEventQueue extends Thread {
+class EvtQ extends Thread {
 	/**
 	 * the player instance
 	 */
 	private BasicPlayer p;
 	/**
-	 * event info array
+	 * event type array
 	 */
-	private EventQueueEntry evt;
+	private String[] evtQ;
+	/**
+	 * event data array
+	 */
+	private Object[] evtDataQ;
+	/**
+	 * head and tail pointer of the event queue
+	 */
+	private int head, tail;
 
 	/**
 	 * The constructor
@@ -1033,10 +1636,10 @@ class PlayerEventQueue extends Thread {
 	 * @param  p  the instance of BasicPlayer intending to post event to
 	 *        this event queue.
 	 */
-	PlayerEventQueue(BasicPlayer p) {
+	EvtQ(BasicPlayer p) {
 		this.p = p;
-		evt = null;
-		//System.out.println("DEBUG: Created Player Event Queue ! player=" + p);
+		evtQ = new String[p.eventQueueSize];
+		evtDataQ = new Object[p.eventQueueSize];
 		start();
 	}
 
@@ -1044,23 +1647,27 @@ class PlayerEventQueue extends Thread {
 	 * Put an event in the event queue and wake up the thread to
 	 * deliver it.  If the event queue is filled, block.
 	 *
-	 * @param  evtName  Description of the Parameter
+	 * @param  evt      Description of the Parameter
 	 * @param  evtData  Description of the Parameter
 	 */
-	synchronized void sendEvent(String evtName, Object evtData) {
+	synchronized void sendEvent(String evt, Object evtData) {
 
-		//System.out.println("DEBUG: about to Queue.sendEvent(" + evtName + "," + evtData +") for player=" + this);
-
-		//add element to the ring ...
-		if (evt == null) {
-			evt = new EventQueueEntry(evtName, evtData);
-		} else {
-			evt.link = new EventQueueEntry(evtName, evtData, evt.link);
-			evt = evt.link;
+		// Wait if the event queue is full.
+		// This potentially will block the Player's main thread.
+		while ((head + 1) % p.eventQueueSize == tail) {
+			try {
+				wait(1000);
+			} catch (Exception e) {
+			}
 		}
-		this.notifyAll();
-
-		//System.out.println("DEBUG: about to Queue.sendEvent(" + evtName + "," + evtData +") for player=" + this);
+		evtQ[head] = evt;
+		evtDataQ[head] = evtData;
+		if (++head == p.eventQueueSize) {
+			head = 0;
+		}
+		notifyAll();
+		// try to let other threads run
+		Thread.yield();
 	}
 
 	/**
@@ -1068,12 +1675,10 @@ class PlayerEventQueue extends Thread {
 	 */
 	public void run() {
 
-		String evtName = "";
+		String evt = "";
 		Object evtData = null;
-		EventQueueEntry evtLink = null;
-
-		boolean evtToGo = false; // true if there is an event to send
-
+		boolean evtToGo = false;
+		// true if there is an event to send
 		// true if at least one event is sent,
 		// in case that posting the initial event
 		// takes a long time
@@ -1082,39 +1687,24 @@ class PlayerEventQueue extends Thread {
 		for (;;) {
 
 			synchronized (this) {
-				// TBD: use a special Object to wait/notify
-				// instead of time delays 
-				// (for synchronization and wake up of 
-				// BasicPlayer.sendEvent(...);s threads and 
-				// PlayerEventQueue.run() thread ) ? 
-				//
-				// If the queue is empty, we'll wait for at most
-				// 5 secs.
-				if (evt == null) {
+
+				// If the queue is empty, we'll wait
+				if (head == tail) {
 					try {
-						this.wait(5000);
-					} catch (InterruptedException ie) {
+						wait(1000);
+					} catch (Exception e) {
 					}
 				}
-				if (evt != null) {
-					evtLink = evt.link;
-					//exclude element from the ring ...
-					if (evtLink == evt) {
-						evt = null;
-					} else {
-						evt.link = evtLink.link;
-					}
-					evtToGo = true;
-
-					evtName = evtLink.name;
-					evtData = evtLink.data;
-
+				if (head != tail) {
+					evt = evtQ[tail];
+					evtData = evtDataQ[tail];
 					// For garbage collection.
-					evtLink.link = null;
-					evtLink.name = null;
-					evtLink.data = null;
-					evtLink = null;
-
+					evtDataQ[tail] = null;
+					evtToGo = true;
+					if (++tail == p.eventQueueSize) {
+						tail = 0;
+					}
+					notifyAll();
 				} else {
 					evtToGo = false;
 				}
@@ -1123,20 +1713,41 @@ class PlayerEventQueue extends Thread {
 			// synchronized this
 
 			if (evtToGo) {
-				// TBD: move it to "sendEvent(...)" to provide loop-related
-				// reaction on EOM earlier ?
-				//
 				// First, check and handle EOM.
-				if (evtName == PlayerListener.END_OF_MEDIA) {
-					p.doFinishLoopIteration();
+				if (evt == PlayerListener.END_OF_MEDIA) {
+					synchronized (p) {
+						p.EOM = true;
+						p.loopAfterEOM = false;
+
+						if (p.state > Player.PREFETCHED) {
+							p.updateTimeBase(false);
+							p.state = Player.PREFETCHED;
+							if (p.loopCount > 1 || p.loopCount == -1) {
+
+								p.loopAfterEOM = true;
+							}
+						}
+					}
 				}
 
-				//System.out.println("DEBUG: about to notifyListeners(" + evtName + "," + evtData +") for player=" + p);
 				// Notify the PlayerListeners.
-				p.notifyListeners(evtName, evtData);
+				synchronized (p.listeners) {
+					PlayerListener l;
+					for (int i = 0; i < p.listeners.size(); i++) {
+						try {
+							l = (PlayerListener) p.listeners.elementAt(i);
+							l.playerUpdate(p, evt, evtData);
+						} catch (Exception e) {
+							e.printStackTrace();
+							System.err.println("Error in playerUpdate " + "while delivering event " + evt + ": " + e);
+						}
+					}
+				}
 
-				// We'll need to loop back if looping was set.
-				p.doNextLoopIteration();
+				if (p.loopAfterEOM) {
+					// We'll need to loop back because looping was set.
+					p.doLoop();
+				}
 
 				evtSent = true;
 
@@ -1147,45 +1758,25 @@ class PlayerEventQueue extends Thread {
 			// event and there's no more event after 5 secs; or if the
 			// Player is closed.
 
-			if (evtName == PlayerListener.CLOSED || evtName == PlayerListener.ERROR) {
-				// try to nullify queue reference and exit 
-				// if player is closing ...
+			if (evt == PlayerListener.CLOSED || evt == PlayerListener.ERROR) {
+				// will cause a deadlock if the queue
+				// is full
 				synchronized (p.evtLock) {
-					//System.out.println("DEBUG: Killed Player Event Queue (STOP/ERROR)! player=" + p);
-					p.eventQueue = null;
-					break; // Exit the event thread.
+					p.evtQ = null;
+					break;
+					// Exit the event thread.
 				}
 			}
 
 			synchronized (this) {
-				// try to nullify queue reference and exit 
-				// if nothing to send (but there were events in the past) ...
-				if (evt == null && evtSent && !evtToGo) {
+				if (head == tail && evtSent && !evtToGo) {
 					synchronized (p.evtLock) {
-						//System.out.println("DEBUG: Killed Player Event Queue (empty for 5 sec)! player=" + p);
-						p.eventQueue = null;
-						break; // Exit the event thread.
+						p.evtQ = null;
+						break;
+						// Exit the event thread.
 					}
 				}
 			}
 		}
-	}
-}
-
-class EventQueueEntry {
-	String name;
-	Object data;
-	EventQueueEntry link;
-
-	public EventQueueEntry(String n, Object d) {
-		name = n;
-		data = d;
-		link = this;
-	}
-
-	public EventQueueEntry(String n, Object d, EventQueueEntry l) {
-		name = n;
-		data = d;
-		link = l;
 	}
 }
