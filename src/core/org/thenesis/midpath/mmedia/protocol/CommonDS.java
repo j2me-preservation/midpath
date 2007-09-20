@@ -61,17 +61,22 @@ public class CommonDS extends BasicDS implements SourceStream {
             super.setLocator(null);
         } catch (MediaException e) { }
         inputStream = is;
-        try {
-            //enable to call to is.reset()
-            is.mark(is.available());
-        } catch (IOException ioe) {
-                //ignore
-        }
-        try {
-            contentLength = is.available();
-        } catch(IOException e) {
-            contentLength = -1;
-        }
+        
+        // Enable to call to is.reset()
+        is.mark(Integer.MAX_VALUE);
+//        try {
+//          //enable to call to is.reset()
+//          is.mark(is.available());
+//        } catch (IOException ioe) {
+//                //ignore
+//        }
+        
+        contentLength = -1;
+//        try {
+//            contentLength = is.available();
+//        } catch(IOException e) {
+//            contentLength = -1;
+//        }
     }
 
     public void connect() throws IOException {
@@ -170,7 +175,8 @@ public class CommonDS extends BasicDS implements SourceStream {
                 goodurl = true;
             }
         } catch (Exception ex) {
-            throw new IOException("failed to connect" + ex.getMessage());
+        	ex.printStackTrace();
+            throw new IOException("failed to connect: " + ex.getMessage());
         }
 
         if ( !goodurl)

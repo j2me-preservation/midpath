@@ -74,8 +74,6 @@ import javax.microedition.io.StreamConnection;
 import com.sun.midp.io.ConnectionBaseAdapter;
 import com.sun.midp.io.HttpUrl;
 import com.sun.midp.main.Configuration;
-import com.sun.midp.midlet.MIDletStateHandler;
-import com.sun.midp.midlet.MIDletSuite;
 import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
 import com.sun.midp.util.DateParser;
@@ -398,25 +396,28 @@ public class Protocol extends ConnectionBaseAdapter implements HttpConnection {
 	 *   display.
 	 */
 	private void checkForPermission(String name) throws InterruptedIOException {
-		MIDletStateHandler midletStateHandler;
-		MIDletSuite midletSuite;
-
-		midletStateHandler = MIDletStateHandler.getMidletStateHandler();
-		midletSuite = midletStateHandler.getMIDletSuite();
-
-		if (midletSuite == null) {
-			throw new IllegalStateException("This class can't be used " + "before a suite is started.");
-		}
-
-		name = protocol + ":" + name;
-
-		try {
-			midletSuite.checkForPermission(Permissions.HTTP, name);
-			ownerTrusted = midletSuite.isTrusted();
-			permissionChecked = true;
-		} catch (InterruptedException ie) {
-			throw new InterruptedIOException("Interrupted while trying to ask the user permission");
-		}
+//		MIDletStateHandler midletStateHandler;
+//		MIDletSuite midletSuite;
+//
+//		midletStateHandler = MIDletStateHandler.getMidletStateHandler();
+//		midletSuite = midletStateHandler.getMIDletSuite();
+//
+//		if (midletSuite == null) {
+//			throw new IllegalStateException("This class can't be used " + "before a suite is started.");
+//		}
+//
+//		name = protocol + ":" + name;
+//
+//		try {
+//			midletSuite.checkForPermission(Permissions.HTTP, name);
+//			ownerTrusted = midletSuite.isTrusted();
+//			permissionChecked = true;
+//		} catch (InterruptedException ie) {
+//			throw new InterruptedIOException("Interrupted while trying to ask the user permission");
+//		}
+		
+		ownerTrusted = true;
+		permissionChecked = true;
 	}
 
 	/**

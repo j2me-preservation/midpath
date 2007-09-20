@@ -85,8 +85,16 @@ public class OggVorbisDecoder implements AudioDecoder {
 	private AudioFormat format;
 
 	public OggVorbisDecoder() {
-
 		//System.out.println("[DEBUG] OggVorbisDecoder.<init>()");
+	}
+
+	/**
+	 * Initialize decoder
+	 * 
+	 * @throws IOException
+	 * @throws IllegalDecoderStateException
+	 */
+	public void initialize(InputStream is) throws IOException {
 		
 		/* Decode setup */
 		
@@ -109,17 +117,9 @@ public class OggVorbisDecoder implements AudioDecoder {
 		block = new Block(dspState);
 		//Now we can read pages
 		syncState.init();
-
-	}
-
-	/**
-	 * Initialize decoder
-	 * 
-	 * @throws IOException
-	 * @throws IllegalDecoderStateException
-	 */
-	public void initialize(InputStream is) throws IOException {
-
+		
+		/* Init variables */
+		
 		input = is;
 		bytes = 0;
 		eos = 0;

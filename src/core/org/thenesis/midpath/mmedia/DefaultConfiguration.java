@@ -228,8 +228,8 @@ public class DefaultConfiguration extends Configuration {
         }
 
         // Protocol handlers.
-        handlers.put("http", "com.sun.mmedia.protocol.CommonDS");
-        handlers.put("file", "com.sun.mmedia.protocol.CommonDS");
+        handlers.put("http", "org.thenesis.midpath.mmedia.protocol.CommonDS");
+        handlers.put("file", "org.thenesis.midpath.mmedia.protocol.CommonDS");
         //handlers.put("capture", "com.sun.mmedia.protocol.WavCapture");
 
 //        // Device handlers.
@@ -292,9 +292,11 @@ public class DefaultConfiguration extends Configuration {
         
         //handlers.put(MIME_VIDEO_MPEG, "com.sun.mmedia.JavaMPEG1Player2");
         
-//        supportedProtocols.put(MIME_IMAGE_GIF, hfProtocols);
-//        supportedProtocols.put(MIME_AUDIO_WAV, hfcProtocols);
-//        supportedProtocols.put(MIME_VIDEO_MPEG, hfProtocols);
+        //supportedProtocols.put(MIME_IMAGE_GIF, hfProtocols);
+        supportedProtocols.put(MIME_AUDIO_WAV, hfcProtocols);
+        supportedProtocols.put(MIME_AUDIO_MP3, hfProtocols);
+        supportedProtocols.put(MIME_AUDIO_OGG, hfProtocols);
+        //supportedProtocols.put(MIME_VIDEO_MPEG, hfProtocols);
 
 //        if (needAMMS) {
 //            // Media Processors.

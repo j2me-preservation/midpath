@@ -155,7 +155,7 @@ import javax.microedition.media.protocol.SourceStream;
  */
 public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 
-	private final static boolean debug = true;
+	private final static boolean DEBUG = false;
 
 	/**
 	 * global player id
@@ -541,7 +541,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 		chkClosed(false);
 
 		if (vmPaused) {
-			if (debug)
+			if (DEBUG)
 				System.out.println("ERROR: Try to prefetch player during paused state");
 			return;
 		}
@@ -601,7 +601,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 		chkClosed(false);
 
 		if (vmPaused) {
-			if (debug)
+			if (DEBUG)
 				System.out.println("ERROR: Try to start player during paused state");
 			return;
 		}
@@ -984,7 +984,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 			}
 			evtQ.sendEvent(evt, evtData);
 			// try to let listener run
-			Thread.currentThread().yield();
+			Thread.yield();
 		}
 
 		if (evt == PlayerListener.CLOSED || evt == PlayerListener.ERROR) {
@@ -1009,7 +1009,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 				}
 				start();
 			} catch (MediaException ex) {
-				if (debug)
+				if (DEBUG)
 					System.out.println("[basic] doLoop exception " + ex.getMessage());
 				loopCount = 1;
 			}
@@ -1113,7 +1113,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 			BasicPlayer p = (BasicPlayer) e.nextElement();
 			int state = p.getState();
 			if (state >= Player.REALIZED) {
-				if (debug)
+				if (DEBUG)
 					System.out.println("Send [" + evt + "] to Player " + p.toString());
 				VolumeControl vc = (VolumeControl) p.getControl("VolumeControl");
 				if (vc != null) {
@@ -1156,7 +1156,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 				}
 			} catch (MediaException ex) {
 			}
-			if (debug)
+			if (DEBUG)
 				System.out.println("*** pause MMAPI : " + p + "(" + state + ") ***");
 		}
 	}
@@ -1181,7 +1181,7 @@ public abstract class BasicPlayer implements Player, TimeBase, StopTimeControl {
 			int state = ((Integer) pstates.get(p)).intValue();
 			long time = ((Long) mtimes.get(p)).longValue();
 
-			if (debug)
+			if (DEBUG)
 				System.out.println("MMAPI resumeAll state: " + state);
 
 			switch (state) {

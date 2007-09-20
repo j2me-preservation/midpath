@@ -486,7 +486,7 @@ public final class Manager {
 
 	private final static String REDIRECTED_MSG = " with exception message: ";
 
-	private final static boolean debug = true;
+	private final static boolean DEBUG = false;
 
 	/**
 	 * This private constructor keeps anyone from actually
@@ -574,7 +574,7 @@ public final class Manager {
 		String validLoc;
 		BasicPlayer p;
 
-		if (debug)
+		if (DEBUG)
 			System.out.println("[mmapi] createPlayer with " + locator);
 
 		/*
@@ -715,21 +715,6 @@ public final class Manager {
 			throw new MediaException(PL_ERR + ex.getMessage());
 		}
 
-		//		//return new VirtualSoundPlayer(stream, type);
-		//
-		//		String className = config.getHandler(type);
-		//		BasicPlayer player = null;
-		//		try {
-		//			// Try and instance the player ....
-		//			Class protoClass = Class.forName(className);
-		//			player = (BasicPlayer) protoClass.newInstance();
-		//			player.initFromStream(stream, type);
-		//		} catch (Exception e) {
-		//			e.printStackTrace();
-		//			throw new MediaException("Not supported");
-		//		}
-		//		return player;
-
 	}
 
 	/**
@@ -749,7 +734,7 @@ public final class Manager {
 
 		BasicPlayer p = null;
 
-		if (debug)
+		if (DEBUG)
 			System.out.println("getPlayerFromType " + className);
 
 		try {
@@ -757,7 +742,7 @@ public final class Manager {
 			Class handlerClass = Class.forName(className);
 			p = (BasicPlayer) handlerClass.newInstance();
 		} catch (Exception e) {
-			if (debug)
+			if (DEBUG)
 				System.out.println("Class not found " + className);
 			throw new MediaException(PL_ERR + e.getMessage());
 		}

@@ -17,8 +17,6 @@
  */
 package org.thenesis.midpath.mmedia;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,6 +26,7 @@ import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.ToneControl;
 import javax.microedition.media.control.VolumeControl;
+import javax.microedition.media.protocol.SourceStream;
 
 import org.thenesis.midpath.sound.Line;
 import org.thenesis.midpath.sound.Mixer;
@@ -57,45 +56,12 @@ public class VirtualSoundPlayer extends BasicPlayer {
 		}
 	}
 
-	private InputStream stream;
-	private String type;
 	private volatile AudioDecoder decoder;
 	private Mixer mixer;
 	private Line line;
 	private volatile DecodingThread decodingThread;
-	private byte[] data;
 
 	public VirtualSoundPlayer() {
-	}
-
-//	public VirtualSoundPlayer(InputStream stream, String type) {
-//		this.stream = stream;
-//		this.type = type;
-//
-//		if (type.equalsIgnoreCase("audio/x-wav")) {
-//			decoder = new WaveDecoder();
-//		} else if (type.equalsIgnoreCase("audio/mp3")) {
-//			decoder = new MP3Decoder();
-//		} else if (type.equalsIgnoreCase("audio/ogg")) {
-//			decoder = new OggVorbisDecoder();
-//		}
-//	}
-	
-	public boolean initFromStream(InputStream stream, String type) {
-		
-		this.stream = stream;
-		this.type = type;
-		
-		if (type.equalsIgnoreCase("audio/x-wav")) {
-			decoder = new WaveDecoder();
-		} else if (type.equalsIgnoreCase("audio/mp3")) {
-			decoder = new MP3Decoder();
-		} else if (type.equalsIgnoreCase("audio/ogg")) {
-			decoder = new OggVorbisDecoder();
-		} else {
-			return false;
-		}
-		return true;
 	}
 
 	protected void doClose() {
@@ -136,25 +102,22 @@ public class VirtualSoundPlayer extends BasicPlayer {
 			throw new MediaException("Failed to open audio backend.");
 		}
 
-		// Grab all the data
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte buf[] = new byte[1024];
-		int length = 0;
-		try {
-			while ((length = stream.read(buf)) > 0) {
-				baos.write(buf, 0, length);
-			}
-		} catch (IOException e) {
-			throw new MediaException("Can't get audio data.");
-		}
-		data = baos.toByteArray();
+		String type = source.getContentType();
+		if (type.equalsIgnoreCase("audio/x-wav")) {
+			decoder = new WaveDecoder();
+		} else if (type.equalsIgnoreCase("audio/mp3")) {
+			decoder = new MP3Decoder();
+		} else if (type.equalsIgnoreCase("audio/ogg")) {
+			decoder = new OggVorbisDecoder();
+		} 
 
 		// Create an audio decoder 
 		try {
 			resetDecoder();
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new MediaException(e.getMessage());
-
+			
 		}
 
 		//System.out.println("[DEBUG] VirtualSoundPlayer.realize(): audio format : " + decoder.getOutputAudioFormat());
@@ -167,16 +130,27 @@ public class VirtualSoundPlayer extends BasicPlayer {
 	}
 
 	private void resetDecoder() throws IOException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		// Create an audio decoder 
-
-		decoder.initialize(bais);
-
+		
+		if (stream.tell() > 0) {
+			stream.seek(0);
+		}
+		DecoderInputStream dis = new DecoderInputStream(stream);
+		decoder.initialize(dis);
 	}
 
 	protected long doSetMediaTime(long now) throws MediaException {
-		return 0;
-		//throw new MediaException("Can't set position on this media");	
+
+		
+		try {
+			if (now == 0) {
+				resetDecoder();
+				return 0;
+			}
+		} catch (IOException e) {
+		}
+		
+		throw new MediaException("Can't set position on this media");
+		
 	}
 
 	protected boolean doStart() {
@@ -213,7 +187,6 @@ public class VirtualSoundPlayer extends BasicPlayer {
 			if ((state == Player.PREFETCHED) || (state == Player.STARTED))
 				throw new IllegalStateException("Prefetched or Started");
 
-			// TODO Auto-generated method stub
 		}
 
 	}
@@ -229,11 +202,6 @@ public class VirtualSoundPlayer extends BasicPlayer {
 				return oldLevel;
 			}
 
-			//			try {
-			//				return SDLMixer.volumeChunk(mixChunk, -1);
-			//			} catch (SDLException e) {
-			//			}
-
 			return 0;
 		}
 
@@ -248,11 +216,6 @@ public class VirtualSoundPlayer extends BasicPlayer {
 				return level;
 			}
 
-			//			try {
-			//				return SDLMixer.volumeChunk(mixChunk, level);
-			//			} catch (SDLException e) {
-			//			}
-			// Should not occur
 			return 0;
 		}
 
@@ -271,30 +234,11 @@ public class VirtualSoundPlayer extends BasicPlayer {
 
 	}
 
-	public void setStream(InputStream stream) {
-		this.stream = stream;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public void endOfMediaReached() {
-
 		//System.out.println("[DEBUG] VirtualPlayer.endOfMediaReached(): start");
-
-		try {
-			resetDecoder();
-		} catch (IOException e) {
-			// Should not occur because we have already decoded the stream before !
-		}
-
 		sendEvent(PlayerListener.END_OF_MEDIA, new Long(-1));
-
 		//System.out.println("[DEBUG] VirtualPlayer.endOfMediaReached(): end");
 	}
-
-	
 
 	public class DecodingThread implements Runnable {
 
@@ -303,7 +247,7 @@ public class VirtualSoundPlayer extends BasicPlayer {
 		private volatile boolean closed = false;
 		private AudioDecoder decoder;
 		private Line line;
-		
+
 		private DecoderCallback decoderCallback = new DecoderCallback() {
 			public void write(byte[] buf, int offset, int length) {
 				//System.out.println("[DEBUG] DecoderCallback.write(): start");
@@ -378,11 +322,49 @@ public class VirtualSoundPlayer extends BasicPlayer {
 				endOfMediaReached();
 			}
 
-
 		}
-		
-		
 
 	}
 
 }
+
+class DecoderInputStream extends InputStream {
+
+	private byte[] buf = new byte[1];
+	private long markPosition = 0;
+	private SourceStream stream;
+
+	public DecoderInputStream(SourceStream stream) {
+		this.stream = stream;
+	}
+
+	public int read() throws IOException {
+		int len = stream.read(buf, 0, 1);
+		if (len < 0) {
+			return -1;
+		} else {
+			return (buf[0] & 0xFF);
+		}
+	}
+
+	public int read(byte[] b, int off, int len) throws IOException {
+		return stream.read(b, off, len);
+	}
+
+	public int read(byte[] b) throws IOException {
+		return stream.read(b, 0, b.length);
+	}
+
+	public void mark(int readlimit) {
+		markPosition = stream.tell();
+	}
+
+	public boolean markSupported() {
+		return (stream.getSeekType() == SourceStream.RANDOM_ACCESSIBLE);
+	}
+
+	public void reset() throws IOException {
+		stream.seek(markPosition);
+	}
+
+};
