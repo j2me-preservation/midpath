@@ -239,27 +239,29 @@ public class Protocol extends NetworkConnectionBase
             throw new IllegalArgumentException("Missing port number");
         }
 
-        //szHost = Util.toCString(host);
-
-        result = socketPeer.getIpNumber(host, ipBytes);
-        if (result == -1) {
-            throw new
-                ConnectionNotFoundException("Could not resolve hostname");
-        }
-
-        /*
-         * JTWI security check, untrusted MIDlets cannot open port 80 or
-         * 8080 or 443. This is so they cannot perform HTTP and HTTPS
-         * requests on server without using the system code. The
-         * system HTTP code will add a "UNTRUSTED/1.0" to the user agent
-         * field for untrusted MIDlets.
-         */
-        if (!ownerTrusted && (port == 80 || port == 8080 || port == 443)) {
-            throw new SecurityException(
-                "Target port denied to untrusted applications");
-        }
-
-        socketPeer.open(ipBytes, port);
+        // FIXME restore open(ipBytes, port) 
+        socketPeer.open(host, port);
+       
+//        result = socketPeer.getIpNumber(host, ipBytes);
+//        if (result == -1) {
+//            throw new
+//                ConnectionNotFoundException("Could not resolve hostname");
+//        }
+//
+//        /*
+//         * JTWI security check, untrusted MIDlets cannot open port 80 or
+//         * 8080 or 443. This is so they cannot perform HTTP and HTTPS
+//         * requests on server without using the system code. The
+//         * system HTTP code will add a "UNTRUSTED/1.0" to the user agent
+//         * field for untrusted MIDlets.
+//         */
+//        if (!ownerTrusted && (port == 80 || port == 8080 || port == 443)) {
+//            throw new SecurityException(
+//                "Target port denied to untrusted applications");
+//        }
+//
+//       
+//        socketPeer.open(ipBytes, port);
     }
 
     /**

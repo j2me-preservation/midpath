@@ -18,9 +18,9 @@
  */
 package org.thenesis.midpath.io.backend.cldc;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
@@ -32,8 +32,8 @@ import com.sun.midp.io.j2me.socket.SocketPeer;
  */
 public class SocketPeerImpl implements SocketPeer {
 	
-	private DataInputStream dis;
-	private DataOutputStream dos;
+	private InputStream dis;
+	private OutputStream dos;
 	StreamConnection connection;
 	private String host;
 	private int port;
@@ -55,9 +55,10 @@ public class SocketPeerImpl implements SocketPeer {
 		}
 	}
 
-	public int getIpNumber(String host, byte[] ipBytes_out) {
-		return 0;
-	}
+//	public int getIpNumber(String host, byte[] ipBytes_out) {
+//		// Fake DNS ok
+//		return 4;
+//	}
 
 	public int getPort(boolean local) throws IOException {
 		return port;
@@ -67,19 +68,18 @@ public class SocketPeerImpl implements SocketPeer {
 		return -1;
 	}
 
-	public void open(byte[] szIpBytes, int port) throws IOException {
-		// TODO Auto-generated method stub
-
-	}
+//	public void open(byte[] szIpBytes, int port) throws IOException {
+//		
+//	}
 	
 	public void open(String hostname, int port) throws IOException {
 		this.host = hostname;
 		this.port = port;
 		
-//		com.sun.cldc.io.j2me.socket.Protocol protocol = new com.sun.cldc.io.j2me.socket.Protocol();
-//		connection = (StreamConnection)protocol.openPrim("//" + hostname + ":" + port, 0, 0);
-//		dis = connection.openDataInputStream();
-//		dos = connection.openDataOutputStream();
+		com.sun.cldc.io.j2me.socket.Protocol protocol = new com.sun.cldc.io.j2me.socket.Protocol();
+		connection = (StreamConnection)protocol.openPrim("//" + hostname + ":" + port, Connector.READ_WRITE, true);
+		dis = connection.openInputStream();
+		dos = connection.openOutputStream();
 	}
 
 	

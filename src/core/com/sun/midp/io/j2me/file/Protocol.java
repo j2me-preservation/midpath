@@ -42,10 +42,6 @@ import javax.microedition.io.file.IllegalModeException;
 import com.sun.midp.io.ConnectionBaseAdapter;
 import com.sun.midp.io.IOToolkit;
 import com.sun.midp.log.Logging;
-import com.sun.midp.main.Configuration;
-import com.sun.midp.midlet.MIDletSuite;
-import com.sun.midp.midlet.Scheduler;
-import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
 
 /**
@@ -933,20 +929,20 @@ public class Protocol extends ConnectionBaseAdapter implements FileConnection {
     private final void checkReadPermission(String fileURL, int mode)
             throws InterruptedIOException {
 
-        if (classSecurityToken == null) { // FC permission
-            MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
-
-            try {
-                suite.checkForPermission(Permissions.FILE_CONNECTION_READ,
-                    fileURL);
-            } catch (InterruptedException ie) {
-                throw new InterruptedIOException(
-                    "Interrupted while trying to ask the user permission");
-            }
-        } else { // call from PIM
-            classSecurityToken.checkIfPermissionAllowed(
-                Permissions.FILE_CONNECTION_READ);
-        }
+//        if (classSecurityToken == null) { // FC permission
+//            MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
+//
+//            try {
+//                suite.checkForPermission(Permissions.FILE_CONNECTION_READ,
+//                    fileURL);
+//            } catch (InterruptedException ie) {
+//                throw new InterruptedIOException(
+//                    "Interrupted while trying to ask the user permission");
+//            }
+//        } else { // call from PIM
+//            classSecurityToken.checkIfPermissionAllowed(
+//                Permissions.FILE_CONNECTION_READ);
+//        }
 
         if (mode == Connector.WRITE) {
             throw new IllegalModeException("Connection is write only");
@@ -962,20 +958,20 @@ public class Protocol extends ConnectionBaseAdapter implements FileConnection {
     protected final void checkRootReadPermission()
             throws InterruptedIOException {
 
-        if (classSecurityToken == null) { // FC permission
-            MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
-
-            try {
-                suite.checkForPermission(Permissions.FILE_CONNECTION_READ,
-                                     "file://" + fileRoot);
-            } catch (InterruptedException ie) {
-                throw new InterruptedIOException(
-                    "Interrupted while trying to ask the user permission");
-            }
-        } else { // call from PIM
-            classSecurityToken.checkIfPermissionAllowed
-                (Permissions.FILE_CONNECTION_READ);
-        }
+//        if (classSecurityToken == null) { // FC permission
+//            MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
+//
+//            try {
+//                suite.checkForPermission(Permissions.FILE_CONNECTION_READ,
+//                                     "file://" + fileRoot);
+//            } catch (InterruptedException ie) {
+//                throw new InterruptedIOException(
+//                    "Interrupted while trying to ask the user permission");
+//            }
+//        } else { // call from PIM
+//            classSecurityToken.checkIfPermissionAllowed
+//                (Permissions.FILE_CONNECTION_READ);
+//        }
 
         if (mode == Connector.WRITE) {
             throw new IllegalModeException("Connection is write only");
@@ -986,20 +982,20 @@ public class Protocol extends ConnectionBaseAdapter implements FileConnection {
     private final void checkWritePermission(String fileURL, int mode)
             throws InterruptedIOException {
 
-        if (classSecurityToken == null) { // FC permission
-            MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
-
-            try {
-                suite.checkForPermission(Permissions.FILE_CONNECTION_WRITE,
-                                     fileURL);
-            } catch (InterruptedException ie) {
-                throw new InterruptedIOException(
-                    "Interrupted while trying to ask the user permission");
-            }
-        } else { // call from PIM
-            classSecurityToken.checkIfPermissionAllowed
-                (Permissions.FILE_CONNECTION_WRITE);
-        }
+//        if (classSecurityToken == null) { // FC permission
+//            MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
+//
+//            try {
+//                suite.checkForPermission(Permissions.FILE_CONNECTION_WRITE,
+//                                     fileURL);
+//            } catch (InterruptedException ie) {
+//                throw new InterruptedIOException(
+//                    "Interrupted while trying to ask the user permission");
+//            }
+//        } else { // call from PIM
+//            classSecurityToken.checkIfPermissionAllowed
+//                (Permissions.FILE_CONNECTION_WRITE);
+//        }
 
         if (mode == Connector.READ) {
             throw new IllegalModeException("Connection is read only");

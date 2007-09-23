@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import javax.microedition.io.SocketConnection;
 
@@ -46,22 +45,37 @@ public class SocketPeerImpl implements SocketPeer {
 		is = socket.getInputStream();
 		os = socket.getOutputStream();
 	}
-
+	
 	/**
 	 * Opens a TCP connection to a server.
 	 *
-	 * @param szIpBytes  raw IPv4 address of host
-	 * @param port       TCP port at host
+	 * @param host hostname
+	 * @param port TCP port at host
 	 *
 	 * @exception  IOException  if an I/O error occurs.
 	 */
-	public void open(byte[] szIpBytes, int port) throws IOException {
-		InetAddress ia = InetAddress.getByAddress(szIpBytes);
-		socket = new Socket(ia, port);
+	public void open(String host, int port) throws IOException {
+		socket = new Socket(host, port);
 		//System.out.println("[DEBUG] SocketPeerImpl.open(): " + socket.getInetAddress());
 		is = socket.getInputStream();
 		os = socket.getOutputStream();
 	}
+
+//	/**
+//	 * Opens a TCP connection to a server.
+//	 *
+//	 * @param szIpBytes  raw IPv4 address of host
+//	 * @param port       TCP port at host
+//	 *
+//	 * @exception  IOException  if an I/O error occurs.
+//	 */
+//	public void open(byte[] szIpBytes, int port) throws IOException {
+//		InetAddress ia = InetAddress.getByAddress(szIpBytes);
+//		socket = new Socket(ia, port);
+//		//System.out.println("[DEBUG] SocketPeerImpl.open(): " + socket.getInetAddress());
+//		is = socket.getInputStream();
+//		os = socket.getOutputStream();
+//	}
 
 	/**
 	 * Reads from the open socket connection.
@@ -117,31 +131,31 @@ public class SocketPeerImpl implements SocketPeer {
 		os.close();
 	}
 
-	/**
-	 * Gets a byte array that represents an IPv4 or IPv6 address 
-	 *
-	 * @param      szHost  the hostname to lookup as a 'C' string
-	 * @param      ipBytes_out  Output array that receives the
-	 *             bytes of IP address
-	 * @return     number of bytes copied to ipBytes_out or -1 for an error
-	 */
-	public int getIpNumber(String host, byte[] ipBytes_out) {
-
-		try {
-			InetAddress ia = InetAddress.getByName(host);
-			byte[] address = ia.getAddress();
-			for (int i = 0; i < ipBytes_out.length; i++){
-				ipBytes_out[i] = address[i];
-			}
-			return ipBytes_out.length;
-		} catch (UnknownHostException e) {
-			//e.printStackTrace();
-			return -1;
-		}
-		
-		//System.out.println("[DEBUG] SocketPeerImpl.getIpNumber(): not implemented yet: " + new String(host));
-		
-	}
+//	/**
+//	 * Gets a byte array that represents an IPv4 or IPv6 address 
+//	 *
+//	 * @param      szHost  the hostname to lookup as a 'C' string
+//	 * @param      ipBytes_out  Output array that receives the
+//	 *             bytes of IP address
+//	 * @return     number of bytes copied to ipBytes_out or -1 for an error
+//	 */
+//	public int getIpNumber(String host, byte[] ipBytes_out) {
+//
+//		try {
+//			InetAddress ia = InetAddress.getByName(host);
+//			byte[] address = ia.getAddress();
+//			for (int i = 0; i < ipBytes_out.length; i++){
+//				ipBytes_out[i] = address[i];
+//			}
+//			return ipBytes_out.length;
+//		} catch (UnknownHostException e) {
+//			//e.printStackTrace();
+//			return -1;
+//		}
+//		
+//		//System.out.println("[DEBUG] SocketPeerImpl.getIpNumber(): not implemented yet: " + new String(host));
+//		
+//	}
 
 	/**
 	 * Gets the requested IP number.

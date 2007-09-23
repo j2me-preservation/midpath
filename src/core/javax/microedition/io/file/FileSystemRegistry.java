@@ -183,14 +183,14 @@ public class FileSystemRegistry {
      * @throws SecurityException if read is not allowed
      */
     private static void checkReadPermission() {
-        MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
-
-        try {
-            suite.checkForPermission
-                (Permissions.FILE_CONNECTION_READ, null);
-        } catch (InterruptedException ie) {
-            throw new SecurityException(
-                "Interrupted while trying to ask the user permission");
-        }
+//        MIDletSuite suite = Scheduler.getScheduler().getMIDletSuite();
+//
+//        try {
+//            suite.checkForPermission
+//                (Permissions.FILE_CONNECTION_READ, null);
+//        } catch (InterruptedException ie) {
+//            throw new SecurityException(
+//                "Interrupted while trying to ask the user permission");
+//        }
     }
 }

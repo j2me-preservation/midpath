@@ -3,16 +3,28 @@ package com.sun.midp.io.j2me.socket;
 import java.io.IOException;
 
 public interface SocketPeer {
-
+	
 	/**
 	 * Opens a TCP connection to a server.
 	 *
-	 * @param szIpBytes  raw IPv4 address of host
-	 * @param port       TCP port at host
+	 * @param host hostname
+	 * @param port TCP port at host
 	 *
 	 * @exception  IOException  if an I/O error occurs.
+	 * 
+	 * TODO: use open(byte[] szIpBytes, int port) instead
 	 */
-	public void open(byte[] szIpBytes, int port) throws IOException;
+	public void open(String host, int port) throws IOException;
+
+//	/**
+//	 * Opens a TCP connection to a server.
+//	 *
+//	 * @param szIpBytes  raw IPv4 address of host
+//	 * @param port       TCP port at host
+//	 *
+//	 * @exception  IOException  if an I/O error occurs.
+//	 */
+//	public void open(byte[] szIpBytes, int port) throws IOException;
 
 	/**
 	 * Reads from the open socket connection.
@@ -100,14 +112,14 @@ public interface SocketPeer {
 	 */
 	public void shutdownOutput();
 	
-	/**
-	 * Gets a byte array that represents an IPv4 or IPv6 address 
-	 *
-	 * @param      szHost  the hostname to lookup as a 'C' string
-	 * @param      ipBytes_out  Output array that receives the
-	 *             bytes of IP address
-	 * @return     number of bytes copied to ipBytes_out or -1 for an error
-	 */
-	public int getIpNumber(String host, byte[] ipBytes_out);
+//	/**
+//	 * Gets a byte array that represents an IPv4 or IPv6 address 
+//	 *
+//	 * @param      szHost  the hostname to lookup as a 'C' string
+//	 * @param      ipBytes_out  Output array that receives the
+//	 *             bytes of IP address
+//	 * @return     number of bytes copied to ipBytes_out or -1 for an error
+//	 */
+//	public int getIpNumber(String host, byte[] ipBytes_out);
 
 }
