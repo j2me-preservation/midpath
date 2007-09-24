@@ -98,7 +98,7 @@ abstract class AbstractTextChunk extends KeyValueChunk implements TextChunk {
 			char[] chs = val.toCharArray();
 			int p = 0;
 			int L = chs.length;
-			String endl = System.getProperty("line.separator");
+			String endl = "\n"; //System.getProperty("line.separator");
 			while (p < L) {
 				char ch = chs[p++];
 				switch (ch) {
