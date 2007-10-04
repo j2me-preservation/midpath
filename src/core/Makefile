@@ -1,5 +1,5 @@
 #
-# Makefile created at Thu Aug  2 19:46:22 2007, by mmake
+# Makefile created at Fri Oct  5 00:12:35 2007, by mmake
 #
 
 # Programs (with common options):
@@ -108,9 +108,11 @@ PACKAGES = \
 	com.sun.midp.chameleon.skins.resources \
 	com.sun.midp.configurator \
 	com.sun.midp.midlet \
+	org.thenesis.midpath.ui.backend.fb \
 	org.thenesis.midpath.ui.backend.swt \
 	com.sun.midp.rms \
 	com.sun.midp.io.j2me.btl2cap \
+	org.thenesis.midpath.mmedia.protocol \
 	com.sun.cldc.io \
 	com.sun.midp.util \
 	org.thenesis.midpath.sound.backend.alsa \
@@ -151,6 +153,7 @@ PACKAGES = \
 	javax.microedition.io \
 	org.thenesis.midpath.ui.virtual \
 	com.sun.midp.chameleon.skins \
+	javax.microedition.media.protocol \
 	com.sun.midp.lcdui \
 	com.sun.midp.installer \
 	com.sun.midp.io.j2me.file \
@@ -488,9 +491,11 @@ com.sun.midp.chameleon : $(call PACKAGE_OBJS,com.sun.midp.chameleon)
 com.sun.midp.chameleon.skins.resources : $(call PACKAGE_OBJS,com.sun.midp.chameleon.skins.resources)
 com.sun.midp.configurator : $(call PACKAGE_OBJS,com.sun.midp.configurator)
 com.sun.midp.midlet : $(call PACKAGE_OBJS,com.sun.midp.midlet)
+org.thenesis.midpath.ui.backend.fb : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.fb)
 org.thenesis.midpath.ui.backend.swt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.swt)
 com.sun.midp.rms : $(call PACKAGE_OBJS,com.sun.midp.rms)
 com.sun.midp.io.j2me.btl2cap : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.btl2cap)
+org.thenesis.midpath.mmedia.protocol : $(call PACKAGE_OBJS,org.thenesis.midpath.mmedia.protocol)
 com.sun.cldc.io : $(call PACKAGE_OBJS,com.sun.cldc.io)
 com.sun.midp.util : $(call PACKAGE_OBJS,com.sun.midp.util)
 org.thenesis.midpath.sound.backend.alsa : $(call PACKAGE_OBJS,org.thenesis.midpath.sound.backend.alsa)
@@ -531,6 +536,7 @@ org.thenesis.midpath.io.backend.cldc : $(call PACKAGE_OBJS,org.thenesis.midpath.
 javax.microedition.io : $(call PACKAGE_OBJS,javax.microedition.io)
 org.thenesis.midpath.ui.virtual : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.virtual)
 com.sun.midp.chameleon.skins : $(call PACKAGE_OBJS,com.sun.midp.chameleon.skins)
+javax.microedition.media.protocol : $(call PACKAGE_OBJS,javax.microedition.media.protocol)
 com.sun.midp.lcdui : $(call PACKAGE_OBJS,com.sun.midp.lcdui)
 com.sun.midp.installer : $(call PACKAGE_OBJS,com.sun.midp.installer)
 com.sun.midp.io.j2me.file : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.file)
