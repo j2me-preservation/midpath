@@ -126,7 +126,6 @@ cp $DIST_HOME/tests/midpath-tests.jar $DIST_HOME/dist
 
 # Add other required libraries to the dist directory
 cp $DIST_HOME/lib/kxml2-2.3.0.jar $DIST_HOME/dist
-cp $DIST_HOME/lib/RXTXcomm.jar $DIST_HOME/dist
 
 # Build native code
 
