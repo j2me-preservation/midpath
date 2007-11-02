@@ -1,6 +1,4 @@
 /*
- *
- *
  * Copyright  1990-2007 Sun Microsystems, Inc. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
  * 
@@ -29,21 +27,15 @@ package com.sun.midp.io.j2me.btl2cap;
 import java.io.IOException;
 
 import javax.bluetooth.BluetoothConnectionException;
-import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.L2CAPConnection;
-import javax.bluetooth.LocalDevice;
-import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.Connection;
-
-import org.javabluetooth.stack.BluetoothStack;
-import org.javabluetooth.stack.hci.HCIException;
-import org.javabluetooth.stack.l2cap.JSR82Channel;
-import org.javabluetooth.stack.l2cap.JSR82ConnectionNotifier;
 
 import com.sun.cldc.io.BluetoothProtocol;
 import com.sun.cldc.io.BluetoothUrl;
 import com.sun.midp.security.Permissions;
 import com.sun.midp.security.SecurityToken;
+
+import de.avetana.bluetooth.connection.Connector;
 
 /**
  * Provides "btl2cap" protocol implementation
@@ -144,54 +136,7 @@ public class Protocol extends BluetoothProtocol {
 	 */
 	protected Connection clientConnection(SecurityToken token, int mode) throws IOException {
 		checkForPermission(token, Permissions.BLUETOOTH_CLIENT);
-
-//		Short psmShort = Short.decode(url.uuid);
-//		short psm = psmShort.shortValue();
-//		Long remoteAddr = Long.decode(url.address);
-//		long remoteAddrLong = remoteAddr.longValue();
-		
-		short psm = Short.parseShort(url.uuid, 16);
-		long remoteAddrLong = Long.parseLong(url.address, 16);
-
-		try {
-			BluetoothStack bluetooth = BluetoothStack.getBluetoothStack();
-			LocalDevice localDev = LocalDevice.getLocalDevice();
-			DiscoveryAgent discovery = localDev.getDiscoveryAgent();
-			RemoteDevice remoteDevice = discovery.getRemoteDevice(remoteAddrLong);
-			if (remoteDevice != null) {
-				JSR82Channel channel = new JSR82Channel();
-				bluetooth.connectL2CAPChannel(channel, remoteDevice, psm);
-				return channel;
-			} else {
-				throw new IllegalArgumentException("Unable to locate Bluetooth Device.");
-			}
-		} catch (HCIException e) {
-			throw new IOException(e.getMessage());
-		}
-		
-
-		//      catch (BluetoothStateException e) { throw new IOException("" + e); }
-		//      catch (HCIException e) { throw new IOException("" + e); }
-
-		//        byte[] bdAddrBytes        = new byte[12];
-		//        String bdAddrString       = url.substring(10, 22);
-		//        Long bdAddrLong           = Long.decode("0x" + bdAddrString);
-		//        long remoteAddrLong       = bdAddrLong.longValue();
-		//        int endIndex              = url.indexOf(';', 22);
-		//        String psmString          = url.substring(23, endIndex);
-		//        Short psmShort            = Short.decode(psmString);
-		//        short psm                 = psmShort.shortValue();
-		//        BluetoothStack bluetooth  = BluetoothStack.getBluetoothStack();
-		//        LocalDevice localDev      = LocalDevice.getLocalDevice();
-		//        DiscoveryAgent discovery  = localDev.getDiscoveryAgent();
-		//        RemoteDevice remoteDevice = discovery.getRemoteDevice(remoteAddrLong);
-		//        if (remoteDevice != null) {
-		//            JSR82Channel channel = new JSR82Channel();
-		//            bluetooth.connectL2CAPChannel(channel, remoteDevice, psm);
-		//            return channel;
-		//        }
-
-		//return new L2CAPConnectionImpl(url, mode);
+		return Connector.open(url.toString(), mode);
 	}
 
 	/**
@@ -204,16 +149,7 @@ public class Protocol extends BluetoothProtocol {
 	 */
 	protected Connection serverConnection(SecurityToken token, int mode) throws IOException {
 		checkForPermission(token, Permissions.BLUETOOTH_SERVER);
-
-		short psm = (short) url.port;
-		return new JSR82ConnectionNotifier(psm);
-
-		//        int endIndex     = url.indexOf(';');
-		//        String psmString = url.substring(20, endIndex);
-		//        Short psmShort   = Short.decode(psmString);
-		//        short psm        = psmShort.shortValue();
-		//        return new JSR82ConnectionNotifier(psm);
-
-		//return new L2CAPNotifierImpl(url, mode);
+		return Connector.open(url.toString(), mode);
 	}
+	
 }
