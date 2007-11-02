@@ -8,7 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
 
 class SWIG_SDLVideoJNI {
   public final static native void SDL_Rect_x_set(long jarg1, short jarg2);
@@ -217,7 +216,7 @@ class SWIG_SDLVideoJNI {
   public final static native void SWIG_SetPixelData32(long jarg1, int[] jarg2);
   public final static native void SWIG_SetPixelData16(long jarg1, int[] jarg2);
   public final static native void SWIG_SetPixelData8(long jarg1, short[] jarg2);
-  public final static native void SWIG_executeBlitQueue(Buffer jarg1, Buffer jarg2, Buffer jarg3, Buffer jarg4, long jarg5, Buffer jarg6, Buffer jarg7, Buffer jarg8, Buffer jarg9, long jarg10, int jarg11);
+  //public final static native void SWIG_executeBlitQueue(Buffer jarg1, Buffer jarg2, Buffer jarg3, Buffer jarg4, long jarg5, Buffer jarg6, Buffer jarg7, Buffer jarg8, Buffer jarg9, long jarg10, int jarg11);
   public final static native int SWIG_SDL_MUSTLOCK(long jarg1);
   public final static native Object SWIG_getPixelDirectByteBuffer(long jarg1);
   public final static native Object SWIG_getOverlayPixelsDirectByteBuffer(long jarg1, int jarg2);

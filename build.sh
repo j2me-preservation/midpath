@@ -79,7 +79,7 @@ CLDC_PATH=$DIST_HOME/dist/cldc1.1.jar
 
 # Build SDLJava for CLDC
 cd $DIST_HOME/external/sdljava-cldc/java
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -sourcepath $DIST_HOME/external/sdljava-cldc/java -source 1.3 -target 1.1" || exit 1
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/sdljava-cldc/java -source 1.3 -target 1.1" || exit 1
 make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -source 1.3 -target 1.1" JAR_FILE="sdljava-cldc.jar" JAR_FLAGS="cvf" || exit 1
 cp $DIST_HOME/external/sdljava-cldc/java/sdljava-cldc.jar $DIST_HOME/dist
 
@@ -102,15 +102,15 @@ make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -ta
 cp $DIST_HOME/external/jorbis-cldc/src/jorbis-cldc.jar $DIST_HOME/dist
 
 # Build Bluetooth library
-cd $DIST_HOME/external/javabluetooth/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $GNU_CLASSPATH_PATH:$CLDC_PATH:$DIST_HOME/lib/RXTXcomm.jar -sourcepath $DIST_HOME/external/javabluetooth/src -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $GNU_CLASSPATH_PATH:$CLDC_PATH:$DIST_HOME/lib/RXTXcomm.jar -source 1.3 -target 1.1" JAR_FILE="jsr82-bluetooth.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/javabluetooth/src/jsr82-bluetooth.jar $DIST_HOME/dist
+cd $DIST_HOME/external/avetanabt-cldc/src
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/avetanabt-cldc/src -source 1.3 -target 1.1" || exit 1
+make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="avetanabt-cldc.jar" JAR_FLAGS="cvf" || exit 1
+cp $DIST_HOME/external/avetanabt-cldc/src/avetanabt-cldc.jar $DIST_HOME/dist
 
 # Build MIDPath
 cd $DIST_HOME/src/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/jsr82-bluetooth.jar:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/src/core -source 1.3 -target 1.1" || exit 1
-make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/jsr82-bluetooth.jar:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/lib/swt.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/src/core/classes || exit 1
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/src/core -source 1.3 -target 1.1" || exit 1
+make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/lib/swt.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/src/core/classes || exit 1
 # Compile JVM.java separately as it can't be compiled against cldc.jar
 ecj -bootclasspath $GNU_CLASSPATH_PATH -source 1.3 -target 1.1 -d $DIST_HOME/src/core/classes com/sun/cldchi/jvm/JVM.java
 jar cvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/src/core/classes .

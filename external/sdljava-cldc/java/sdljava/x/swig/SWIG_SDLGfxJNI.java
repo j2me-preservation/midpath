@@ -8,8 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
-
 import com.sun.cldchi.jvm.JVM;
 
 class SWIG_SDLGfxJNI {
@@ -80,12 +78,12 @@ class SWIG_SDLGfxJNI {
   public final static native void rotozoomSurfaceSize(int jarg1, int jarg2, double jarg3, double jarg4, int[] jarg5, int[] jarg6);
   public final static native long zoomSurface(long jarg1, double jarg2, double jarg3, int jarg4);
   public final static native void zoomSurfaceSize(int jarg1, int jarg2, double jarg3, double jarg4, int[] jarg5, int[] jarg6);
-  public final static native int SWIG_polygonColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, long jarg5);
-  public final static native int SWIG_polygonRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, short jarg5, short jarg6, short jarg7, short jarg8);
-  public final static native int SWIG_aapolygonColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, long jarg5);
-  public final static native int SWIG_aapolygonRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, short jarg5, short jarg6, short jarg7, short jarg8);
-  public final static native int SWIG_filledPolygonColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, int jarg5);
-  public final static native int SWIG_filledPolygonRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, short jarg5, short jarg6, short jarg7, short jarg8);
-  public final static native int SWIG_bezierColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, int jarg5, long jarg6);
-  public final static native int SWIG_bezierRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, int jarg5, short jarg6, short jarg7, short jarg8, short jarg9);
+//  public final static native int SWIG_polygonColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, long jarg5);
+//  public final static native int SWIG_polygonRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, short jarg5, short jarg6, short jarg7, short jarg8);
+//  public final static native int SWIG_aapolygonColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, long jarg5);
+//  public final static native int SWIG_aapolygonRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, short jarg5, short jarg6, short jarg7, short jarg8);
+//  public final static native int SWIG_filledPolygonColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, int jarg5);
+//  public final static native int SWIG_filledPolygonRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, short jarg5, short jarg6, short jarg7, short jarg8);
+//  public final static native int SWIG_bezierColor(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, int jarg5, long jarg6);
+//  public final static native int SWIG_bezierRGBA(long jarg1, Buffer jarg2, Buffer jarg3, int jarg4, int jarg5, short jarg6, short jarg7, short jarg8, short jarg9);
 }

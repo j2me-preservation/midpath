@@ -1,5 +1,5 @@
 #
-# Makefile created at Sun Dec 17 23:29:43 2006, by mmake
+# Makefile created at Fri Nov  2 10:20:25 2007, by mmake
 #
 
 # Programs (with common options):
@@ -88,11 +88,11 @@ JAVA_STUB	= /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaAppl
 
 # Resource files:
 #  Extend the list to install other files of your choice
-RESOURCE_SRC	:= *.properties *.gif *.au *.mp3 *.ogg
+RESOURCE_SRC	:= *.properties *.gif *.au
 
 # Objects that should go into the jar file. (find syntax)
 JAR_OBJS	:= \( -name '*.class' -o -name '*.gif' -o -name "*.au" \
-		       -o -name '*.properties' -o -name '*.mp3' -o -name '*.ogg' \)
+		       -o -name '*.properties' \)
 
 # Include the separate variables file if it exists
 MAKEFILE_VARS	= makefile.vars
@@ -104,14 +104,30 @@ endif
 
 # Packages we should compile
 PACKAGES = \
-	org.thenesis.midpath.test
+	javax.bluetooth \
+	de.avetana.bluetooth.l2cap \
+	de.avetana.bluetooth.connection \
+	de.avetana.bluetooth.rfcomm \
+	de.avetana.bluetooth.hci \
+	de.avetana.bluetooth.obex \
+	edu.oswego.cs.dl.util.concurrent \
+	de.avetana.bluetooth.stack \
+	javax.obex \
+	de.avetana.bluetooth.sdp \
+	de.avetana.bluetooth.util
 
 
 # All packages that can be recursively compiled.
 ALL_PACKAGES = \
-	org \
-	org.thenesis.midpath \
-	org.thenesis \
+	de.avetana.bluetooth \
+	de.avetana \
+	edu.oswego \
+	javax \
+	edu.oswego.cs \
+	edu.oswego.cs.dl \
+	edu \
+	de \
+	edu.oswego.cs.dl.util \
 	$(PACKAGES)
 
 
@@ -401,8 +417,24 @@ ifneq ($(DEPEND),)
 endif
 
 #package targets
-org : $(call PACKAGE_OBJS,org)
-org.thenesis.midpath : $(call PACKAGE_OBJS,org.thenesis.midpath)
-org.thenesis : $(call PACKAGE_OBJS,org.thenesis)
-org.thenesis.midpath.test : $(call PACKAGE_OBJS,org.thenesis.midpath.test)
+de.avetana.bluetooth : $(call PACKAGE_OBJS,de.avetana.bluetooth)
+de.avetana : $(call PACKAGE_OBJS,de.avetana)
+edu.oswego : $(call PACKAGE_OBJS,edu.oswego)
+javax : $(call PACKAGE_OBJS,javax)
+edu.oswego.cs : $(call PACKAGE_OBJS,edu.oswego.cs)
+edu.oswego.cs.dl : $(call PACKAGE_OBJS,edu.oswego.cs.dl)
+edu : $(call PACKAGE_OBJS,edu)
+de : $(call PACKAGE_OBJS,de)
+edu.oswego.cs.dl.util : $(call PACKAGE_OBJS,edu.oswego.cs.dl.util)
+javax.bluetooth : $(call PACKAGE_OBJS,javax.bluetooth)
+de.avetana.bluetooth.l2cap : $(call PACKAGE_OBJS,de.avetana.bluetooth.l2cap)
+de.avetana.bluetooth.connection : $(call PACKAGE_OBJS,de.avetana.bluetooth.connection)
+de.avetana.bluetooth.rfcomm : $(call PACKAGE_OBJS,de.avetana.bluetooth.rfcomm)
+de.avetana.bluetooth.hci : $(call PACKAGE_OBJS,de.avetana.bluetooth.hci)
+de.avetana.bluetooth.obex : $(call PACKAGE_OBJS,de.avetana.bluetooth.obex)
+edu.oswego.cs.dl.util.concurrent : $(call PACKAGE_OBJS,edu.oswego.cs.dl.util.concurrent)
+de.avetana.bluetooth.stack : $(call PACKAGE_OBJS,de.avetana.bluetooth.stack)
+javax.obex : $(call PACKAGE_OBJS,javax.obex)
+de.avetana.bluetooth.sdp : $(call PACKAGE_OBJS,de.avetana.bluetooth.sdp)
+de.avetana.bluetooth.util : $(call PACKAGE_OBJS,de.avetana.bluetooth.util)
 

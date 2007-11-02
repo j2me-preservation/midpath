@@ -763,46 +763,46 @@ public class SDLVideo {
 		return SDLGrabMode.swigToEnum(SWIG_SDLVideo.SDL_WM_GrabInput(mode.swigValue()));
 	}
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	/* YUV video surface overlay functions                                       */
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-	/**
-	 * Describe <code>createYUVOverlay</code> method here.
-	 *
-	 * @param width an <code>int</code> value
-	 * @param height an <code>int</code> value
-	 * @param format an <code>int</code> value
-	 * @param display a <code>SDLSurface</code> value
-	 * @return a <code>SDLOverlay</code> value
-	 * @exception SDLException if an error occurs
-	 */
-	public static SDLOverlay createYUVOverlay(int width, int height, int format, SDLSurface display)
-			throws SDLException {
-		SDL_Overlay overlay = SWIG_SDLVideo.SDL_CreateYUVOverlay(width, height, format, display.getSwigSurface());
-		if (overlay != null) {
-			return new SDLOverlay(overlay);
-		}
-		throw new SDLException(SDLMain.getError());
-	}
-
-	public static int lockYUVOVerlay(SDLOverlay overlay) {
-		return SWIG_SDLVideo.SDL_LockYUVOverlay(overlay.getSwigOverlay());
-	}
-
-	public static int displayYUVOverlay(SDLOverlay overlay, SDLRect rect) {
-		return SWIG_SDLVideo.SWIG_displayYUVOverlay(overlay.getSwigOverlay(), rect.getX(), rect.getY(),
-				rect.getWidth(), rect.getHeight());
-	}
-
-	public static void freeYUVOverlay(SDLOverlay overlay) {
-		SWIG_SDLVideo.SDL_FreeYUVOverlay(overlay.getSwigOverlay());
-	}
-
-	//  public final static native int SDL_LockYUVOverlay(long jarg1);
-	//  public final static native void SDL_UnlockYUVOverlay(long jarg1);
-	//  public final static native int SDL_DisplayYUVOverlay(long jarg1, long jarg2);
-	//  public final static native void SDL_FreeYUVOverlay(long jarg1);
+//	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//	/* YUV video surface overlay functions                                       */
+//	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+//
+//	/**
+//	 * Describe <code>createYUVOverlay</code> method here.
+//	 *
+//	 * @param width an <code>int</code> value
+//	 * @param height an <code>int</code> value
+//	 * @param format an <code>int</code> value
+//	 * @param display a <code>SDLSurface</code> value
+//	 * @return a <code>SDLOverlay</code> value
+//	 * @exception SDLException if an error occurs
+//	 */
+//	public static SDLOverlay createYUVOverlay(int width, int height, int format, SDLSurface display)
+//			throws SDLException {
+//		SDL_Overlay overlay = SWIG_SDLVideo.SDL_CreateYUVOverlay(width, height, format, display.getSwigSurface());
+//		if (overlay != null) {
+//			return new SDLOverlay(overlay);
+//		}
+//		throw new SDLException(SDLMain.getError());
+//	}
+//
+//	public static int lockYUVOVerlay(SDLOverlay overlay) {
+//		return SWIG_SDLVideo.SDL_LockYUVOverlay(overlay.getSwigOverlay());
+//	}
+//
+//	public static int displayYUVOverlay(SDLOverlay overlay, SDLRect rect) {
+//		return SWIG_SDLVideo.SWIG_displayYUVOverlay(overlay.getSwigOverlay(), rect.getX(), rect.getY(),
+//				rect.getWidth(), rect.getHeight());
+//	}
+//
+//	public static void freeYUVOverlay(SDLOverlay overlay) {
+//		SWIG_SDLVideo.SDL_FreeYUVOverlay(overlay.getSwigOverlay());
+//	}
+//
+//	//  public final static native int SDL_LockYUVOverlay(long jarg1);
+//	//  public final static native void SDL_UnlockYUVOverlay(long jarg1);
+//	//  public final static native int SDL_DisplayYUVOverlay(long jarg1, long jarg2);
+//	//  public final static native void SDL_FreeYUVOverlay(long jarg1);
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	/* OpenGL support functions.                                                 */
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

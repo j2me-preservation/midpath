@@ -21,10 +21,7 @@ package sdljava.video;
  *
  *  Ivan Z. Ganza (ivan_ganza@yahoo.com)
  */
-import java.nio.ByteBuffer;
-
 import sdljava.x.swig.SDL_Overlay;
-import sdljava.x.swig.SWIG_SDLVideo;
 
 /**
  * A SDL_Overlay is similar to a SDL_Surface except it stores a YUV overlay.
@@ -103,8 +100,8 @@ public class SDLOverlay {
 		return swigOverlay.getHw_overlay() == 1;
 	}
 
-	ByteBuffer getPixelsForPlane(int plane) {
-		return (ByteBuffer) SWIG_SDLVideo.SWIG_getOverlayPixelsDirectByteBuffer(swigOverlay, plane);
-	}
+//	ByteBuffer getPixelsForPlane(int plane) {
+//		return (ByteBuffer) SWIG_SDLVideo.SWIG_getOverlayPixelsDirectByteBuffer(swigOverlay, plane);
+//	}
 
 }

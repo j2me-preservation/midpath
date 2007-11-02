@@ -8,8 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
-
 public interface SWIG_SDLVideoConstants {
   public final static int SDL_ALPHA_OPAQUE = 255;
   public final static int SDL_ALPHA_TRANSPARENT = 0;

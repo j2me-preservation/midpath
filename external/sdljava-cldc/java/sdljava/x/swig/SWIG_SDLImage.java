@@ -8,7 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
 
 public class SWIG_SDLImage {
   public static SDL_Surface IMG_Load(String file) {

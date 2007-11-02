@@ -8,8 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
-
 public class SWIG_SDLGfx {
   public static int pixelColor(SDL_Surface dst, short x, short y, long color) {
     return SWIG_SDLGfxJNI.pixelColor(SDL_Surface.getCPtr(dst), x, y, color);
@@ -213,36 +211,36 @@ public class SWIG_SDLGfx {
     SWIG_SDLGfxJNI.zoomSurfaceSize(width, height, zoomx, zoomy, arg4, arg5);
   }
 
-  public static int SWIG_polygonColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, long color) {
-    return SWIG_SDLGfxJNI.SWIG_polygonColor(SDL_Surface.getCPtr(dst), vx, vy, n, color);
-  }
-
-  public static int SWIG_polygonRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, short r, short g, short b, short a) {
-    return SWIG_SDLGfxJNI.SWIG_polygonRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, r, g, b, a);
-  }
-
-  public static int SWIG_aapolygonColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, long color) {
-    return SWIG_SDLGfxJNI.SWIG_aapolygonColor(SDL_Surface.getCPtr(dst), vx, vy, n, color);
-  }
-
-  public static int SWIG_aapolygonRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, short r, short g, short b, short a) {
-    return SWIG_SDLGfxJNI.SWIG_aapolygonRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, r, g, b, a);
-  }
-
-  public static int SWIG_filledPolygonColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, int color) {
-    return SWIG_SDLGfxJNI.SWIG_filledPolygonColor(SDL_Surface.getCPtr(dst), vx, vy, n, color);
-  }
-
-  public static int SWIG_filledPolygonRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, short r, short g, short b, short a) {
-    return SWIG_SDLGfxJNI.SWIG_filledPolygonRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, r, g, b, a);
-  }
-
-  public static int SWIG_bezierColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, int s, long color) {
-    return SWIG_SDLGfxJNI.SWIG_bezierColor(SDL_Surface.getCPtr(dst), vx, vy, n, s, color);
-  }
-
-  public static int SWIG_bezierRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, int s, short r, short g, short b, short a) {
-    return SWIG_SDLGfxJNI.SWIG_bezierRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, s, r, g, b, a);
-  }
+//  public static int SWIG_polygonColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, long color) {
+//    return SWIG_SDLGfxJNI.SWIG_polygonColor(SDL_Surface.getCPtr(dst), vx, vy, n, color);
+//  }
+//
+//  public static int SWIG_polygonRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, short r, short g, short b, short a) {
+//    return SWIG_SDLGfxJNI.SWIG_polygonRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, r, g, b, a);
+//  }
+//
+//  public static int SWIG_aapolygonColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, long color) {
+//    return SWIG_SDLGfxJNI.SWIG_aapolygonColor(SDL_Surface.getCPtr(dst), vx, vy, n, color);
+//  }
+//
+//  public static int SWIG_aapolygonRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, short r, short g, short b, short a) {
+//    return SWIG_SDLGfxJNI.SWIG_aapolygonRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, r, g, b, a);
+//  }
+//
+//  public static int SWIG_filledPolygonColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, int color) {
+//    return SWIG_SDLGfxJNI.SWIG_filledPolygonColor(SDL_Surface.getCPtr(dst), vx, vy, n, color);
+//  }
+//
+//  public static int SWIG_filledPolygonRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, short r, short g, short b, short a) {
+//    return SWIG_SDLGfxJNI.SWIG_filledPolygonRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, r, g, b, a);
+//  }
+//
+//  public static int SWIG_bezierColor(SDL_Surface dst, Buffer vx, Buffer vy, int n, int s, long color) {
+//    return SWIG_SDLGfxJNI.SWIG_bezierColor(SDL_Surface.getCPtr(dst), vx, vy, n, s, color);
+//  }
+//
+//  public static int SWIG_bezierRGBA(SDL_Surface dst, Buffer vx, Buffer vy, int n, int s, short r, short g, short b, short a) {
+//    return SWIG_SDLGfxJNI.SWIG_bezierRGBA(SDL_Surface.getCPtr(dst), vx, vy, n, s, r, g, b, a);
+//  }
 
 }

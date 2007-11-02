@@ -8,8 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
-
 public class SWIG_SDLVideo implements SWIG_SDLVideoConstants {
   public static String SDL_VideoDriverName(String namebuf, int maxlen) {
     return SWIG_SDLVideoJNI.SDL_VideoDriverName(namebuf, maxlen);
@@ -279,9 +277,9 @@ public class SWIG_SDLVideo implements SWIG_SDLVideoConstants {
     SWIG_SDLVideoJNI.SWIG_SetPixelData8(SDL_Surface.getCPtr(surface), pixelData);
   }
 
-  public static void SWIG_executeBlitQueue(Buffer vsrcX, Buffer vsrcY, Buffer vsrcWidth, Buffer vsrcHeight, SDL_Surface src, Buffer vdstX, Buffer vdstY, Buffer vdstWidth, Buffer vdstHeight, SDL_Surface dst, int count) {
-    SWIG_SDLVideoJNI.SWIG_executeBlitQueue(vsrcX, vsrcY, vsrcWidth, vsrcHeight, SDL_Surface.getCPtr(src), vdstX, vdstY, vdstWidth, vdstHeight, SDL_Surface.getCPtr(dst), count);
-  }
+//  public static void SWIG_executeBlitQueue(Buffer vsrcX, Buffer vsrcY, Buffer vsrcWidth, Buffer vsrcHeight, SDL_Surface src, Buffer vdstX, Buffer vdstY, Buffer vdstWidth, Buffer vdstHeight, SDL_Surface dst, int count) {
+//    SWIG_SDLVideoJNI.SWIG_executeBlitQueue(vsrcX, vsrcY, vsrcWidth, vsrcHeight, SDL_Surface.getCPtr(src), vdstX, vdstY, vdstWidth, vdstHeight, SDL_Surface.getCPtr(dst), count);
+//  }
 
   public static int SWIG_SDL_MUSTLOCK(SDL_Surface surface) {
     return SWIG_SDLVideoJNI.SWIG_SDL_MUSTLOCK(SDL_Surface.getCPtr(surface));

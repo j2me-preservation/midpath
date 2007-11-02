@@ -31,7 +31,7 @@ import java.util.TimerTask;
  * @author Bart LEBOEUF
  * @version $Id: Task.java,v 1.1 2005/03/13 09:26:39 doc_alton Exp $
  */
-public class Task extends TimerTask implements Comparable {
+public class Task extends TimerTask { //implements Comparable {
 
 	/**
 	 * Creation time

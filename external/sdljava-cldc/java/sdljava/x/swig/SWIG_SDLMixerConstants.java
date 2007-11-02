@@ -8,7 +8,6 @@
 
 package sdljava.x.swig;
 
-import java.nio.*;
 
 public interface SWIG_SDLMixerConstants {
   public final static int MIX_DEFAULT_CHANNELS = 2;
