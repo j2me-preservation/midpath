@@ -1,5 +1,5 @@
 #
-# Makefile created at Fri Oct  5 00:12:35 2007, by mmake
+# Makefile created at Sat Nov  3 18:14:54 2007, by mmake
 #
 
 # Programs (with common options):
@@ -105,10 +105,12 @@ endif
 # Packages we should compile
 PACKAGES = \
 	com.sun.midp.chameleon \
+	com.sun.midp.io.j2me.btgoep \
 	com.sun.midp.chameleon.skins.resources \
 	com.sun.midp.configurator \
 	com.sun.midp.midlet \
 	org.thenesis.midpath.ui.backend.fb \
+	com.sun.midp.io.j2me.btspp \
 	org.thenesis.midpath.ui.backend.swt \
 	com.sun.midp.rms \
 	com.sun.midp.io.j2me.btl2cap \
@@ -132,6 +134,7 @@ PACKAGES = \
 	org.thenesis.midpath.sound \
 	org.thenesis.midpath.sound.backend.pulseaudio \
 	com.sun.midp.main \
+	org.thenesis.midpath.ui.backend \
 	com.sun.midp.io.j2me.socket \
 	com.sun.midp.midletsuite \
 	javax.microedition.media.control \
@@ -179,7 +182,6 @@ ALL_PACKAGES = \
 	javax.microedition \
 	org.thenesis.midpath.image \
 	com.sun.cldchi \
-	org.thenesis.midpath.ui.backend \
 	org.thenesis.midpath.font \
 	$(PACKAGES)
 
@@ -485,13 +487,14 @@ org.thenesis.midpath : $(call PACKAGE_OBJS,org.thenesis.midpath)
 javax.microedition : $(call PACKAGE_OBJS,javax.microedition)
 org.thenesis.midpath.image : $(call PACKAGE_OBJS,org.thenesis.midpath.image)
 com.sun.cldchi : $(call PACKAGE_OBJS,com.sun.cldchi)
-org.thenesis.midpath.ui.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend)
 org.thenesis.midpath.font : $(call PACKAGE_OBJS,org.thenesis.midpath.font)
 com.sun.midp.chameleon : $(call PACKAGE_OBJS,com.sun.midp.chameleon)
+com.sun.midp.io.j2me.btgoep : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.btgoep)
 com.sun.midp.chameleon.skins.resources : $(call PACKAGE_OBJS,com.sun.midp.chameleon.skins.resources)
 com.sun.midp.configurator : $(call PACKAGE_OBJS,com.sun.midp.configurator)
 com.sun.midp.midlet : $(call PACKAGE_OBJS,com.sun.midp.midlet)
 org.thenesis.midpath.ui.backend.fb : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.fb)
+com.sun.midp.io.j2me.btspp : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.btspp)
 org.thenesis.midpath.ui.backend.swt : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend.swt)
 com.sun.midp.rms : $(call PACKAGE_OBJS,com.sun.midp.rms)
 com.sun.midp.io.j2me.btl2cap : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.btl2cap)
@@ -515,6 +518,7 @@ org.thenesis.midpath.sound.backend.esd : $(call PACKAGE_OBJS,org.thenesis.midpat
 org.thenesis.midpath.sound : $(call PACKAGE_OBJS,org.thenesis.midpath.sound)
 org.thenesis.midpath.sound.backend.pulseaudio : $(call PACKAGE_OBJS,org.thenesis.midpath.sound.backend.pulseaudio)
 com.sun.midp.main : $(call PACKAGE_OBJS,com.sun.midp.main)
+org.thenesis.midpath.ui.backend : $(call PACKAGE_OBJS,org.thenesis.midpath.ui.backend)
 com.sun.midp.io.j2me.socket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.socket)
 com.sun.midp.midletsuite : $(call PACKAGE_OBJS,com.sun.midp.midletsuite)
 javax.microedition.media.control : $(call PACKAGE_OBJS,javax.microedition.media.control)
