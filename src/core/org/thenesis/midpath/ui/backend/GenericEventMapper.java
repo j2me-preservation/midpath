@@ -15,25 +15,27 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA  
  */
-package org.thenesis.midpath.ui.backend.qt;
+package org.thenesis.midpath.ui.backend;
 
 import javax.microedition.lcdui.Canvas;
+
+import org.thenesis.midpath.ui.backend.Keys;
 
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.lcdui.EventConstants;
 
-public class QTEventMapper implements EventMapper {
+public class GenericEventMapper implements EventMapper {
 
 	public int getGameAction(int keyCode) {
 		switch (keyCode) {
-		case QTCanvas.Key_F3:
+		case Keys.VK_F3:
 			return Canvas.GAME_A;
-		case QTCanvas.Key_F4:
+		case Keys.VK_F4:
 			return Canvas.GAME_B;
-		case QTCanvas.Key_F5:
+		case Keys.VK_F5:
 			return Canvas.GAME_C;
-		case QTCanvas.Key_F6:
+		case Keys.VK_F6:
 			return Canvas.GAME_D;
 		case Constants.KEYCODE_SELECT:
 			return Canvas.FIRE;
@@ -53,13 +55,13 @@ public class QTEventMapper implements EventMapper {
 	public int getKeyCode(int gameAction) {
 		switch (gameAction) {
 		case Canvas.GAME_A:
-			return QTCanvas.Key_F3;
+			return Keys.VK_F3;
 		case Canvas.GAME_B:
-			return QTCanvas.Key_F4;
+			return Keys.VK_F4;
 		case Canvas.GAME_C:
-			return QTCanvas.Key_F5;
+			return Keys.VK_F5;
 		case Canvas.GAME_D:
-			return QTCanvas.Key_F6;
+			return Keys.VK_F6;
 		case Canvas.FIRE:
 			return Constants.KEYCODE_SELECT;
 		case Canvas.DOWN:
@@ -82,48 +84,46 @@ public class QTEventMapper implements EventMapper {
 
 	public int getSystemKey(int keyCode) {
 		switch (keyCode) {
-		case QTCanvas.Key_BackSpace:
-		case QTCanvas.Key_Delete:
+		case Keys.VK_BACK_SPACE:
+		case Keys.VK_DELETE:
 			return EventConstants.SYSTEM_KEY_CLEAR;
-		case QTCanvas.Key_End:
+		case Keys.VK_END:
 			return EventConstants.SYSTEM_KEY_END;
-		case QTCanvas.Key_F12:
+		case Keys.VK_F12:
 			return EventConstants.SYSTEM_KEY_POWER;
-		case QTCanvas.Key_Enter:
-		case QTCanvas.Key_Return:   
+		case Keys.VK_ENTER:
 			return EventConstants.SYSTEM_KEY_SEND;
 		default:
 			return 0;
 		}
 	}
 
-	static int mapToInternalEvent(int keyCode, char c) {
-		
+	public int mapToInternalEvent(int keyCode, char c) {
+
 		switch (keyCode) {
-		case QTCanvas.Key_Down:
+		case Keys.VK_DOWN:
 			return Constants.KEYCODE_DOWN;
-		case QTCanvas.Key_Left:
+		case Keys.VK_LEFT:
 			return Constants.KEYCODE_LEFT;
-		case QTCanvas.Key_Right:
+		case Keys.VK_RIGHT:
 			return Constants.KEYCODE_RIGHT;
-		case QTCanvas.Key_Up:
+		case Keys.VK_UP:
 			return Constants.KEYCODE_UP;
-		case QTCanvas.Key_Enter:
-		case QTCanvas.Key_Return:
+		case Keys.VK_ENTER:
 			return Constants.KEYCODE_SELECT;
-		case QTCanvas.Key_F1:
+		case Keys.VK_F1:
 			return EventConstants.SOFT_BUTTON1;
-		case QTCanvas.Key_F2:
+		case Keys.VK_F2:
 			return EventConstants.SOFT_BUTTON2;
-		case QTCanvas.Key_Asterisk:
+		case Keys.VK_ASTERISK:
 			return Canvas.KEY_STAR;
-		case QTCanvas.Key_BackSpace:
-		case QTCanvas.Key_Delete:
-			return QTCanvas.Key_Delete;
-		case QTCanvas.Key_End:
-			return QTCanvas.Key_End;
-		case QTCanvas.Key_F12:
-			return QTCanvas.Key_F12;
+		case Keys.VK_BACK_SPACE:
+		case Keys.VK_DELETE:
+			return Keys.VK_DELETE;
+		case Keys.VK_END:
+			return Keys.VK_END;
+		case Keys.VK_F12:
+			return Keys.VK_F12;
 		}
 
 		switch (c) {
@@ -154,7 +154,6 @@ public class QTEventMapper implements EventMapper {
 		default:
 			return 0;
 		}
-		
 
 	}
 

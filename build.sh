@@ -16,8 +16,10 @@ while getopts "haesgq-:" option ; do
 			alsa ) option=a ;;
 			esd ) option=e ;;
 			gtk ) option=g ;;
-			qt ) option=q ;;
+			qt3 ) option=q ;;
+			qt4 ) option=t ;;
 			sdl ) option=s ;;
+			fb ) option=f ;;
 			* ) echo "Option $OPTARG unknown" ;;
 		esac
 	fi
@@ -26,10 +28,12 @@ while getopts "haesgq-:" option ; do
 		    echo " Options :"
 		    echo "  -h	--help : Show this help"
 		    echo "  -a	--alsa : Compile ALSA native code"
-		    echo "  -e	--esd : Compile ESD native code"
-		    echo "  -g	--gtk : Compile GTK native code"
-		    echo "  -q	--qt : Compile Qt native code"
-		    echo "  -s	--sdl : Compile SDL native code"
+		    echo "  -e	--esd  : Compile ESD native code"
+		    echo "  -g	--gtk  : Compile GTK native code"
+		    echo "  -q	--qt3  : Compile Qt3 native code"
+		    echo "  -t	--qt4  : Compile Qt4 native code"
+		    echo "  -s	--sdl  : Compile SDL native code"
+		    echo "  -f	--fb   : Compile Linux framebuffer native code"
 		    echo " Targets :"
 		    echo "  generic (default)"
 		    echo "  maemo (compile libmidpathgtk with hildon libraries)"
@@ -41,10 +45,14 @@ while getopts "haesgq-:" option ; do
 			echo "ESD enabled" ;;
 		g ) GTK_ENABLED=yes
 			echo "GTK enabled" ;;
-		q ) QT_ENABLED=yes
-			echo "QT enabled" ;;
+		q ) QT3_ENABLED=yes
+			echo "QT3 enabled" ;;
+		t ) QT4_ENABLED=yes
+			echo "QT4 enabled" ;;
 		s ) SDL_ENABLED=yes
 			echo "SDL enabled" ;;
+		f ) FB_ENABLED=yes
+			echo "FB enabled" ;;
 		? ) echo "Unknown" ;;
 	esac
 done
@@ -155,10 +163,17 @@ make || exit 1
 cp *.so $DIST_HOME/dist
 fi
 
-if [ "$QT_ENABLED" = "yes" ]; then
+if [ "$QT3_ENABLED" = "yes" ]; then
 # Build the Qt native part
 cd $DIST_HOME/native/qt
 make || exit 1
+cp *.so $DIST_HOME/dist
+fi
+
+if [ "$QT4_ENABLED" = "yes" ]; then
+# Build the Qt native part
+cd $DIST_HOME/native/qt
+make QT4_BACKEND=yes || exit 1
 cp *.so $DIST_HOME/dist
 fi
 
@@ -169,3 +184,9 @@ make || exit 1
 cp *.so $DIST_HOME/dist
 fi
 
+if [ "$FB_ENABLED" = "yes" ]; then
+# Build the SDLJava native part
+cd $DIST_HOME/native/fb
+make || exit 1
+cp *.so $DIST_HOME/dist
+fi

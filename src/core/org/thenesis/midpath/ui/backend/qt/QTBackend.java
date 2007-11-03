@@ -17,6 +17,7 @@
  */
 package org.thenesis.midpath.ui.backend.qt;
 
+import org.thenesis.midpath.ui.backend.GenericEventMapper;
 import org.thenesis.midpath.ui.virtual.UIBackend;
 import org.thenesis.midpath.ui.virtual.VirtualSurface;
 
@@ -30,14 +31,14 @@ import com.sun.midp.log.Logging;
 public class QTBackend extends QTCanvas implements UIBackend {
 
 	private VirtualSurface rootVirtualSurface;
-	private QTEventMapper eventMapper = new QTEventMapper();
+	private GenericEventMapper eventMapper = new GenericEventMapper();
 
 	private boolean dragEnabled = false;
 
 	public QTBackend(int w, int h) {
 		super(w, h);
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-		
+
 		// Initialize the QT canvas and start the QT thread
 		open();
 	}
@@ -56,9 +57,9 @@ public class QTBackend extends QTCanvas implements UIBackend {
 
 	public void updateSurfacePixels(int x, int y, long width, long height) {
 		//System.out.println("[DEBUG] QTBackend.updateSurfacePixels(): " + x + " " + y + " " + width + " " + height);	
-		updateARGBPixels(rootVirtualSurface.data, x, y, (int)width, (int)height);
+		updateARGBPixels(rootVirtualSurface.data, x, y, (int) width, (int) height);
 	}
-	
+
 	public void close() {
 		super.close();
 	}
@@ -81,7 +82,7 @@ public class QTBackend extends QTCanvas implements UIBackend {
 			System.out.println("[DEBUG] QTBackend.buttonEvent()");
 
 		NativeEvent nativeEvent = new NativeEvent(EventTypes.PEN_EVENT);
-		
+
 		if (state == PRESSED) {
 			dragEnabled = true;
 			nativeEvent.intParam1 = EventConstants.PRESSED; // Event type
@@ -89,7 +90,7 @@ public class QTBackend extends QTCanvas implements UIBackend {
 			dragEnabled = false;
 			nativeEvent.intParam1 = EventConstants.RELEASED; // Event type
 		}
-		
+
 		nativeEvent.intParam2 = x; // x
 		nativeEvent.intParam3 = y; // y
 		// Set event source (intParam4). Fake display with id=1
@@ -103,9 +104,9 @@ public class QTBackend extends QTCanvas implements UIBackend {
 	 */
 	public void onKeyEvent(int state, int keyCode, int unicode) {
 		if (Logging.TRACE_ENABLED)
-			System.out.println("[DEBUG] QTBackend.keyEvent(): key code: " + keyCode + " char: " + (char)unicode);
+			System.out.println("[DEBUG] QTBackend.keyEvent(): key code: " + keyCode + " char: " + (char) unicode);
 
-		char c = (char)unicode;
+		char c = (char) unicode;
 
 		NativeEvent nativeEvent = new NativeEvent(EventTypes.KEY_EVENT);
 		// Set event type (intParam1)
@@ -113,9 +114,9 @@ public class QTBackend extends QTCanvas implements UIBackend {
 			nativeEvent.intParam1 = EventConstants.PRESSED;
 		} else {
 			nativeEvent.intParam1 = EventConstants.RELEASED;
-		} 
+		}
 		// Set event key code (intParam2)
-		int internalCode = QTEventMapper.mapToInternalEvent(keyCode, c);
+		int internalCode = eventMapper.mapToInternalEvent(keyCode, c);
 		if (internalCode != 0) {
 			nativeEvent.intParam2 = internalCode;
 		} else if (unicode != 0) {
@@ -147,14 +148,14 @@ public class QTBackend extends QTCanvas implements UIBackend {
 			EventQueue.getEventQueue().post(nativeEvent);
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.thenesis.midpath.ui.backend.qt.QTCanvas#onWindowDeleteEvent()
 	 */
 	public void onCloseEvent() {
 		if (Logging.TRACE_ENABLED)
 			System.out.println("Window delete event received: ");
-		
+
 		NativeEvent nativeEvent = new NativeEvent(EventTypes.SHUTDOWN_EVENT);
 		EventQueue.getEventQueue().post(nativeEvent);
 	}
