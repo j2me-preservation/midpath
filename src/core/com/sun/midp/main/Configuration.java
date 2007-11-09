@@ -187,6 +187,12 @@ public class Configuration {
 
         return def;
     }
+	/**
+	 * @return the fileProperties
+	 */
+	public static ConfigurationProperties getAllProperties() {
+		return fileProperties;
+	}
     
 //    /**
 //     * native interface to the configuration parameter storage.

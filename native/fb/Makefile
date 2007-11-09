@@ -2,11 +2,11 @@
 CFLAGS = -I/usr/include/classpath
 LDFLAGS =  
 
-SOURCES = org_thenesis_midpath_ui_backend_fb_FBCanvas.c
+SOURCES = org_thenesis_microbackend_ui_fb_FBBackend.c
 
 OBJECTS = $(patsubst %.c, %.o, $(SOURCES))
 
-all: libmidpathfb.so
+all: libmicrobackendfb.so
 
 %.o : %.c
 	$(CC) $(CFLAGS) -fPIC -g -c -Wall -o $(patsubst %.c, %.o, $<) $<

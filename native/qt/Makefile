@@ -8,11 +8,11 @@ CFLAGS = `pkg-config --cflags qt-mt` -I/usr/include/classpath
 LDFLAGS = `pkg-config --libs qt-mt`
 endif
 
-SOURCES = org_thenesis_midpath_ui_backend_qt_QTCanvas.cpp
+SOURCES = org_thenesis_microbackend_ui_qt_QTBackend.cpp
 
 OBJECTS = $(patsubst %.cpp, %.o, $(SOURCES))
 
-all: libmidpathqt.so
+all: libmicrobackendqt.so
 
 %.o : %.cpp
 	$(CC) $(CFLAGS) $(DFLAGS) -fPIC -g -c -Wall -o $(patsubst %.cpp, %.o, $<) $<

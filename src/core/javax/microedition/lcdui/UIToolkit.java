@@ -24,8 +24,8 @@ package javax.microedition.lcdui;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.thenesis.midpath.ui.backend.sdl.SDLToolkit;
-import org.thenesis.midpath.ui.virtual.VirtualToolkit;
+import org.thenesis.midpath.ui.toolkit.sdl.SDLToolkit;
+import org.thenesis.midpath.ui.toolkit.virtual.VirtualToolkit;
 
 import com.sun.midp.events.EventMapper;
 import com.sun.midp.main.BaseMIDletSuiteLauncher;

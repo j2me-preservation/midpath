@@ -1,0 +1,319 @@
+/*
+ * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
+package org.thenesis.microbackend.ui.swt;
+
+import java.io.IOException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.thenesis.microbackend.ui.BackendEventListener;
+import org.thenesis.microbackend.ui.Configuration;
+import org.thenesis.microbackend.ui.KeyConstants;
+import org.thenesis.microbackend.ui.NullBackendEventListener;
+import org.thenesis.microbackend.ui.UIBackend;
+
+/**  
+ * TODO: Handle modifiers and shift/alt/control key codes
+ */
+public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListener, MouseMoveListener, DisposeListener {
+
+	private ImageData imageData;
+	private Image image;
+	private GC gc;
+	private Runnable painterRunnable;
+	private Display display;
+	private Shell shell;
+	
+	private Thread swtThread;
+	private volatile boolean initialized = false;
+	
+	private int canvasWidth;
+	private int canvasHeight;
+	
+	private BackendEventListener listener = new NullBackendEventListener();
+
+	public SWTBackend(int w, int h) {
+		canvasWidth = w;
+		canvasHeight = h;
+	}
+
+	public SWTBackend() {
+	}
+
+	/* UIBackend interface */
+
+	public void initialize(Configuration conf, int width, int height) {
+		canvasWidth = width;
+		canvasHeight = height;
+	}
+
+	public void open() throws IOException {
+		start();
+	}
+
+	public void close() {
+		stop();
+	}
+
+	public void setBackendEventListener(BackendEventListener listener) {
+		this.listener = listener;
+	}
+
+	public void updateARGBPixels(int[] argbPixels, int x, int y, int width, int heigth) {
+
+		//System.out.println("[DEBUG] SWTBackend.updateSurfacePixels(): " + x + " " + y + " " + width + " " + height);	
+
+		int w = canvasWidth;
+		int h = canvasHeight;
+
+		for (int j = 0; j < h; j++) {
+			imageData.setPixels(0, j, w, argbPixels, w * j);
+		}
+
+		//		for (int j = 0; j < height; j++) {
+		//			imageData.setPixels(x, j, (int) width, rootVirtualSurface.data, rootVirtualSurface.width * j + x);
+		//		}
+
+		if (display != null) {
+			display.syncExec(painterRunnable);
+		}
+
+	}
+
+	/*
+	 * SWT thread
+	 */
+
+	private void start() {
+
+		swtThread = new Thread(this);
+		swtThread.start();
+
+		// FIXME Ugly
+		try {
+			while (!initialized) {
+				Thread.sleep(1);
+			}
+		} catch (InterruptedException e) {
+			// Do nothing
+		}
+
+	}
+
+	private void stop() {
+		shell.dispose();
+	}
+
+	public void run() {
+
+		int w = canvasWidth;
+		int h = canvasHeight;
+
+		display = new Display();
+		shell = new Shell(display);
+		shell.setText("");
+
+		Canvas canvas = new Canvas(shell, SWT.NONE);
+		canvas.setSize(w, h);
+		PaletteData palette = new PaletteData(0x00FF0000, 0x0000FF00, 0x000000FF);
+		imageData = new ImageData(w, h, 32, palette);
+		gc = new GC(canvas);
+
+		painterRunnable = new Runnable() {
+
+			public void run() {
+				image = new Image(display, imageData);
+				gc.drawImage(image, 0, 0);
+				image.dispose();
+			}
+		};
+
+		canvas.addKeyListener(this);
+		canvas.addMouseListener(this);
+		canvas.addMouseMoveListener(this);
+		canvas.addDisposeListener(this);
+		canvas.forceFocus();
+		shell.pack();
+		shell.open();
+
+		initialized = true;
+
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
+		display.dispose();
+
+	}
+	
+
+	public void keyPressed(KeyEvent e) {
+		//System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + e.character);
+		listener.keyPressed(convertKeyCode(e.keyCode), e.character, 0);
+	}
+
+	public void keyReleased(KeyEvent e) {
+		//System.out.println("[DEBUG] SWTBackend.keyReleased(): key code: " + e.keyCode + " char: " + e.character);
+		listener.keyReleased(convertKeyCode(e.keyCode), e.character, 0);
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// Not used
+	}
+
+	public void mouseDoubleClick(MouseEvent arg0) {
+		// Not used
+	}
+
+	public void mouseDown(MouseEvent e) {	
+		//System.out.println("[DEBUG] SWTBackend.mouseDown()");
+		listener.mousePressed(e.x, e.y, 0);
+	}
+
+	public void mouseUp(MouseEvent e) {
+		//System.out.println("[DEBUG] SWTBackend.mouseUp()");
+		listener.mouseReleased(e.x, e.y, 0);
+	}
+
+	public void mouseMove(MouseEvent e) {
+		//System.out.println("[DEBUG] SWTBackend.mouseDragged(): " + dragEnabled);
+		listener.mouseMoved(e.x, e.y, 0);
+	}
+
+	public void widgetDisposed(DisposeEvent e) {
+		listener.windowClosed();
+	}
+
+	protected static int convertKeyCode(int keyCode) {
+		switch (keyCode) {
+		case SWT.ARROW_UP:
+			return KeyConstants.VK_UP;
+		case SWT.ARROW_DOWN:
+			return KeyConstants.VK_DOWN;
+		case SWT.ARROW_LEFT:
+			return KeyConstants.VK_LEFT;
+		case SWT.ARROW_RIGHT:
+			return KeyConstants.VK_RIGHT;
+		case SWT.PAGE_UP:
+			return KeyConstants.VK_PAGE_UP;
+		case SWT.PAGE_DOWN:
+			return KeyConstants.VK_PAGE_DOWN;
+		case SWT.HOME:
+			return KeyConstants.VK_HOME;
+		case SWT.END:
+			return KeyConstants.VK_END;
+		case SWT.INSERT:
+			return KeyConstants.VK_INSERT;
+		case SWT.F1:
+			return KeyConstants.VK_F1;
+		case SWT.F2:
+			return KeyConstants.VK_F2;
+		case SWT.F3:
+			return KeyConstants.VK_F3;
+		case SWT.F4:
+			return KeyConstants.VK_F4;
+		case SWT.F5:
+			return KeyConstants.VK_F5;
+		case SWT.F6:
+			return KeyConstants.VK_F6;
+		case SWT.F7:
+			return KeyConstants.VK_F7;
+		case SWT.F8:
+			return KeyConstants.VK_F8;
+		case SWT.F9:
+			return KeyConstants.VK_F9;
+		case SWT.F10:
+			return KeyConstants.VK_F10;
+		case SWT.F11:
+			return KeyConstants.VK_F11;
+		case SWT.F12:
+			return KeyConstants.VK_F12;
+		case SWT.F13:
+			return KeyConstants.VK_F13;
+		case SWT.F14:
+			return KeyConstants.VK_F14;
+		case SWT.F15:
+			return KeyConstants.VK_F15;
+		case SWT.KEYPAD_MULTIPLY:
+			return KeyConstants.VK_MULTIPLY;
+		case SWT.KEYPAD_ADD:
+			return KeyConstants.VK_ADD;
+		case SWT.KEYPAD_SUBTRACT:
+			return KeyConstants.VK_SUBTRACT;
+		case SWT.KEYPAD_DECIMAL:
+			return KeyConstants.VK_DECIMAL;
+		case SWT.KEYPAD_DIVIDE:
+			return KeyConstants.VK_DIVIDE;
+		case SWT.KEYPAD_0:
+			return KeyConstants.VK_NUMPAD0;
+		case SWT.KEYPAD_1:
+			return KeyConstants.VK_NUMPAD1;
+		case SWT.KEYPAD_2:
+			return KeyConstants.VK_NUMPAD2;
+		case SWT.KEYPAD_3:
+			return KeyConstants.VK_NUMPAD3;
+		case SWT.KEYPAD_4:
+			return KeyConstants.VK_NUMPAD4;
+		case SWT.KEYPAD_5:
+			return KeyConstants.VK_NUMPAD5;
+		case SWT.KEYPAD_6:
+			return KeyConstants.VK_NUMPAD6;
+		case SWT.KEYPAD_7:
+			return KeyConstants.VK_NUMPAD7;
+		case SWT.KEYPAD_8:
+			return KeyConstants.VK_NUMPAD8;
+		case SWT.KEYPAD_9:
+			return KeyConstants.VK_NUMPAD9;
+		case SWT.KEYPAD_EQUAL:
+			return KeyConstants.VK_EQUALS;
+		case SWT.KEYPAD_CR:
+			return KeyConstants.VK_ENTER;
+		case SWT.HELP:
+			return KeyConstants.VK_HELP;
+		case SWT.CAPS_LOCK:
+			return KeyConstants.VK_CAPS_LOCK;
+		case SWT.NUM_LOCK:
+			return KeyConstants.VK_NUM_LOCK;
+		case SWT.SCROLL_LOCK:
+			return KeyConstants.VK_SCROLL_LOCK;
+		case SWT.PAUSE:
+			return KeyConstants.VK_PAUSE;
+		case SWT.BREAK:
+			return KeyConstants.VK_UNDEFINED;
+		case SWT.PRINT_SCREEN:
+			return KeyConstants.VK_PRINTSCREEN;
+		default:
+			return KeyConstants.VK_UNDEFINED;
+		}
+
+	}
+
+}

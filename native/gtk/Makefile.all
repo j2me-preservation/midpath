@@ -1,9 +1,7 @@
 
-
-
 OBJECTS=$(patsubst %.c, %.o, $(SOURCES))
 
-all: libmidpathgtk.so
+all: libmicrobackendgtk.so
 
 %.o : %.c
 	$(CC) $(CFLAGS) -fPIC -g -c -Wall -o $(patsubst %.c, %.o, $<) $<
