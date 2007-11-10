@@ -88,7 +88,7 @@ CLDC_PATH=$DIST_HOME/dist/cldc1.1.jar
 # Build SDLJava for CLDC
 cd $DIST_HOME/external/sdljava-cldc/java
 make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/sdljava-cldc/java -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH -source 1.3 -target 1.1" JAR_FILE="sdljava-cldc.jar" JAR_FLAGS="cvf" || exit 1
+make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="sdljava-cldc.jar" JAR_FLAGS="cvf" || exit 1
 cp $DIST_HOME/external/sdljava-cldc/java/sdljava-cldc.jar $DIST_HOME/dist
 
 # Build Escher X11 library
@@ -115,13 +115,24 @@ make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_H
 make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="avetanabt-cldc.jar" JAR_FLAGS="cvf" || exit 1
 cp $DIST_HOME/external/avetanabt-cldc/src/avetanabt-cldc.jar $DIST_HOME/dist
 
+# Build MicroBackend library
+cd $DIST_HOME/src/microbackend
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/src/microbackend -source 1.3 -target 1.1" || exit 1
+make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -source 1.3 -target 1.1" JAR_FILE="microbackend.jar" JAR_FLAGS="cvf" || exit 1
+cp $DIST_HOME/src/microbackend/microbackend.jar $DIST_HOME/dist
+
 # Build MIDPath
 cd $DIST_HOME/src/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/src/core -source 1.3 -target 1.1" || exit 1
-make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/lib/swt.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/src/core/classes || exit 1
-# Compile JVM.java separately as it can't be compiled against cldc.jar
-ecj -bootclasspath $GNU_CLASSPATH_PATH -source 1.3 -target 1.1 -d $DIST_HOME/src/core/classes com/sun/cldchi/jvm/JVM.java
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -sourcepath $DIST_HOME/src/core -source 1.3 -target 1.1" || exit 1
+make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/src/core/classes || exit 1
 jar cvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/src/core/classes .
+
+# Include com.sun.cldchi.jvm.JVM class (J2SE glue) in jars which could be used in a J2SE environment  
+mkdir -p $DIST_HOME/src/j2se-glue/classes
+cd $DIST_HOME/src/j2se-glue
+ecj -bootclasspath $GNU_CLASSPATH_PATH -source 1.3 -target 1.1 -d $DIST_HOME/src/j2se-glue/classes com/sun/cldchi/jvm/JVM.java
+jar uvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/src/j2se-glue/classes .
+jar uvf $DIST_HOME/dist/microbackend.jar -C $DIST_HOME/src/j2se-glue/classes .
 
 # Add resources to the midpath.jar
 #(cd $DIST_HOME/resources-embedded && find | grep -v "/.svn") > resources.list
@@ -139,13 +150,13 @@ cp $DIST_HOME/lib/kxml2-2.3.0.jar $DIST_HOME/dist
 
 if [ "$GTK_ENABLED" = "yes" ]; then
 if [ "$MAEMO_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/gtk
+	cd $DIST_HOME/native/microbackend/gtk
 	make -f Makefile.maemo || exit 1
-	cp $DIST_HOME/native/gtk/libmidpathgtk.so $DIST_HOME/dist
+	cp *.so $DIST_HOME/dist
 else
-	cd $DIST_HOME/native/gtk
+	cd $DIST_HOME/native//microbackend/gtk
 	make -f Makefile || exit 1
-	cp $DIST_HOME/native/gtk/libmidpathgtk.so $DIST_HOME/dist
+	cp *.so $DIST_HOME/dist
 fi
 fi
 
@@ -165,14 +176,14 @@ fi
 
 if [ "$QT3_ENABLED" = "yes" ]; then
 # Build the Qt native part
-cd $DIST_HOME/native/qt
+cd $DIST_HOME/native/microbackend/qt
 make || exit 1
 cp *.so $DIST_HOME/dist
 fi
 
 if [ "$QT4_ENABLED" = "yes" ]; then
 # Build the Qt native part
-cd $DIST_HOME/native/qt
+cd $DIST_HOME/native/microbackend/qt
 make QT4_BACKEND=yes || exit 1
 cp *.so $DIST_HOME/dist
 fi
@@ -185,8 +196,8 @@ cp *.so $DIST_HOME/dist
 fi
 
 if [ "$FB_ENABLED" = "yes" ]; then
-# Build the SDLJava native part
-cd $DIST_HOME/native/fb
+# Build the Linux framebuffer native part
+cd $DIST_HOME/native/microbackend/fb
 make || exit 1
 cp *.so $DIST_HOME/dist
 fi
