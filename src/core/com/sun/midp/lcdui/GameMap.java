@@ -41,6 +41,12 @@ public class GameMap {
      * The DisplayAccess associated with the GameCanvas
      */
     static private DisplayAccess displayAccess;
+    
+    /**
+     * The GraphicsAccess tunnel instance handed out from
+     * javax.microedition.lcdui package 
+     */
+    static private GraphicsAccess graphicsAccess;
 
     /**
      * Lock to ensure synchronized access to the displayable
@@ -61,7 +67,6 @@ public class GameMap {
 	}
     }
 
-
     /**
      * Get the DisplayAccess object for this Displayable.
      * @param c The Displayable to get the DisplayAccess for
@@ -76,5 +81,30 @@ public class GameMap {
 	    }
         }
     }
+    
+    /**
+     * Sets graphics accessor instance from javax.microedition.lcdui package
+     * to use extended package-private Image and Graphics APIs
+     *
+     * @param graphicsAccess graphics accessor tunnel
+     */
+    public static void registerGraphicsAccess(GraphicsAccess graphicsAccess) {
+        synchronized (lock) {
+            GameMap.graphicsAccess = graphicsAccess;
+        }
+    }
+
+    /**
+     * Gets GraphicsAccess instance needed to access extended
+     * Image and Graphics APIs
+     * 
+     * @return GraphicsAccess tunnel instance
+     */
+    public static GraphicsAccess getGraphicsAccess() {
+        synchronized (lock) {
+            return graphicsAccess;
+        }
+    }
+
 
 }

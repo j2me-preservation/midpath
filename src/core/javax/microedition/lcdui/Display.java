@@ -46,6 +46,7 @@ import com.sun.midp.lcdui.DisplayEventConsumer;
 import com.sun.midp.lcdui.DisplayEventHandlerFactory;
 import com.sun.midp.lcdui.DisplayEventProducer;
 import com.sun.midp.lcdui.EventConstants;
+import com.sun.midp.lcdui.GameMap;
 import com.sun.midp.lcdui.RepaintEventProducer;
 import com.sun.midp.lcdui.SystemAlert;
 import com.sun.midp.log.Logging;
@@ -501,6 +502,9 @@ public class Display {
 
 	/** Chameleon graphics queue */
 	private CGraphicsQ graphicsQ;
+	
+	/** Accessor to extended Image API needed for Chameleon and GameCanvas */
+    private static GraphicsAccessImpl graphicsAccessor;
 
 	/** Chameleon tunnel to romized Image constructor */
 	private static ChamImageTunnel chamImageTunnel;
@@ -529,6 +533,9 @@ public class Display {
 
 		WIDTH = Constants.CHAM_WIDTH;
 		HEIGHT = Constants.CHAM_HEIGHT;
+		
+		graphicsAccessor = new GraphicsAccessImpl();
+        GameMap.registerGraphicsAccess(graphicsAccessor);
 
 		chamImageTunnel = new ChamImageTunnel();
 

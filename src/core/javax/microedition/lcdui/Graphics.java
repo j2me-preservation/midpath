@@ -1951,4 +1951,20 @@ public class Graphics {
     	return 0x000000;
     }
 
+	/**
+	 * @return the maxHeight
+	 */
+	short getMaxHeight() {
+		return maxHeight;
+	}
+
+	/**
+	 * @return the maxWidth
+	 */
+	short getMaxWidth() {
+		return maxWidth;
+	}
+    
+    
+
 } // class Graphics
