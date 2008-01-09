@@ -1,0 +1,93 @@
+/*
+ * Copyright  1990-2007 Sun Microsystems, Inc. All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details (a copy is
+ * included at /legal/license.txt).
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ * 
+ * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
+ * Clara, CA 95054 or visit www.sun.com if you need additional
+ * information or have any questions.
+ */
+
+package com.sun.jsr239;
+
+import javax.microedition.khronos.egl.EGLSurface;
+import javax.microedition.lcdui.Graphics;
+
+/**
+ * A class encapsulating an EGL surface.
+ */
+public class JavaEGLSurface extends EGLSurface {
+
+	private int width, height;
+	private boolean largestPBuffer = false;
+	private static int id = -1;
+	private int[] buffer;
+
+	/**
+	 * An LCDUI Graphics object referencing the surface.
+	 */
+	private Graphics target;
+
+	public JavaEGLSurface(int[] buf, int width, int height) {
+			//this.largestPBuffer = largestPBuffer;
+			this.buffer = buf;
+			this.width = width;
+			this.height = height;
+			id++;
+	}
+
+	public String toString() {
+		return "EGLSurfaceImpl[" + id + "]";
+	}
+
+	public void setTarget(Graphics target) {
+		this.target = target;
+	}
+
+	public Graphics getTarget() {
+		return this.target;
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public int getHeight() {
+		return this.height;
+	}
+	
+	boolean isLargestPBuffer() {
+		return largestPBuffer;
+	}
+
+	public void dispose() {
+		
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @return the buffer
+	 */
+	int[] getBuffer() {
+		return buffer;
+	}
+
+	
+}

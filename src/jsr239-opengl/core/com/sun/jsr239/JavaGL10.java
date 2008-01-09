@@ -1,0 +1,1145 @@
+package com.sun.jsr239;
+
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.Hashtable;
+
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
+import javax.microedition.khronos.opengles.GL10;
+
+import jgl.GL;
+
+public class JavaGL10 implements GL10 {
+
+	private GL gl;
+
+	static final boolean DEBUG = false;
+
+	/**
+	 * <code>context</code> is the context the GL10
+	 * is created for. 
+	 */
+	EGLContext context = null;
+
+	private static EGL10 egl;
+
+	private Pointer colorPointer = new Pointer();
+	private Pointer normalPointer = new Pointer();
+	private Pointer texCoordPointer = new Pointer();
+	private Pointer vertexPointer = new Pointer();
+
+	private boolean isGLColorArrayEnabled = false;
+	private boolean isGLNormalArrayEnabled = false;
+	private boolean isGLTextureCoordArrayEnabled = false;
+	private boolean isGLVertexArrayEnabled = false;
+
+	/**
+	 * IMPL_NOTE: <code>contextsByThread</code> may lead to the Java memory
+	 * leaks (when a thread dies, an associated context will not be ever
+	 * collected). As the possible workaround the following solution can be
+	 * used: a private <code>Hashtable</code> member can be added for class
+	 * <code>Thread</code> to keep a reference to the context. In this case
+	 * the life span of a context will not be longer then that of a thread.
+	 */
+	// Map Thread -> EGLContext
+	public static Hashtable contextsByThread = new Hashtable();
+
+	//	 If GLConfiguration.singleThreaded is true, the context that is
+	// current on the (single) native thread, or EGL_NO_CONTEXT.  If
+	// singleThreaded is false, this variable has no meaning.
+	public static EGLContext currentContext = EGL10.EGL_NO_CONTEXT;
+
+	public JavaGL10(JavaEGLContext context) {
+		this.context = context;
+		gl = new jgl.GL(context.getJGLContext());
+		egl = (EGL10) EGLContext.getEGL();
+	}
+
+	/**
+	 * Set the context associated with the current Java thread as the
+	 * native context.  This is only necessary if we are on a
+	 * single-threaded VM and the context is not already current.
+	 */
+	public static void grabContext() {
+		if (!GLConfiguration.singleThreaded) {
+			return;
+		}
+
+		// Locate the desired context for this Java thread
+		Thread currentThread = Thread.currentThread();
+		EGLContext newContext = (EGLContext) contextsByThread.get(currentThread);
+		if (newContext == JavaGL10.currentContext) {
+			return;
+		}
+
+		if (newContext != null) {
+			EGLDisplay display = ((ContextAccess) newContext).getDisplay();
+			EGLSurface draw = ((ContextAccess) newContext).getDrawSurface();
+			EGLSurface read = ((ContextAccess) newContext).getReadSurface();
+			egl.eglMakeCurrent(display, draw, read, newContext);
+			JavaGL10.currentContext = newContext;
+		}
+	}
+
+	GL getJGL() {
+		return gl;
+	}
+	
+	private float convertFPToFloat(int fp) {
+		return ((float)fp) / 65535; 
+	}
+	
+	/* GL10 interface */
+
+	public void glActiveTexture(int texture) {
+		if (DEBUG)
+			System.out.println("GL10.glActiveTexture() is not supported yet");
+	}
+
+	public void glAlphaFunc(int func, float ref) {
+		if (DEBUG)
+			System.out.println("GL10.glAlphaFunc() is not supported yet");
+	}
+
+	public void glAlphaFuncx(int func, int ref) {
+		if (DEBUG)
+			System.out.println("GL10.glAlphaFuncx() is not supported yet");
+	}
+
+	public void glBindTexture(int target, int texture) {
+		gl.glBindTexture(target, texture);
+	}
+
+	public void glBlendFunc(int sfactor, int dfactor) {
+		gl.glBlendFunc(sfactor, dfactor);
+	}
+
+	public void glClear(int mask) {
+		gl.glClear(mask);
+	}
+
+	public void glClearColor(float red, float green, float blue, float alpha) {
+		gl.glClearColor(red, green, blue, alpha);
+	}
+
+	public void glClearColorx(int red, int green, int blue, int alpha) {
+		glClearColor(convertFPToFloat(red), convertFPToFloat(green), convertFPToFloat(blue), convertFPToFloat(alpha));
+	}
+
+	public void glClearDepthf(float depth) {
+		gl.glClearDepth(depth);
+	}
+
+	public void glClearDepthx(int depth) {
+		glClearDepthf(convertFPToFloat(depth));
+	}
+
+	public void glClearStencil(int s) {
+		gl.glClearStencil(s);
+	}
+
+	public void glClientActiveTexture(int texture) {
+		System.out.println("GL10.glClientActiveTexture() is not supported yet");
+	}
+
+	public void glColor4f(float red, float green, float blue, float alpha) {
+		gl.glColor4f(red, green, blue, alpha);
+	}
+
+	public void glColor4x(int red, int green, int blue, int alpha) {
+		gl.glColor4f(convertFPToFloat(red), convertFPToFloat(green), convertFPToFloat(blue), convertFPToFloat(alpha));
+	}
+
+	public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha) {
+		gl.glColorMask(red, green, blue, alpha);
+	}
+
+	public void glColorPointer(int size, int type, int stride, Buffer pointer) {
+		colorPointer.set(size, type, stride, pointer);
+	}
+
+	public void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border,
+			int imageSize, Buffer data) {
+		System.out.println("GL10.glCompressedTexImage2D() is not supported yet");
+	}
+
+	public void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height,
+			int format, int imageSize, Buffer data) {
+		System.out.println("GL10.glCompressedTexSubImage2D() is not supported yet");
+
+	}
+
+	public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height,
+			int border) {
+		gl.glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+
+	}
+
+	public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height) {
+		gl.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+	}
+
+	public void glCullFace(int mode) {
+		gl.glCullFace(mode);
+	}
+
+	public void glDeleteTextures(int n, int[] textures, int offset) {
+		// FIXME Handle the offset
+		gl.glDeleteTextures(n, textures);
+	}
+
+	public void glDeleteTextures(int n, IntBuffer textures) {
+		glDeleteTextures(n, textures.array(), 0);
+	}
+
+	public void glDepthFunc(int func) {
+		gl.glDepthFunc(func);
+	}
+
+	public void glDepthMask(boolean flag) {
+		gl.glDepthMask(flag);
+	}
+
+	public void glDepthRangef(float zNear, float zFar) {
+		gl.glDepthRange(zNear, zFar);
+	}
+
+	public void glDepthRangex(int zNear, int zFar) {
+		glDepthRangef(convertFPToFloat(zNear), convertFPToFloat(zFar));
+	}
+
+	public void glDisable(int cap) {
+		gl.glDisable(cap);
+	}
+
+	public void glDisableClientState(int array) {
+		switch (array) {
+		case GL_COLOR_ARRAY:
+			isGLColorArrayEnabled = false;
+			break;
+		case GL_NORMAL_ARRAY:
+			isGLNormalArrayEnabled = false;
+			break;
+		case GL_TEXTURE_COORD_ARRAY:
+			isGLTextureCoordArrayEnabled = false;
+			break;
+		case GL_VERTEX_ARRAY:
+			isGLVertexArrayEnabled = false;
+			break;
+		}
+	}
+	
+	private void drawElement(int indice) {
+		// Color
+		if (isGLColorArrayEnabled) {
+			if (colorPointer.type == GL_UNSIGNED_BYTE) {
+				byte c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+				ByteBuffer vBuffer = (ByteBuffer) colorPointer.pointer;
+				int offset = indice * (colorPointer.size + colorPointer.stride);
+				vBuffer.position(offset);
+				c0 = vBuffer.get();
+				c1 = vBuffer.get();
+				c2 = vBuffer.get();
+				c3 = vBuffer.get();
+				gl.glColor4b(c0, c1, c2, c3);
+			} else if (colorPointer.type == GL_FIXED) {
+				// FIXME
+				if (colorPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				int c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+				IntBuffer vBuffer = (IntBuffer) colorPointer.pointer;
+				int offset = indice * colorPointer.size;
+				vBuffer.position(offset);
+				c0 = vBuffer.get();
+				c1 = vBuffer.get();
+				c2 = vBuffer.get();
+				c3 = vBuffer.get();
+				gl.glColor4i(c0, c1, c2, c3);
+			} else if (colorPointer.type == GL_FLOAT) {
+				// FIXME
+				if (colorPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				float c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+				FloatBuffer vBuffer = (FloatBuffer) colorPointer.pointer;
+				int offset = indice * colorPointer.size;
+				vBuffer.position(offset);
+				c0 = vBuffer.get();
+				c1 = vBuffer.get();
+				c2 = vBuffer.get();
+				c3 = vBuffer.get();
+				gl.glColor4f(c0, c1, c2, c3);
+			}
+		}
+
+		// Vertex
+		if (isGLVertexArrayEnabled) {
+			if (vertexPointer.size == 3) {
+				if (vertexPointer.type == GL_BYTE) {
+					int v0 = 0, v1 = 0, v2 = 0;
+					ByteBuffer vBuffer = (ByteBuffer) vertexPointer.pointer;
+					int offset = indice * (vertexPointer.size + vertexPointer.stride);
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3i(v0, v1, v2);
+				} else if (vertexPointer.type == GL_SHORT) {
+					// FIXME
+					if (vertexPointer.stride != 0) {
+						throw new UnsupportedOperationException(
+								"stride != 0 : not supported by this implementation");
+					}
+					short v0 = 0, v1 = 0, v2 = 0;
+					ShortBuffer vBuffer = (ShortBuffer) vertexPointer.pointer;
+					int offset = indice * vertexPointer.size;
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3s(v0, v1, v2);
+				} else if (vertexPointer.type == GL_FIXED) {
+					// FIXME
+					if (vertexPointer.stride != 0) {
+						throw new UnsupportedOperationException(
+								"stride != 0 : not supported by this implementation");
+					}
+					int v0 = 0, v1 = 0, v2 = 0;
+					IntBuffer vBuffer = (IntBuffer) vertexPointer.pointer;
+					int offset = indice * vertexPointer.size;
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3i(v0, v1, v2);
+				} else if (vertexPointer.type == GL_FLOAT) {
+					// FIXME
+					if (vertexPointer.stride != 0) {
+						throw new UnsupportedOperationException(
+								"stride != 0 : not supported by this implementation");
+					}
+					float v0 = 0, v1 = 0, v2 = 0;
+					FloatBuffer vBuffer = (FloatBuffer) vertexPointer.pointer;
+					int offset = indice * vertexPointer.size;
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3f(v0, v1, v2);
+				}
+			}
+		}
+
+		// Normal
+		if (isGLNormalArrayEnabled) {
+			if (normalPointer.type == GL_BYTE) {
+				byte v0 = 0, v1 = 0, v2 = 0;
+				ByteBuffer vBuffer = (ByteBuffer) normalPointer.pointer;
+				int offset = indice * (normalPointer.size + normalPointer.stride);
+				vBuffer.position(offset);
+				v0 = vBuffer.get();
+				v1 = vBuffer.get();
+				v2 = vBuffer.get();
+				gl.glNormal3b(v0, v1, v2);
+			} else if (normalPointer.type == GL_SHORT) {
+				// FIXME
+				if (normalPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				short v0 = 0, v1 = 0, v2 = 0;
+				ShortBuffer vBuffer = (ShortBuffer) normalPointer.pointer;
+				int offset = indice * normalPointer.size;
+				vBuffer.position(offset);
+				v0 = vBuffer.get();
+				v1 = vBuffer.get();
+				v2 = vBuffer.get();
+				gl.glNormal3s(v0, v1, v2);
+			} else if (normalPointer.type == GL_FIXED) {
+				// FIXME
+				if (normalPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				int v0 = 0, v1 = 0, v2 = 0;
+				IntBuffer vBuffer = (IntBuffer) normalPointer.pointer;
+				int offset = indice * normalPointer.size;
+				vBuffer.position(offset);
+				v0 = vBuffer.get();
+				v1 = vBuffer.get();
+				v2 = vBuffer.get();
+				gl.glNormal3i(v0, v1, v2);
+			} else if (normalPointer.type == GL_FLOAT) {
+				// FIXME
+				if (normalPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				float v0 = 0, v1 = 0, v2 = 0;
+				FloatBuffer vBuffer = (FloatBuffer) normalPointer.pointer;
+				int offset = indice * normalPointer.size;
+				vBuffer.position(offset);
+				v0 = vBuffer.get();
+				v1 = vBuffer.get();
+				v2 = vBuffer.get();
+				gl.glNormal3f(v0, v1, v2);
+			}
+		}
+		
+		// Texture
+		if (isGLTextureCoordArrayEnabled) {
+			if (texCoordPointer.type == GL_BYTE) {
+				int v0 = 0, v1 = 0, v2 = 0, v3 = 0;
+				ByteBuffer vBuffer = (ByteBuffer) texCoordPointer.pointer;
+				int offset = indice * (texCoordPointer.size + texCoordPointer.stride);
+				vBuffer.position(offset);
+				if (texCoordPointer.size == 2) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					gl.glTexCoord2i(v0, v1);
+				} else if (texCoordPointer.size == 3) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glTexCoord3i(v0, v1, v2);
+				} else if (texCoordPointer.size == 4) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					v3 = vBuffer.get();
+					gl.glTexCoord4i(v0, v1, v2, v3);
+				}
+			} else if (texCoordPointer.type == GL_SHORT) {
+				// FIXME
+				if (texCoordPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				short v0 = 0, v1 = 0, v2 = 0, v3 = 0;
+				ShortBuffer vBuffer = (ShortBuffer) texCoordPointer.pointer;
+				int offset = indice * texCoordPointer.size;
+				vBuffer.position(offset);
+				if (texCoordPointer.size == 2) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					gl.glTexCoord2s(v0, v1);
+				} else if (texCoordPointer.size == 3) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glTexCoord3s(v0, v1, v2);
+				} else if (texCoordPointer.size == 4) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					v3 = vBuffer.get();
+					gl.glTexCoord4s(v0, v1, v2, v3);
+				}
+			} else if (texCoordPointer.type == GL_FIXED) {
+				// FIXME
+				if (texCoordPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				int v0 = 0, v1 = 0, v2 = 0, v3 = 0;
+				IntBuffer vBuffer = (IntBuffer) texCoordPointer.pointer;
+				int offset = indice * texCoordPointer.size;
+				vBuffer.position(offset);
+				if (texCoordPointer.size == 2) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					gl.glTexCoord2i(v0, v1);
+				} else if (texCoordPointer.size == 3) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glTexCoord3i(v0, v1, v2);
+				} else if (texCoordPointer.size == 4) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					v3 = vBuffer.get();
+					gl.glTexCoord4i(v0, v1, v2, v3);
+				}
+			} else if (texCoordPointer.type == GL_FLOAT) {
+				// FIXME
+				if (texCoordPointer.stride != 0) {
+					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+				}
+				float v0 = 0, v1 = 0, v2 = 0, v3 = 0;
+				FloatBuffer vBuffer = (FloatBuffer) texCoordPointer.pointer;
+				int offset = indice * texCoordPointer.size;
+				vBuffer.position(offset);
+				if (texCoordPointer.size == 2) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					gl.glTexCoord2f(v0, v1);
+				} else if (texCoordPointer.size == 3) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glTexCoord3f(v0, v1, v2);
+				} else if (texCoordPointer.size == 4) {
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					v3 = vBuffer.get();
+					gl.glTexCoord4f(v0, v1, v2, v3);
+				}
+			}
+		}
+	}
+	
+	/** 
+	 * Convert jGL rendering mode values to OpenGL ES compliant values 
+	 * @param mode
+	 * @return
+	 */
+	private int convertMode(int mode) {
+		// Convert type
+		int targetMode = -1;
+		switch (mode) {
+		case GL_POINTS:
+			targetMode = GL.GL_POINTS;
+			break;
+		case GL_LINE_STRIP:
+			targetMode = GL.GL_LINE_STRIP;
+			break;
+		case GL_LINE_LOOP:
+			targetMode = GL.GL_LINE_LOOP;
+			break;
+		case GL_LINES:
+			targetMode = GL.GL_LINES;
+			break;
+		case GL_TRIANGLES:
+			targetMode = GL.GL_TRIANGLES;
+			break;
+		case GL_TRIANGLE_STRIP:
+			targetMode = GL.GL_TRIANGLE_STRIP;
+			break;
+		case GL_TRIANGLE_FAN:
+			targetMode = GL.GL_TRIANGLE_FAN;
+			break;
+		}
+		
+		return targetMode;
+	}
+
+	public void glDrawArrays(int mode, int first, int count) {
+		
+		int targetMode = convertMode(mode);
+		
+		gl.glBegin(targetMode);
+		for (int i = 0; i < count; i++) {
+			drawElement(first + i);
+		}
+		gl.glEnd();
+		
+	}
+
+	public void glDrawElements(int mode, int count, int type, Buffer indices) {
+
+		int targetMode = convertMode(mode);
+
+		gl.glBegin(targetMode);
+		for (int i = 0; i < count; i++) {
+
+			// Get the current indice
+			int indice = 0;
+			if (type == GL_UNSIGNED_BYTE) {
+				indice = ((ByteBuffer) indices).get(i);
+			} else if (type == GL_UNSIGNED_SHORT) {
+				indice = ((ShortBuffer) indices).get(i);
+			}
+			drawElement(indice);
+		}
+		gl.glEnd();
+
+	}
+
+	public void glEnable(int cap) {
+		gl.glEnable(cap);
+	}
+
+	public void glEnableClientState(int array) {
+
+		switch (array) {
+		case GL_COLOR_ARRAY:
+			isGLColorArrayEnabled = true;
+			break;
+		case GL_NORMAL_ARRAY:
+			isGLNormalArrayEnabled = true;
+			break;
+		case GL_TEXTURE_COORD_ARRAY:
+			isGLTextureCoordArrayEnabled = true;
+			break;
+		case GL_VERTEX_ARRAY:
+			isGLVertexArrayEnabled = true;
+			break;
+		}
+
+	}
+
+	public void glFinish() {
+		glFlush();
+	}
+
+	public void glFlush() {
+		gl.glFlush();
+	}
+
+	public void glFogf(int pname, float param) {
+		if (DEBUG)
+			System.out.println("[DEBUG] GL10.glFogf() is not supported");
+	}
+
+	public void glFogfv(int pname, float[] params, int offset) {
+		if (DEBUG)
+			System.out.println("[DEBUG] GL10.glFogfv() is not supported");
+	}
+
+	public void glFogfv(int pname, FloatBuffer params) {
+		glFogfv(pname, params.array(), 0);
+	}
+
+	public void glFogx(int pname, int param) {
+		if (DEBUG)
+			System.out.println("[DEBUG] GL10.glFogfx() is not supported");
+	}
+
+	public void glFogxv(int pname, int[] params, int offset) {
+		if (DEBUG)
+			System.out.println("[DEBUG] GL10.glFogxv() is not supported");
+	}
+
+	public void glFogxv(int pname, IntBuffer params) {
+		glFogxv(pname, params.array(), 0);
+	}
+
+	public void glFrontFace(int mode) {
+		gl.glFrontFace(mode);
+	}
+
+	public void glFrustumf(float left, float right, float bottom, float top, float near, float far) {
+		gl.glFrustum(left, right, bottom, top, near, far);
+	}
+
+	public void glFrustumx(int left, int right, int bottom, int top, int near, int far) {
+		glFrustumf(convertFPToFloat(left), convertFPToFloat(right), convertFPToFloat(bottom), convertFPToFloat(top), convertFPToFloat(near), convertFPToFloat(far));
+	}
+
+	public void glGenTextures(int n, int[] textures, int offset) {
+		// FIXME Handle the offset
+		gl.glGenTextures(n, textures);
+		
+	}
+
+	public void glGenTextures(int n, IntBuffer textures) {
+		glGenTextures(n, textures.array(), 0);
+	}
+
+	public int glGetError() {
+		return gl.glGetError();
+	}
+
+	public void glGetIntegerv(int pname, int[] params, int offset) {
+		// FIXME Handle the offset
+		gl.glGetIntegerv(pname, params);
+	}
+
+	public void glGetIntegerv(int pname, IntBuffer params) {
+		glGetIntegerv(pname, params.array(), 0);
+	}
+
+	public String glGetString(int name) {
+		return gl.glGetString(name);
+	}
+
+	public void glHint(int target, int mode) {
+		if (DEBUG)
+			System.out.println("glHint() is not supported");
+	}
+
+	public void glLightModelf(int pname, float param) {
+		gl.glLightModelf(pname, param);
+	}
+
+	public void glLightModelfv(int pname, float[] params, int offset) {
+		//	FIXME Handle offset
+		gl.glLightModelfv(pname, params);
+	}
+
+	public void glLightModelfv(int pname, FloatBuffer params) {
+		glLightModelfv(pname, params.array(), 0);
+	}
+
+	public void glLightModelx(int pname, int param) {
+		gl.glLightModelf(pname, convertFPToFloat(param));
+	}
+
+	public void glLightModelxv(int pname, int[] params, int offset) {
+		// FIXME Handle offset / FP
+		gl.glLightModeliv(pname, params);
+	}
+
+	public void glLightModelxv(int pname, IntBuffer params) {
+		glLightModelxv(pname, params.array(), 0);
+	}
+
+	public void glLightf(int light, int pname, float param) {
+		gl.glLightf(light, pname, param);
+	}
+
+	public void glLightfv(int light, int pname, float[] params, int offset) {
+		// FIXME Handle the offset
+		gl.glLightfv(light, pname, params);
+	}
+
+	public void glLightfv(int light, int pname, FloatBuffer params) {
+		glLightfv(light, pname, params.array(), 0);
+	}
+
+	public void glLightx(int light, int pname, int param) {
+		gl.glLightf(light, pname, convertFPToFloat(param));
+	}
+
+	public void glLightxv(int light, int pname, int[] params, int offset) {
+		// FIXME Handle offset / FP
+		gl.glLightiv(light, pname, params);
+	}
+
+	public void glLightxv(int light, int pname, IntBuffer params) {
+		glLightxv(light, pname, params.array(), 0);
+	}
+
+	public void glLineWidth(float width) {
+		gl.glLineWidth(width);
+	}
+
+	public void glLineWidthx(int width) {
+		glLineWidth(convertFPToFloat(width));
+	}
+
+	public void glLoadIdentity() {
+		gl.glLoadIdentity();
+	}
+
+	public void glLoadMatrixf(float[] m, int offset) {
+		// FIXME Handle offset
+		gl.glLoadMatrixf(m);
+	}
+
+	public void glLoadMatrixf(FloatBuffer m) {
+		glLoadMatrixf(m.array(), 0);
+	}
+
+	public void glLoadMatrixx(int[] m, int offset) {
+		float[] fm = new float[m.length];
+		for (int i = 0; i < m.length; i++) {
+			fm[i] = convertFPToFloat(m[i]);
+		}
+		glLoadMatrixf(fm, offset);
+	}
+
+	public void glLoadMatrixx(IntBuffer m) {
+		glLoadMatrixx(m.array(), 0);
+	}
+
+	public void glLogicOp(int opcode) {
+		//	TODO
+		System.out.println("glLogicOp() is not supported yet");
+	}
+
+	public void glMaterialf(int face, int pname, float param) {
+		gl.glMaterialf(face, pname, param);
+	}
+
+	public void glMaterialfv(int face, int pname, float[] params, int offset) {
+		gl.glMaterialfv(face, pname, params);
+	}
+
+	public void glMaterialfv(int face, int pname, FloatBuffer params) {
+		glMaterialfv(face, pname, params.array(), 0);
+	}
+
+	public void glMaterialx(int face, int pname, int param) {
+		gl.glMaterialf(face, pname, convertFPToFloat(param));
+	}
+
+	public void glMaterialxv(int face, int pname, int[] params, int offset) {
+		// FIXME Handle offset
+		float[] fm = new float[params.length];
+		for (int i = 0; i < params.length; i++) {
+			fm[i] = convertFPToFloat(params[i]);
+		}
+		gl.glMaterialfv(face, pname, fm);
+	}
+
+	public void glMaterialxv(int face, int pname, IntBuffer params) {
+		glMaterialxv(face, pname, params.array(), 0);
+	}
+
+	public void glMatrixMode(int mode) {
+		gl.glMatrixMode(mode);
+	}
+
+	public void glMultMatrixf(float[] m, int offset) {
+		// FIXME Handle offset
+		gl.glMultMatrixf(m);
+	}
+
+	public void glMultMatrixf(FloatBuffer m) {
+		glMultMatrixf(m.array(), 0);
+	}
+
+	public void glMultMatrixx(int[] m, int offset) {
+		float[] fm = new float[m.length];
+		for (int i = 0; i < m.length; i++) {
+			fm[i] = convertFPToFloat(m[i]);
+		}
+		glMultMatrixf(fm, offset);
+	}
+
+	public void glMultMatrixx(IntBuffer m) {
+		glMultMatrixx(m.array(), 0);
+	}
+
+	public void glMultiTexCoord4f(int target, float s, float t, float r, float q) {
+		// TODO
+		System.out.println("glMultiTexCoord4f() is not supported yet");
+	}
+
+	public void glMultiTexCoord4x(int target, int s, int t, int r, int q) {
+		//	TODO
+		System.out.println("glMultiTexCoord4x() is not supported yet");
+	}
+
+	public void glNormal3f(float nx, float ny, float nz) {
+		gl.glNormal3f(nx, ny, nz);
+	}
+
+	public void glNormal3x(int nx, int ny, int nz) {
+		gl.glNormal3f(convertFPToFloat(nx), convertFPToFloat(ny), convertFPToFloat(nz));
+	}
+
+	public void glNormalPointer(int type, int stride, Buffer pointer) {
+		normalPointer.set(3, type, stride, pointer);
+	}
+
+	public void glOrthof(float left, float right, float bottom, float top, float near, float far) {
+		gl.glOrtho(left, right, bottom, top, near, far);
+	}
+
+	public void glOrthox(int left, int right, int bottom, int top, int near, int far) {
+		glOrthof(convertFPToFloat(left), convertFPToFloat(right), convertFPToFloat(bottom), convertFPToFloat(top), convertFPToFloat(near), convertFPToFloat(far));
+	}
+
+	public void glPixelStorei(int pname, int param) {
+		gl.glPixelStorei(pname, param);
+	}
+
+	public void glPointSize(float size) {
+		gl.glPointSize(size);
+	}
+
+	public void glPointSizex(int size) {
+		glPointSize(convertFPToFloat(size));
+	}
+
+	public void glPolygonOffset(float factor, float units) {
+		if (DEBUG)
+			System.out.println("glPolygonOffset() is not supported yet");
+	}
+
+	public void glPolygonOffsetx(int factor, int units) {
+		if (DEBUG)
+			System.out.println("glPolygonOffsetx() is not supported yet");
+	}
+
+	public void glPopMatrix() {
+		gl.glPopMatrix();
+	}
+
+	public void glPushMatrix() {
+		gl.glPushMatrix();
+	}
+
+	public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
+		// TODO get pixels in an arry and put it in the given buffer 
+		//gl.glReadPixels(x, y, width, height, format, type, pixels);
+	}
+
+	public void glRotatef(float angle, float x, float y, float z) {
+		gl.glRotatef(angle, x, y, z);
+	}
+
+	public void glRotatex(int angle, int x, int y, int z) {
+		glRotatef(convertFPToFloat(angle), convertFPToFloat(x), convertFPToFloat(y), convertFPToFloat(z));
+	}
+
+	public void glSampleCoverage(float value, boolean invert) {
+		//	TODO
+		System.out.println("glSampleCoverage() is not supported yet");
+	}
+
+	public void glSampleCoveragex(int value, boolean invert) {
+		// TODO
+		System.out.println("glSampleCoveragex() is not supported yet");
+	}
+
+	public void glScalef(float x, float y, float z) {
+		gl.glScalef(x, y, z);
+	}
+
+	public void glScalex(int x, int y, int z) {
+		glScalef(convertFPToFloat(x), convertFPToFloat(y), convertFPToFloat(z));
+	}
+
+	public void glScissor(int x, int y, int width, int height) {
+		if (DEBUG)
+			System.out.println("[DEBUG] glScissor() is not supported yet");
+	}
+
+	public void glShadeModel(int mode) {
+		gl.glShadeModel(mode);
+	}
+
+	public void glStencilFunc(int func, int ref, int mask) {
+		gl.glStencilFunc(func, ref, mask);
+	}
+
+	public void glStencilMask(int mask) {
+		gl.glStencilMask(mask);
+	}
+
+	public void glStencilOp(int fail, int zfail, int zpass) {
+		gl.glStencilOp(fail, zfail, zpass);
+	}
+
+	public void glTexCoordPointer(int size, int type, int stride, Buffer pointer) {
+		texCoordPointer.set(size, type, stride, pointer);
+	}
+
+	public void glTexEnvf(int target, int pname, float param) {
+		gl.glTexEnvf(target, pname, param);
+	}
+
+	public void glTexEnvfv(int target, int pname, float[] params, int offset) {
+		// FIXME Handle offset
+		gl.glTexEnvfv(target, pname, params);
+	}
+
+	public void glTexEnvfv(int target, int pname, FloatBuffer params) {
+		glTexEnvfv(target, pname, params.array(), 0);
+	}
+
+	public void glTexEnvx(int target, int pname, int param) {
+		gl.glTexEnvf(target, pname, convertFPToFloat(param));
+	}
+
+	public void glTexEnvxv(int target, int pname, int[] params, int offset) {
+		// FIXME Handle offset
+		float[] fm = new float[params.length];
+		for (int i = 0; i < params.length; i++) {
+			fm[i] = convertFPToFloat(params[i]);
+		}
+		gl.glTexEnvfv(target, pname, fm);
+	}
+
+	public void glTexEnvxv(int target, int pname, IntBuffer params) {
+		glTexEnvxv(target, pname, params.array(), 0);
+	}
+
+	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format,
+			int type, Buffer pixels) {
+
+		byte[][][] pArray = new byte[width][height][4];
+
+		// Convert image pixels to GL_RGBA/GL_UNSIGNED_BYTE
+		switch (type) {
+		case GL_UNSIGNED_BYTE:
+			switch (format) {
+			case GL_RGB: {
+				ByteBuffer byteBuf = (ByteBuffer) pixels;
+				for (int j = 0; j < height; j++) {
+					byteBuf.position(j * width);
+					for (int i = 0; i < width; i++) {
+						pArray[i][j][0] = byteBuf.get();
+						pArray[i][j][1] = byteBuf.get();
+						pArray[i][j][2] = byteBuf.get();
+						pArray[i][j][3] = (byte) 0xFF;
+					}
+				}
+			}
+				break;
+			case GL_RGBA: {
+				ByteBuffer byteBuf = (ByteBuffer) pixels;
+				for (int j = 0; j < height; j++) {
+					byteBuf.position(j * width);
+					for (int i = 0; i < width; i++) {
+						pArray[i][j][0] = byteBuf.get();
+						pArray[i][j][1] = byteBuf.get();
+						pArray[i][j][2] = byteBuf.get();
+						pArray[i][j][3] = byteBuf.get();
+					}
+				}
+			}
+				break;
+			case GL_ALPHA: {
+				ByteBuffer byteBuf = (ByteBuffer) pixels;
+				for (int j = 0; j < height; j++) {
+					byteBuf.position(j * width);
+					for (int i = 0; i < width; i++) {
+						pArray[i][j][0] = 0;
+						pArray[i][j][1] = 0;
+						pArray[i][j][2] = 0;
+						pArray[i][j][3] = byteBuf.get();
+					}
+				}
+			}
+				break;
+			case GL_LUMINANCE: {
+				ByteBuffer byteBuf = (ByteBuffer) pixels;
+				for (int j = 0; j < height; j++) {
+					byteBuf.position(j * width);
+					for (int i = 0; i < width; i++) {
+						byte val = byteBuf.get();
+						pArray[i][j][0] = val;
+						pArray[i][j][1] = val;
+						pArray[i][j][2] = val;
+						pArray[i][j][3] = (byte) 0xFF;
+					}
+				}
+			}
+				break;
+			case GL_LUMINANCE_ALPHA: {
+				ByteBuffer byteBuf = (ByteBuffer) pixels;
+				for (int j = 0; j < height; j++) {
+					byteBuf.position(j * width);
+					for (int i = 0; i < width; i++) {
+						byte val = byteBuf.get();
+						pArray[i][j][0] = val;
+						pArray[i][j][1] = val;
+						pArray[i][j][2] = val;
+						pArray[i][j][3] = byteBuf.get();
+					}
+				}
+			}
+				break;
+			} // switch
+			break;
+		case GL_UNSIGNED_SHORT_5_6_5: {
+			ShortBuffer byteBuf = (ShortBuffer) pixels;
+			for (int j = 0; j < height; j++) {
+				byteBuf.position(j * width);
+				for (int i = 0; i < width; i++) {
+					int rgb = byteBuf.get();
+					int r = (rgb >> 11) & 0x1f;
+				    int g = (rgb >> 5) & 0x3f;
+				    int b = rgb  & 0x1f;
+				    // Replicate the high bits into the low bits 
+					pArray[i][j][0] = (byte) (((r << 3) | (r >> 2)) & 0xff);
+					pArray[i][j][1] = (byte) (((g << 2) | (g >> 4)) & 0xff);
+					pArray[i][j][2] = (byte) (((b << 3) | (b >> 2)) & 0xff);
+					pArray[i][j][3] = (byte) 0xff;
+				}
+			}
+		}
+			break;
+		case GL_UNSIGNED_SHORT_4_4_4_4: {
+			ShortBuffer byteBuf = (ShortBuffer) pixels;
+			for (int j = 0; j < height; j++) {
+				byteBuf.position(j * width);
+				for (int i = 0; i < width; i++) {
+					int rgb = byteBuf.get();
+					int r = (rgb >> 12) & 0xF;
+				    int g = (rgb >> 8) & 0xF;
+				    int b = (rgb >> 4) & 0xF;
+				    int a = rgb & 0xF;
+					// Replicate the high bits into the low bits 
+					pArray[i][j][0] = (byte) ((r << 4) | r);
+					pArray[i][j][1] = (byte) ((g << 4) | g);
+					pArray[i][j][2] = (byte) ((b << 4) | b);
+					pArray[i][j][3] = (byte) ((a << 4) | a);
+				}
+			}
+		}
+			break;
+		case GL_UNSIGNED_SHORT_5_5_5_1: {
+			ShortBuffer byteBuf = (ShortBuffer) pixels;
+			for (int j = 0; j < height; j++) {
+				byteBuf.position(j * width);
+				for (int i = 0; i < width; i++) {
+					int rgb = byteBuf.get();
+					int r = (rgb >> 11) & 0x1F;
+				    int g = (rgb >> 6) & 0x1F;
+				    int b = (rgb >> 1) & 0x1F;
+				    // Replicate the high bits into the low bits 
+					pArray[i][j][0] = (byte) ((r << 3) | (r >> 2));
+					pArray[i][j][1] = (byte) ((g << 3) | (g >> 2)) ;
+					pArray[i][j][2] = (byte) ((b << 3) | (b >> 2));
+					pArray[i][j][3] = (byte) ((rgb & 0x1) << 8);
+				}
+			}
+		}
+			break;
+		}
+
+		gl.glTexImage2D(target, level, GL_RGBA, width, height, border, GL_RGBA, GL_UNSIGNED_BYTE, pArray);
+	}
+
+	public void glTexParameterf(int target, int pname, float param) {
+		gl.glTexParameterf(target, pname, param);
+	}
+
+	public void glTexParameterx(int target, int pname, int param) {
+		gl.glTexParameterf(target, pname, convertFPToFloat(param));
+	}
+
+	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,
+			int type, Buffer pixels) {
+		gl.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+	}
+
+	public void glTranslatef(float x, float y, float z) {
+		gl.glTranslatef(x, y, z);
+	}
+
+	public void glTranslatex(int x, int y, int z) {
+		glTranslatef(convertFPToFloat(x), convertFPToFloat(y), convertFPToFloat(z));
+	}
+
+	public void glVertexPointer(int size, int type, int stride, Buffer pointer) {
+		vertexPointer.set(size, type, stride, pointer);
+	}
+
+	public void glViewport(int x, int y, int width, int height) {
+		gl.glViewport(x, y, width, height);
+
+	}
+
+	/* GL10 Ext interface */
+
+	//	public int glQueryMatrixxOES(int[] mantissa, int mantissaOffset, int[] exponent, int exponentOffset) {
+	//		// TODO
+	//		System.out.println("glVertexPointer() is not supported yet");
+	//		return 0;
+	//	}
+	private class Pointer {
+
+		int size;
+		int type;
+		int stride;
+		Buffer pointer;
+
+		public void set(int size, int type, int stride, Buffer pointer) {
+			this.size = size;
+			this.type = type;
+			this.stride = stride;
+			this.pointer = pointer;
+		}
+	}
+
+}
