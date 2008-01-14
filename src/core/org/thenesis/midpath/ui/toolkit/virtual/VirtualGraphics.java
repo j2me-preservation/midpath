@@ -1204,9 +1204,6 @@ public class VirtualGraphics extends Graphics {
 
 	public void drawRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
 
-		x += transX;
-		y += transY;
-
 		//Vertical lines
 		drawLine(x, y + arcHeight, x, y + h - arcHeight);
 		drawLine(x + w + 1, y + arcHeight, x + w + 1, y + h - arcHeight);
@@ -1223,9 +1220,6 @@ public class VirtualGraphics extends Graphics {
 	}
 
 	public void fillRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
-
-		x += transX;
-		y += transY;
 
 		fillRect(x, y + arcHeight + 1, w, h - 2 * arcHeight); // center
 		fillRect(x + arcWidth + 1, y, w - 2 * arcWidth, arcHeight + 1); // top middle
