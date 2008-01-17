@@ -30,8 +30,8 @@ import java.util.Vector;
 
 import javax.microedition.m2g.ExternalResourceHandler;
 
+import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.j2d.ImageLoaderUtil;
-import com.sun.perseus.j2d.RasterImage;
 
 /**
  * JSR 226 implementation of the <code>ImageLoader</code> interface.
@@ -66,7 +66,7 @@ public class SVGImageLoader extends DefaultImageLoader {
      * ImageLoaderUtil contains helper methods which make this 
      * implementation easier.
      */
-    protected ImageLoaderUtil loaderUtil = new ImageLoaderUtil();
+    protected ImageLoaderUtil loaderUtil = PerseusToolkit.getInstance().createImageLoaderUtil();
 
     /**
      * Set to true once the associated DocumentNode has fully loaded.

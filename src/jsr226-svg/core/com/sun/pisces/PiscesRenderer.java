@@ -25,6 +25,8 @@
 
 package com.sun.pisces;
 
+import com.sun.perseus.PerseusToolkit;
+
 /**
  *
  * @version 
@@ -67,7 +69,7 @@ public final class PiscesRenderer extends PathSink {
 		String strValue;
 		int intValue;
 
-		strValue = Configuration.getProperty("pisces.stroke.xbias");
+		strValue = PerseusToolkit.getInstance().getConfigurationProperty("pisces.stroke.xbias");
 		intValue = 0; // default x bias
 		if (strValue != null) {
 			try {
@@ -77,7 +79,7 @@ public final class PiscesRenderer extends PathSink {
 		}
 		STROKE_X_BIAS = intValue;
 
-		strValue = Configuration.getProperty("pisces.stroke.ybias");
+		strValue = PerseusToolkit.getInstance().getConfigurationProperty("pisces.stroke.ybias");
 		intValue = 0; // default y bias
 		if (strValue != null) {
 			try {

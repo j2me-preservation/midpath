@@ -36,7 +36,7 @@ import java.io.InputStream;
  * 
  *
  */
-public class AbstractGZIPSupport {
+public class GZIPSupport {
 
 	/**
 	 * Used for HTTP request headers
@@ -57,7 +57,7 @@ public class AbstractGZIPSupport {
 	 * @throws IOException if an I/O error happens while opening the 
 	 *         requested URI.
 	 */
-	static InputStream openHandleGZIP(String svgURI) throws IOException {
+	public InputStream openHandleGZIP(String svgURI) throws IOException {
 		throw new UnsupportedOperationException("Must be implemented by concrete class");
 	}
 
@@ -80,7 +80,7 @@ public class AbstractGZIPSupport {
 	 * @throws IOException if an I/O error happens while building
 	 *         a GZIPInputStream.
 	 */
-	public static InputStream handleGZIP(InputStream is) throws IOException {
+	public InputStream handleGZIP(InputStream is) throws IOException {
 		// Wrap the stream if it does not support marking.
 		// BufferedInputStream supports marking.
 

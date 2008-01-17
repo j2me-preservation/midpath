@@ -32,18 +32,20 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.lcdui.Image;
 
+import com.sun.perseus.model.RasterImage;
+
 /**
  * This class contains utility methods which make <code>ImageLoader</code> 
  * implementations easier.
  *
  * @version $Id: ImageLoaderUtil.java,v 1.12 2006/04/21 06:34:56 st125089 Exp $
  */
-public class ImageLoaderUtil extends AbstractImageLoaderUtil {
+public class ImageLoaderUtilImpl extends ImageLoaderUtil {
 
 	/**
 	 * Default constructor
 	 */
-	public ImageLoaderUtil() {
+	public ImageLoaderUtilImpl() {
 		super();
 	}
 
@@ -94,7 +96,7 @@ public class ImageLoaderUtil extends AbstractImageLoaderUtil {
 			}
 
 		}
-		return (new RasterImage(img));
+		return (new RasterImageImpl(img));
 
 	}
 
@@ -106,7 +108,7 @@ public class ImageLoaderUtil extends AbstractImageLoaderUtil {
 	 */
 	public RasterImage createImage(final byte[] imageData) {
 		Image img = Image.createImage(imageData, 0, imageData.length);
-		return (new RasterImage(img));
+		return (new RasterImageImpl(img));
 	}
 
 	/**
@@ -114,13 +116,13 @@ public class ImageLoaderUtil extends AbstractImageLoaderUtil {
 	 */
 	public RasterImage createImage(int[] imageData, int width, int height, boolean processAlpha) {
 		Image img = Image.createRGBImage(imageData, width, height, processAlpha);
-		return new RasterImage(img);
+		return new RasterImageImpl(img);
 	}
 
 
 	public RasterImage createImage(InputStream is) throws IOException {
 		Image img = Image.createImage(is);
-		return new RasterImage(img);
+		return new RasterImageImpl(img);
 	}
 
 	

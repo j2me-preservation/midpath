@@ -28,7 +28,6 @@ package com.sun.perseus.model;
 import com.sun.perseus.util.RunnableQueue;
 import com.sun.perseus.util.RunnableQueue.RunnableHandler;
 
-import com.sun.perseus.j2d.RasterImage;
 
 /**
  * @version $Id: RasterImageConsumer.java,v 1.4 2006/06/29 10:47:33 ln156897 Exp $

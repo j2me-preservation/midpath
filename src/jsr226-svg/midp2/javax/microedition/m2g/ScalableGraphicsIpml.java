@@ -27,12 +27,12 @@ package javax.microedition.m2g;
 
 import javax.microedition.lcdui.Graphics;
 
-import com.sun.pisces.GraphicsSurfaceDestination;
+import com.sun.pisces.GraphicsSurfaceDestinationImpl;
 
 /**
  *
  */
-public class ScalableGraphics extends AbstractScalableGraphics  {
+public class ScalableGraphicsIpml extends ScalableGraphics  {
 
     /**
      * The Graphics object bound to this class
@@ -42,7 +42,7 @@ public class ScalableGraphics extends AbstractScalableGraphics  {
     /**
     * Constructor
     */
-    private ScalableGraphics() {
+    public ScalableGraphicsIpml() {
     	super();
     }
 	
@@ -63,7 +63,7 @@ public class ScalableGraphics extends AbstractScalableGraphics  {
         }
         
         g = (Graphics) target;
-        gsd = new GraphicsSurfaceDestination(g);
+        gsd = new GraphicsSurfaceDestinationImpl(g);
     }
     
     /**
@@ -82,11 +82,6 @@ public class ScalableGraphics extends AbstractScalableGraphics  {
     	return (g == null);
     }
 
-    /**
-     *
-     */
-    public static ScalableGraphics createInstance() {
-        return new ScalableGraphics();
-    }
+    
 
 }

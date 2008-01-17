@@ -28,7 +28,6 @@ package com.sun.perseus.model;
 import com.sun.perseus.j2d.Box;
 import com.sun.perseus.j2d.GraphicsProperties;
 import com.sun.perseus.j2d.PaintTarget;
-import com.sun.perseus.j2d.RasterImage;
 import com.sun.perseus.j2d.RenderGraphics;
 import com.sun.perseus.j2d.Tile;
 import com.sun.perseus.j2d.Transform;

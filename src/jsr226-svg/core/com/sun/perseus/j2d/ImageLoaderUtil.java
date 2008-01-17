@@ -28,6 +28,7 @@ package com.sun.perseus.j2d;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.sun.perseus.model.RasterImage;
 import com.sun.perseus.util.Base64DecodeStream;
 
 /**
@@ -36,7 +37,7 @@ import com.sun.perseus.util.Base64DecodeStream;
  *
  * @version $Id: ImageLoaderUtil.java,v 1.12 2006/04/21 06:34:56 st125089 Exp $
  */
-public abstract class AbstractImageLoaderUtil {
+public abstract class ImageLoaderUtil {
 
 	/**
 	 * Default, broken image returned if an image cannot be loaded.
@@ -66,7 +67,7 @@ public abstract class AbstractImageLoaderUtil {
 	/**
 	 * Default constructor
 	 */
-	public AbstractImageLoaderUtil() {
+	public ImageLoaderUtil() {
 
 		createPlaceholderImages();
 

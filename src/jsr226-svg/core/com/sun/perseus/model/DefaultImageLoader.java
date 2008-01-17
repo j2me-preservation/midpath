@@ -27,8 +27,8 @@ package com.sun.perseus.model;
 
 import java.util.Hashtable;
 
+import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.j2d.ImageLoaderUtil;
-import com.sun.perseus.j2d.RasterImage;
 import com.sun.perseus.platform.URLResolver;
 import com.sun.perseus.util.RunnableQueue;
 
@@ -53,7 +53,7 @@ public class DefaultImageLoader implements ImageLoader {
      * ImageLoaderUtil contains helper methods which make this 
      * implementation easier.
      */
-    protected ImageLoaderUtil loaderUtil = new ImageLoaderUtil();
+    protected ImageLoaderUtil loaderUtil = PerseusToolkit.getInstance().createImageLoaderUtil();
 
     /**
      * Use a single loading queue for the implementation.

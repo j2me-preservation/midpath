@@ -25,7 +25,6 @@
  */
 package com.sun.perseus.model;
 
-import com.sun.perseus.j2d.RasterImage;
 
 /**
  * Interface for handling RasterImage resources loading. Implementations can 

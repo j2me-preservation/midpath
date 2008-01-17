@@ -25,6 +25,7 @@
  */
 package com.sun.perseus.builder;
 
+import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.model.FontFace;
 import com.sun.perseus.model.ModelNode;
 import com.sun.perseus.model.UpdateAdapter;
@@ -121,7 +122,7 @@ public final class DefaultFontFace {
     static void loadInitialFontFaces() throws Error {
         try {
             InputStream is = 
-                ResourceHandler.getInitialFontResource();
+            	PerseusToolkit.getInstance().getInitialFontResource();
             if (is == null) {
                 throw new Exception
                     (Messages.formatMessage
@@ -167,7 +168,7 @@ public final class DefaultFontFace {
     static void loadDefaultFontFace() throws Error {
         try {
             InputStream is = 
-                ResourceHandler.getDefaultFontResource();
+                PerseusToolkit.getInstance().getDefaultFontResource();
             if (is == null) {
                 throw new Exception
                     (Messages.formatMessage

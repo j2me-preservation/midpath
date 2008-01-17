@@ -25,6 +25,7 @@
  */
 package javax.microedition.m2g;
 
+import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.j2d.RGB;
 import com.sun.perseus.j2d.RenderGraphics;
 import com.sun.perseus.model.DirtyAreaManager;
@@ -37,7 +38,7 @@ import com.sun.pisces.RendererBase;
 /**
  *
  */
-public abstract class AbstractScalableGraphics  {
+public abstract class ScalableGraphics  {
     /**
      * Paint used to clear offscreens.
      */
@@ -103,7 +104,7 @@ public abstract class AbstractScalableGraphics  {
     /**
     * Constructor
     */
-    protected AbstractScalableGraphics() {
+    protected ScalableGraphics() {
     }
 	
     /**
@@ -216,5 +217,12 @@ public abstract class AbstractScalableGraphics  {
 
         this.alpha = alpha;
     }
+    
+    /**
+    *
+    */
+   public static ScalableGraphics createInstance() {
+       return PerseusToolkit.getInstance().createScalableGraphics();
+   }
 
 }

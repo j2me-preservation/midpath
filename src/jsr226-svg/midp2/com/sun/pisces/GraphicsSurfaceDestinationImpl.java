@@ -28,10 +28,10 @@ package com.sun.pisces;
 
 import javax.microedition.lcdui.Graphics;
 
-public final class GraphicsSurfaceDestination extends AbstractGraphicsSurfaceDestination {
+public final class GraphicsSurfaceDestinationImpl extends GraphicsSurfaceDestination {
     private final Graphics g;
     
-    public GraphicsSurfaceDestination(Graphics g) {
+    public GraphicsSurfaceDestinationImpl(Graphics g) {
         this.g = g;
     }
    

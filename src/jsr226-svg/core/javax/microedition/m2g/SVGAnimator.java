@@ -25,7 +25,7 @@
  */
 package javax.microedition.m2g;
 
-import com.sun.perseus.midp.SVGAnimatorImpl;
+import com.sun.perseus.PerseusToolkit;
 
 /**
  *
@@ -36,7 +36,7 @@ public abstract class SVGAnimator {
      *
      */
     public static SVGAnimator createAnimator(SVGImage svgImage) {
-        return SVGAnimatorImpl.createAnimator(svgImage, null);
+        return PerseusToolkit.getInstance().createAnimator(svgImage);
     }
 
     /**
@@ -44,7 +44,7 @@ public abstract class SVGAnimator {
      */
     public static SVGAnimator createAnimator(SVGImage svgImage,
                                              String componentBaseClass) {
-        return SVGAnimatorImpl.createAnimator(svgImage, componentBaseClass);
+    	return PerseusToolkit.getInstance().createAnimator(svgImage, componentBaseClass);
     }
 
     /**

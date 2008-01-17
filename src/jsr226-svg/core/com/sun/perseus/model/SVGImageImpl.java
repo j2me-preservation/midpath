@@ -40,10 +40,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGElement;
 
+import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.builder.ModelBuilder;
 import com.sun.perseus.builder.SVGTinyModelFactory;
-import com.sun.perseus.j2d.RasterImage;
-import com.sun.perseus.platform.GZIPSupport;
+import com.sun.perseus.platform.GZIPSupportImpl;
 import com.sun.perseus.util.SVGConstants;
 
 /**
@@ -381,7 +381,7 @@ public class SVGImageImpl extends SVGImage {
         InputStream is = null;
 
         try {
-            is = GZIPSupport.openHandleGZIP(URL);
+            is = PerseusToolkit.getInstance().getGZIPSupport().openHandleGZIP(URL);
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe.getMessage());
         }

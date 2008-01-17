@@ -54,6 +54,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.model.CompositeNode;
 import com.sun.perseus.model.DocumentNode;
 import com.sun.perseus.model.ElementNode;
@@ -63,6 +64,7 @@ import com.sun.perseus.model.ModelNode;
 import com.sun.perseus.model.UpdateAdapter;
 import com.sun.perseus.model.UpdateListener;
 import com.sun.perseus.platform.GZIPSupport;
+import com.sun.perseus.platform.GZIPSupportImpl;
 import com.sun.perseus.platform.ThreadSupport;
 import com.sun.perseus.util.SVGConstants;
 import com.sun.perseus.util.SimpleTokenizer;
@@ -850,7 +852,7 @@ public class ModelBuilder extends DefaultHandler {
     public static DocumentNode loadDocument(final String svgURI) 
         throws IOException {
 
-        InputStream is = GZIPSupport.openHandleGZIP(svgURI);
+        InputStream is = PerseusToolkit.getInstance().getGZIPSupport().openHandleGZIP(svgURI);
         DocumentNode doc = new DocumentNode();
         doc.setLoaded(false);
         doc.setDocumentURI(svgURI);
@@ -964,12 +966,12 @@ public class ModelBuilder extends DefaultHandler {
             // load that stream. Otherwise, we build an input stream from
             // the root's URI.
             if (is == null) {
-                is = GZIPSupport.openHandleGZIP(svgURI);
+                is = PerseusToolkit.getInstance().getGZIPSupport().openHandleGZIP(svgURI);
             }
 
             // The following wraps the input stream, if necessary, to handle
             // GZIP compression.
-            gzipIS = GZIPSupport.handleGZIP(is);
+            gzipIS = PerseusToolkit.getInstance().getGZIPSupport().handleGZIP(is);
             final InputStream fgzipIS = gzipIS;
 
             root.invokeAndWait(new Runnable() {

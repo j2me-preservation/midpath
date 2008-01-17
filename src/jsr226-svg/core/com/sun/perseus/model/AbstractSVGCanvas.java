@@ -31,7 +31,7 @@ import javax.microedition.m2g.SVGEventListener;
 import com.sun.perseus.j2d.RenderGraphics;
 import com.sun.perseus.util.RunnableQueue;
 import com.sun.perseus.util.SVGConstants;
-import com.sun.pisces.GraphicsSurfaceDestination;
+import com.sun.pisces.GraphicsSurfaceDestinationImpl;
 import com.sun.pisces.NativeSurface;
 import com.sun.pisces.PiscesRenderer;
 import com.sun.pisces.RendererBase;
@@ -109,7 +109,7 @@ public abstract class AbstractSVGCanvas implements CanvasUpdateListener {
 	/**
 	 * Used to blit the offscreen onto the graphics destination.
 	 */
-	protected GraphicsSurfaceDestination gsd;
+	protected GraphicsSurfaceDestinationImpl gsd;
 
 	/**
 	 * Offscreen width

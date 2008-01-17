@@ -41,7 +41,7 @@ import java.io.IOException;
  * 
  *
  */
-public class GZIPSupport extends AbstractGZIPSupport {
+public class GZIPSupportImpl extends GZIPSupport {
 
 
     /**
@@ -53,7 +53,7 @@ public class GZIPSupport extends AbstractGZIPSupport {
      * @throws IOException if an I/O error happens while opening the 
      *         requested URI.
      */
-    public static InputStream openHandleGZIP(String svgURI) throws IOException {
+    public InputStream openHandleGZIP(String svgURI) throws IOException {
 
         InputConnection svgURLConnection = 
             (InputConnection)Connector.open(svgURI, Connector.READ);

@@ -26,7 +26,7 @@
 
 package com.sun.pisces;
 
-public abstract class AbstractGraphicsSurfaceDestination implements SurfaceDestination {
+public abstract class GraphicsSurfaceDestination implements SurfaceDestination {
     
     public void drawSurface(Surface ps, int srcX, int srcY, 
             int dstX, int dstY, int width, int height, float opacity) {

@@ -27,69 +27,68 @@ package com.sun.perseus.j2d;
 
 import javax.microedition.lcdui.Image;
 
+import com.sun.perseus.model.RasterImage;
+
 /**
  * Class for 2D Raster Images.
  *
  * @version $Id: RasterImage.java,v 1.4 2006/04/21 06:34:58 st125089 Exp $
  */
-public class RasterImage {
+public class RasterImageImpl implements RasterImage {
 
-    Image image;
+	Image image;
 
-    /**
-     * The cached pixel array.
-     */
-    int[] argb;
+	/**
+	 * The cached pixel array.
+	 */
+	int[] argb;
 
-    /**
-     */
-    RasterImage(Image img) {
-        if (img == null) {
-            throw new NullPointerException();
-        }
+	/**
+	 */
+	RasterImageImpl(Image img) {
+		if (img == null) {
+			throw new NullPointerException();
+		}
 
-        image = img;
-    }
+		image = img;
+	}
 
-    /**
-     * @return the image width.
-     */
-    public int getWidth() {
-        return image.getWidth();
-    }
+	/**
+	 * @return the image width.
+	 */
+	public int getWidth() {
+		return image.getWidth();
+	}
 
-    /**
-     * @return the image height.
-     */
-    public int getHeight() {
-        return image.getHeight();
-    }
+	/**
+	 * @return the image height.
+	 */
+	public int getHeight() {
+		return image.getHeight();
+	}
 
-    /**
-     * @return a pixel array where the image data is stored in 
-     *         single pixel packed format 0xaarrggbb, with a 
-     *         scanline stride equal to the image width and a
-     *         zero offset in the returned array. The returned
-     *         array is of size width * height.
-     */
-    public int[] getRGB() {
+	/**
+	 * @return a pixel array where the image data is stored in 
+	 *         single pixel packed format 0xaarrggbb, with a 
+	 *         scanline stride equal to the image width and a
+	 *         zero offset in the returned array. The returned
+	 *         array is of size width * height.
+	 */
+	public int[] getRGB() {
 
-        if (argb != null) {
-            return argb;
-        }
+		if (argb != null) {
+			return argb;
+		}
 
-	int w = image.getWidth();
-	int h = image.getHeight();
+		int w = image.getWidth();
+		int h = image.getHeight();
 
-	argb  = new int[w*h];
+		argb = new int[w * h];
 
-        image.getRGB(argb,
-		     0, w,
-		     0, 0,
-		     w, h);
+		image.getRGB(argb, 0, w, 0, 0, w, h);
 
-	return argb;
+		return argb;
 
-    }
+	}
 
 }

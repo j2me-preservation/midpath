@@ -31,7 +31,7 @@ import javax.microedition.lcdui.Graphics;
 
 import com.sun.perseus.model.AbstractSVGCanvas;
 import com.sun.perseus.model.DocumentNode;
-import com.sun.pisces.GraphicsSurfaceDestination;
+import com.sun.pisces.GraphicsSurfaceDestinationImpl;
 
 /**
  * This class provides support for an LCDUI Canvas extension which can display
@@ -92,7 +92,7 @@ class SVGCanvas extends AbstractSVGCanvas {
 				}
 
 				if (gsd == null) {
-					gsd = new GraphicsSurfaceDestination(g);
+					gsd = new GraphicsSurfaceDestinationImpl(g);
 				}
 				gsd.drawSurface(offscreen, 0, 0, 0, 0, offscreenWidth, offscreenHeight, 1);
 				canvasManager.consume();

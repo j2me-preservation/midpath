@@ -25,6 +25,7 @@
  */
 package com.sun.perseus.j2d;
 
+import com.sun.perseus.model.RasterImage;
 import com.sun.pisces.PiscesRenderer;
 import com.sun.pisces.Transform6;
 
