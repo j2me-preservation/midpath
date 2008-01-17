@@ -25,8 +25,6 @@
 
 package com.sun.pisces;
 
-import com.sun.midp.main.Configuration;
-
 /**
  *
  * @version 

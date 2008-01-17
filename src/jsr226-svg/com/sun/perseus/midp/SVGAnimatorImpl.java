@@ -107,7 +107,7 @@ public final class SVGAnimatorImpl extends SVGAnimator {
 
     // JAVADOC COMMENT ELIDED
     public Object getTargetComponent() {
-        return svgCanvas;
+        return svgCanvas.getMidpCanvas();
     }
 
     // JAVADOC COMMENT ELIDED

@@ -27,23 +27,12 @@ package javax.microedition.m2g;
 
 import javax.microedition.lcdui.Graphics;
 
-import com.sun.perseus.j2d.RGB;
-import com.sun.perseus.j2d.RenderGraphics;
-import com.sun.perseus.model.DirtyAreaManager;
-import com.sun.perseus.model.DocumentNode;
 import com.sun.pisces.GraphicsSurfaceDestination;
-import com.sun.pisces.NativeSurface;
-import com.sun.pisces.PiscesRenderer;
-import com.sun.pisces.RendererBase;
 
 /**
  *
  */
-public class ScalableGraphics  {
-    /**
-     * Paint used to clear offscreens.
-     */
-    static final RGB CLEAR_PAINT = new RGB(0, 0, 0, 0);
+public class ScalableGraphics extends AbstractScalableGraphics  {
 
     /**
      * The Graphics object bound to this class
@@ -51,66 +40,10 @@ public class ScalableGraphics  {
     Graphics g = null;
 
     /**
-     * The GraphicsSurfaceDestination used to blit the native surface to the
-     * Graphics.
-     */
-    GraphicsSurfaceDestination gsd = null;
-
-    /**
-     * The current quality mode.
-     */
-    int qualityMode = RENDERING_QUALITY_HIGH;
-
-    /**
-     * The DirtyAreaManager used to minimize renderings.
-     */
-    DirtyAreaManager dirtyAreaManager = new DirtyAreaManager(null);
-
-    /**
-     * The current transparency for rendering images.
-     */
-    float alpha = 1f;
-
-    /**
-     * The offscreen buffer, used for temporary rendering of the 
-     * image.
-     */
-    NativeSurface offscreen;
-
-    /**
-     * The PiscesRenderer associated with the offscreen.
-     */
-    PiscesRenderer pr;
-
-    /**
-     * The offscreen width.
-     */
-    int offscreenWidth;
-
-    /**
-     * The offscreen height.
-     */
-    int offscreenHeight;
-
-    /**
-     * The RenderGraphics used to draw to the PiscesRenderer
-     */
-    RenderGraphics rg;
-
-    /**
-     *
-     */
-    public static final int RENDERING_QUALITY_LOW = 1;
-
-    /**
-     *
-     */
-    public static final int RENDERING_QUALITY_HIGH = 2;
-
-    /**
     * Constructor
     */
     private ScalableGraphics() {
+    	super();
     }
 	
     /**
@@ -144,104 +77,9 @@ public class ScalableGraphics  {
         g = null;
         gsd = null;
     }
-
-    /**
-     *
-     */
-    public void render(int x, int y, ScalableImage image) {
-        if (image == null) {
-            throw new NullPointerException();
-        }
-
-        if (g == null) {
-            throw new IllegalStateException();
-        }
-
-        DocumentNode documentNode = 
-            (DocumentNode) ((SVGImage) image).getDocument();
-
-        int vpw = image.getViewportWidth();
-        int vph = image.getViewportHeight();
-        checkOffscreen(vpw, vph);
-
-        if (DirtyAreaManager.ON) {
-            dirtyAreaManager.setViewport(documentNode);
-            documentNode.setUpdateListener(dirtyAreaManager);
-        }
-
-        rg.setRenderingQuality(qualityMode == RENDERING_QUALITY_HIGH);
-
-        documentNode.sample(documentNode.getCurrentTime());
-        documentNode.applyAnimations();
-
-        if (DirtyAreaManager.ON) {
-            dirtyAreaManager.refresh(documentNode, rg, CLEAR_PAINT);
-        } else {
-            // Clear offscreen and paint
-            pr.setColor(0, 0, 0, 0);
-            pr.setClip(0, 0, offscreenWidth, offscreenHeight);
-            pr.clearRect(0, 0, offscreenWidth, offscreenHeight);
-            documentNode.paint(rg);
-        }
-        
-        // Now, render the image with alpha.
-        gsd.drawSurface(offscreen, 0, 0, x, y, offscreenWidth, offscreenHeight, alpha);
-    }
-
-    /**
-     * Get an offscreen buffer big enough to draw a widht by height
-     * image.
-     *
-     * @param width the desired minimal width
-     * @param height the desired minimal height.
-     */
-    void checkOffscreen(final int width,
-                        final int height) {
-        int w = width;
-        int h = height;
-        if (w <= 0) {
-            w = 1;
-        }
-        
-        if (h <= 0) {
-            h = 1;
-        }
-        
-        if (offscreen == null
-            ||
-            offscreenWidth != w
-            ||
-            offscreenHeight != h) {
-            offscreen = new NativeSurface(w, h);
-            offscreenWidth = w;
-            offscreenHeight = h;
-
-            pr = new PiscesRenderer(offscreen, w, h, 0, w, 1, 
-                                    RendererBase.TYPE_INT_ARGB);
-            rg = new RenderGraphics(pr, offscreenWidth, offscreenHeight);
-        } 
-    }
-
-    /**
-     *
-     */
-    public void setRenderingQuality(int mode) {
-        if (mode != RENDERING_QUALITY_LOW && mode != RENDERING_QUALITY_HIGH) {
-            throw new IllegalArgumentException("" + mode);
-        }
-
-        this.qualityMode = mode;
-    }
-
-    /**
-     *
-     */
-    public void setTransparency(float alpha) {
-        if (alpha < 0f || alpha > 1f) {
-            throw new IllegalArgumentException();
-        }
-
-        this.alpha = alpha;
+    
+    boolean isGraphicsNull() {
+    	return (g == null);
     }
 
     /**
