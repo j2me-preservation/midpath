@@ -41,17 +41,8 @@ import java.io.IOException;
  * 
  *
  */
-public class GZIPSupport {
+public class GZIPSupport extends AbstractGZIPSupport {
 
-    /**
-     * Used for HTTP request headers
-     */
-    public static final String HTTP_ACCEPT_ENCODING = "Accept-Encoding";
-
-    /**
-     * GZIP encoding
-     */
-    static final String HTTP_GZIP_ENCODING = "gzip";
 
     /**
      * If GZIP encoding is supported, this method should setup the
@@ -97,66 +88,5 @@ public class GZIPSupport {
             httpC.setRequestProperty(HTTP_ACCEPT_ENCODING, encodings);
         }
 
-        /**
-         * This method checks if the input stream is a GZIP stream.
-         * It reads the first two bytes of the stream and compares
-         * the short it reads with the GZIP magic number
-         * (see <code>java.util.zip.GZIPInputStream.GZIP_MAGIC).
-         * 
-         * If the magic number matches, the method returns a 
-         * <code>java.util.zip.GZIPInputStream</code> which wraps the
-         * input stream. Otherwise, the method returns either the 
-         * unchanged stream or a <code>BufferedInputStream</code>
-         * if the input stream did not support marking, as defined
-         * by the <code>java.io.InputStream.mark</code> method.
-         *
-         * @param is the input stream that might be GZIPPed.
-         * @return a stream that handles GZIP uncompression, if any is 
-         *         needed.
-         * @throws IOException if an I/O error happens while building
-         *         a GZIPInputStream.
-         */
-        public static InputStream handleGZIP(InputStream is) throws IOException {
-            // Wrap the stream if it does not support marking.
-            // BufferedInputStream supports marking.
-
-            //Temporary: wrap all input streams to workaround bug in WTK (CR 6335742)
-            //Temporary: //if (!is.markSupported())
-            is = new BufferedInputStream(is);
-
-            int magicIn = 0;
-            try {
-                is.mark(2);
-                magicIn = 0x0000ffff & (is.read() | is.read() << 8);
-            } catch (IOException ex) {
-                // We were not able to read at least two bytes,
-                // this cannot be a GZIP stream as it does not 
-                // even have the magic number header
-                is.reset();
-
-                return is;
-
-            } finally {
-                try {
-
-                    is.reset();
-
-                } catch (IOException ioe) {
-                    // This should _never_ happen because we do not fall
-                    // into _any_ of the conditions that might cause a 
-                    // reset() to throw an IOException. If we got into that
-                    // situation, it means we are in serious troubles.
-                    throw new Error();
-                }
-            }
-            if (magicIn == GZIPInputStream.GZIP_MAGIC) {
-
-                return new GZIPInputStream(is);
-
-            }
-
-            return is;
-
-        }
 
     }
