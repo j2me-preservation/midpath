@@ -46,7 +46,7 @@ public class GZIPSupport {
 	/**
 	 * GZIP encoding
 	 */
-	static final String HTTP_GZIP_ENCODING = "gzip";
+	public static final String HTTP_GZIP_ENCODING = "gzip";
 
 	/**
 	 * If GZIP encoding is supported, this method should setup the

@@ -63,8 +63,6 @@ import com.sun.perseus.model.FontFace;
 import com.sun.perseus.model.ModelNode;
 import com.sun.perseus.model.UpdateAdapter;
 import com.sun.perseus.model.UpdateListener;
-import com.sun.perseus.platform.GZIPSupport;
-import com.sun.perseus.platform.GZIPSupportImpl;
 import com.sun.perseus.platform.ThreadSupport;
 import com.sun.perseus.util.SVGConstants;
 import com.sun.perseus.util.SimpleTokenizer;

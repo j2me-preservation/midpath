@@ -25,20 +25,18 @@
  */
 package com.sun.perseus.builder;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import com.sun.perseus.PerseusToolkit;
+import com.sun.perseus.model.DocumentNode;
 import com.sun.perseus.model.FontFace;
 import com.sun.perseus.model.ModelNode;
 import com.sun.perseus.model.UpdateAdapter;
-import com.sun.perseus.model.DocumentNode;
-
-import com.sun.perseus.platform.ResourceHandler;
-
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.Reader;
-
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
 
 /**
  * This helper class encapsulates the creation of a default <tt>FontFace</tt>

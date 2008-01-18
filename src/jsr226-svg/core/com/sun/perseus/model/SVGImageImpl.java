@@ -43,7 +43,6 @@ import org.w3c.dom.svg.SVGElement;
 import com.sun.perseus.PerseusToolkit;
 import com.sun.perseus.builder.ModelBuilder;
 import com.sun.perseus.builder.SVGTinyModelFactory;
-import com.sun.perseus.platform.GZIPSupportImpl;
 import com.sun.perseus.util.SVGConstants;
 
 /**

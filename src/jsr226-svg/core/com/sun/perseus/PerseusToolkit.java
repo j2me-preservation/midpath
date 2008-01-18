@@ -7,12 +7,25 @@ import javax.microedition.m2g.SVGImage;
 import javax.microedition.m2g.ScalableGraphics;
 
 import com.sun.perseus.j2d.ImageLoaderUtil;
-import com.sun.perseus.midp.MIDPPerseusToolkit;
 import com.sun.perseus.platform.GZIPSupport;
 
 public abstract class PerseusToolkit {
 
-	private static PerseusToolkit instance = new MIDPPerseusToolkit();
+	private static PerseusToolkit instance;
+	
+	static {
+		String toolkit = System.getProperty("jsr226.toolkit");
+		if (toolkit == null) { // Default
+			toolkit = "org.thenesis.midpath.svg.midp.MIDPPerseusToolkit";
+		}
+		try {
+			Class toolkitClass = Class.forName(toolkit);
+			instance = (PerseusToolkit) toolkitClass.newInstance();
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Error : No toolkit found for JSR226 (SVG)");
+		}
+		
+	}
 
 	protected PerseusToolkit() {
 	}

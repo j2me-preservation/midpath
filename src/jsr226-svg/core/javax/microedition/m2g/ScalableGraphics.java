@@ -48,7 +48,7 @@ public abstract class ScalableGraphics  {
      * The GraphicsSurfaceDestination used to blit the native surface to the
      * Graphics.
      */
-    GraphicsSurfaceDestination gsd = null;
+    protected GraphicsSurfaceDestination gsd = null;
 
     /**
      * The current quality mode.
@@ -160,7 +160,7 @@ public abstract class ScalableGraphics  {
         gsd.drawSurface(offscreen, 0, 0, x, y, offscreenWidth, offscreenHeight, alpha);
     }
     
-    abstract boolean isGraphicsNull();
+    protected abstract boolean isGraphicsNull();
 
     /**
      * Get an offscreen buffer big enough to draw a widht by height
