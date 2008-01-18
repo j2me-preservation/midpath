@@ -29,79 +29,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.thenesis.midpath.demo.ui.choicegroup;
+package org.thenesis.midpath.demo.ui;
 
-import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.TextField;
 import javax.microedition.midlet.MIDlet;
 
 
 /**
- * The alert demo displays a list of alerts that will be displayed once the
- * user clicks a list item. These alerts try to present the full range of
- * alert types supported in MIDP.
+ * The text field demo displays all of the text field types on the screen
+ * allowing the user to edit them at will.
  *
  * @version 2.0
  */
-public class ChoiceGroupDemo extends MIDlet implements CommandListener {
-    private static final Command CMD_EXIT = new Command("Exit", Command.EXIT, 1);
-    private Display display;
-    private boolean firsttime;
+public class CommandDemo extends MIDlet implements CommandListener {
+    private Command exitCommand = new Command("Exit", Command.EXIT, 1);
+    private Command command1 = new Command("command 1", Command.ITEM, 2);
+    private Command command2 = new Command("command 2", Command.ITEM, 2);
+    private Command command3 = new Command("command 3", Command.ITEM, 2);
+    private Command command4 = new Command("command 4", Command.ITEM, 2);
+    private boolean firstTime;
     private Form mainForm;
 
-    public ChoiceGroupDemo() {
-        firsttime = true;
+    public CommandDemo() {
+        firstTime = true;
+        mainForm = new Form("Text Field");
     }
 
     protected void startApp() {
-        if (firsttime) {
-            display = Display.getDisplay(this);
+        if (firstTime) {
+            mainForm.append("This demo contains text fields each one " +
+                "with a different constraint");
 
-            mainForm = new Form("Choice Group");
-            mainForm.append("These are the available choice group types");
+            mainForm.append(new TextField("Any Character", "", 15, TextField.PLAIN));
 
-            // these are the images and strings for the choices.
-            Image[] imageArray = null;
-
-            try {
-                // load the duke image to place in the image array
-                Image duke = Image.createImage("Duke.png");
-
-                // these are the images and strings for the choices.
-                imageArray = new Image[] { duke, duke, duke, duke };
-            } catch (java.io.IOException err) {
-                // ignore the image loading failure the application can recover.
-            }
-
-            String[] stringArray = { "Option A", "Option B", "Option C", "Option D" };
-
-            // create the list of choice groups.
-            ChoiceGroup[] groups =
-                {
-                    new ChoiceGroup("Exclusive", ChoiceGroup.EXCLUSIVE, stringArray, imageArray),
-                    new ChoiceGroup("Multiple", ChoiceGroup.MULTIPLE, stringArray, imageArray),
-                    new ChoiceGroup("Pop-Up", ChoiceGroup.POPUP, stringArray, imageArray)
-                };
-
-            for (int iter = 0; iter < groups.length; iter++) {
-                mainForm.append(groups[iter]);
-            }
-
-            mainForm.addCommand(CMD_EXIT);
+            mainForm.addCommand(exitCommand);
+           mainForm.addCommand(command1);
+            mainForm.addCommand(command2);
+            mainForm.addCommand(command3);
+            mainForm.addCommand(command4);
             mainForm.setCommandListener(this);
-            firsttime = false;
+            firstTime = false;
         }
 
-        display.setCurrent(mainForm);
+        Display.getDisplay(this).setCurrent(mainForm);
     }
 
-    public void commandAction(Command c, Displayable d) {
-        if (c == CMD_EXIT) {
+    public void commandAction(Command c, Displayable s) {
+        if (c == exitCommand) {
             destroyApp(false);
             notifyDestroyed();
         }

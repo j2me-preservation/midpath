@@ -99,7 +99,7 @@ public class ListDemo extends MIDlet implements CommandListener {
 
             try {
                 // load the duke image to place in the image array
-                Image icon = Image.createImage("/midp/uidemo/Icon.png");
+                Image icon = Image.createImage("Icon.png");
 
                 // these are the images and strings for the choices.
                 imageArray = new Image[] { icon, icon, icon };
