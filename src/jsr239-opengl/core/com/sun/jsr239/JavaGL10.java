@@ -92,7 +92,11 @@ public class JavaGL10 implements GL10 {
 	}
 	
 	private float convertFPToFloat(int fp) {
-		return ((float)fp) / 65535; 
+		return ((float)fp) / 65536; 
+	}
+	
+	private int convertFloatToFP(float f) {
+		return (int) (f * 65536); 
 	}
 	
 	/* GL10 interface */
@@ -190,8 +194,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glDeleteTextures(int n, int[] textures, int offset) {
-		// FIXME Handle the offset
-		gl.glDeleteTextures(n, textures);
+		int[] t = textures;
+		if (offset > 0) {
+			int length = textures.length - offset;
+			t = new int[length];
+			System.arraycopy(textures, offset, t, 0, length);
+		}
+		gl.glDeleteTextures(n, t);
 	}
 
 	public void glDeleteTextures(int n, IntBuffer textures) {
@@ -253,15 +262,15 @@ public class JavaGL10 implements GL10 {
 				if (colorPointer.stride != 0) {
 					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
 				}
-				int c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+				float c0 = 0, c1 = 0, c2 = 0, c3 = 0;
 				IntBuffer vBuffer = (IntBuffer) colorPointer.pointer;
 				int offset = indice * colorPointer.size;
 				vBuffer.position(offset);
-				c0 = vBuffer.get();
-				c1 = vBuffer.get();
-				c2 = vBuffer.get();
-				c3 = vBuffer.get();
-				gl.glColor4i(c0, c1, c2, c3);
+				c0 = convertFPToFloat(vBuffer.get());
+				c1 = convertFPToFloat(vBuffer.get());
+				c2 = convertFPToFloat(vBuffer.get());
+				c3 = convertFPToFloat(vBuffer.get());
+				gl.glColor4f(c0, c1, c2, c3);
 			} else if (colorPointer.type == GL_FLOAT) {
 				// FIXME
 				if (colorPointer.stride != 0) {
@@ -311,14 +320,14 @@ public class JavaGL10 implements GL10 {
 						throw new UnsupportedOperationException(
 								"stride != 0 : not supported by this implementation");
 					}
-					int v0 = 0, v1 = 0, v2 = 0;
+					float v0 = 0, v1 = 0, v2 = 0;
 					IntBuffer vBuffer = (IntBuffer) vertexPointer.pointer;
 					int offset = indice * vertexPointer.size;
 					vBuffer.position(offset);
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					v2 = vBuffer.get();
-					gl.glVertex3i(v0, v1, v2);
+					v0 = convertFPToFloat(vBuffer.get());
+					v1 = convertFPToFloat(vBuffer.get());
+					v2 = convertFPToFloat(vBuffer.get());
+					gl.glVertex3f(v0, v1, v2);
 				} else if (vertexPointer.type == GL_FLOAT) {
 					// FIXME
 					if (vertexPointer.stride != 0) {
@@ -366,14 +375,14 @@ public class JavaGL10 implements GL10 {
 				if (normalPointer.stride != 0) {
 					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
 				}
-				int v0 = 0, v1 = 0, v2 = 0;
+				float v0 = 0, v1 = 0, v2 = 0;
 				IntBuffer vBuffer = (IntBuffer) normalPointer.pointer;
 				int offset = indice * normalPointer.size;
 				vBuffer.position(offset);
-				v0 = vBuffer.get();
-				v1 = vBuffer.get();
-				v2 = vBuffer.get();
-				gl.glNormal3i(v0, v1, v2);
+				v0 = convertFPToFloat(vBuffer.get());
+				v1 = convertFPToFloat(vBuffer.get());
+				v2 = convertFPToFloat(vBuffer.get());
+				gl.glNormal3f(v0, v1, v2);
 			} else if (normalPointer.type == GL_FLOAT) {
 				// FIXME
 				if (normalPointer.stride != 0) {
@@ -443,25 +452,25 @@ public class JavaGL10 implements GL10 {
 				if (texCoordPointer.stride != 0) {
 					throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
 				}
-				int v0 = 0, v1 = 0, v2 = 0, v3 = 0;
+				float v0 = 0, v1 = 0, v2 = 0, v3 = 0;
 				IntBuffer vBuffer = (IntBuffer) texCoordPointer.pointer;
 				int offset = indice * texCoordPointer.size;
 				vBuffer.position(offset);
 				if (texCoordPointer.size == 2) {
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					gl.glTexCoord2i(v0, v1);
+					v0 = convertFPToFloat(vBuffer.get());
+					v1 = convertFPToFloat(vBuffer.get());
+					gl.glTexCoord2f(v0, v1);
 				} else if (texCoordPointer.size == 3) {
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					v2 = vBuffer.get();
-					gl.glTexCoord3i(v0, v1, v2);
+					v0 = convertFPToFloat(vBuffer.get());
+					v1 = convertFPToFloat(vBuffer.get());
+					v2 = convertFPToFloat(vBuffer.get());
+					gl.glTexCoord3f(v0, v1, v2);
 				} else if (texCoordPointer.size == 4) {
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					v2 = vBuffer.get();
-					v3 = vBuffer.get();
-					gl.glTexCoord4i(v0, v1, v2, v3);
+					v0 = convertFPToFloat(vBuffer.get());
+					v1 = convertFPToFloat(vBuffer.get());
+					v2 = convertFPToFloat(vBuffer.get());
+					v3 = convertFPToFloat(vBuffer.get());
+					gl.glTexCoord4f(v0, v1, v2, v3);
 				}
 			} else if (texCoordPointer.type == GL_FLOAT) {
 				// FIXME
@@ -631,8 +640,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glGenTextures(int n, int[] textures, int offset) {
-		// FIXME Handle the offset
-		gl.glGenTextures(n, textures);
+		int[] t = textures;
+		if (offset > 0) {
+			int length = textures.length - offset;
+			t = new int[length];
+			System.arraycopy(textures, offset, t, 0, length);
+		}
+		gl.glGenTextures(n, t);
 		
 	}
 
@@ -645,12 +659,105 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glGetIntegerv(int pname, int[] params, int offset) {
+		
+		switch(pname) {
+		case GL_ALIASED_POINT_SIZE_RANGE:
+			params[offset] = 1;
+			params[offset + 1] = 1;
+			break;
+		case GL_ALIASED_LINE_WIDTH_RANGE:
+			params[offset] = 1;
+			params[offset + 1] = 1;
+			break;
+		case GL_ALPHA_BITS:
+			params[offset] = 8;
+			break;
+		case GL_BLUE_BITS:
+			params[offset] = 8;
+			break;
+		case GL_COMPRESSED_TEXTURE_FORMATS:
+			params[offset] = GL_PALETTE4_RGB8_OES;
+			params[offset + 1] = GL_PALETTE4_RGBA8_OES;
+			params[offset + 2] = GL_PALETTE4_R5_G6_B5_OES;
+			params[offset + 3] = GL_PALETTE4_RGBA4_OES;
+			params[offset + 4] = GL_PALETTE4_RGB5_A1_OES;
+			params[offset + 5] = GL_PALETTE8_RGB8_OES;
+			params[offset + 6] = GL_PALETTE8_RGBA8_OES;
+			params[offset + 7] = GL_PALETTE8_R5_G6_B5_OES;
+			params[offset + 8] = GL_PALETTE8_RGBA4_OES;
+			params[offset + 9] = GL_PALETTE8_RGB5_A1_OES;
+			break;
+		case GL_DEPTH_BITS:
+			params[offset] = 32; // FIXME ?
+			break;
+		case GL_GREEN_BITS:
+			params[offset] = 8;
+			break;
+		case GL_IMPLEMENTATION_COLOR_READ_FORMAT_OES:
+			params[offset]= GL_RGBA;
+			break;
+		case GL_IMPLEMENTATION_COLOR_READ_TYPE_OES:
+			params[offset]= GL_UNSIGNED_BYTE;
+			break;
+		case GL_MAX_ELEMENTS_INDICES:
+			params[offset] = 4096;
+			break;
+		case GL_MAX_ELEMENTS_VERTICES:
+			params[offset] = 4096;
+			break;
+		case GL_MAX_LIGHTS:
+			params[offset] = 8;
+			break;
+		case GL_MAX_MODELVIEW_STACK_DEPTH:
+			params[offset] = 16;
+			break;
+		case GL_MAX_PROJECTION_STACK_DEPTH:
+			params[offset] = 2;
+			break;
+		case GL_MAX_TEXTURE_SIZE:
+			params[offset] = 256;
+			break;
+		case GL_MAX_TEXTURE_STACK_DEPTH:
+			params[offset] = 2;
+			break;
+		case GL_MAX_TEXTURE_UNITS:
+			params[offset] = 1;
+			break;
+		case GL_MAX_VIEWPORT_DIMS:
+			params[offset] = 1024;
+			params[offset + 1] = 1024;
+			break;
+		case GL_NUM_COMPRESSED_TEXTURE_FORMATS:
+			params[offset] = 10;
+			break;
+		case GL_RED_BITS:
+			params[offset] = 8;
+			break;
+		case GL_SMOOTH_LINE_WIDTH_RANGE:
+			params[offset] = 1;
+			params[offset + 1] = 1;
+			break;
+		case GL_SMOOTH_POINT_SIZE_RANGE:
+			params[offset] = 1;
+			params[offset + 1] = 1;
+			break;
+		case GL_STENCIL_BITS:
+			params[offset] = 24; // FIXME ?
+			break;
+		case GL_SUBPIXEL_BITS:
+			params[offset] = 4; // FIXME ?
+			break;
+			
+		}
+		
 		// FIXME Handle the offset
-		gl.glGetIntegerv(pname, params);
+		//gl.glGetIntegerv(pname, params);
 	}
 
 	public void glGetIntegerv(int pname, IntBuffer params) {
-		glGetIntegerv(pname, params.array(), 0);
+		int[] b = new int[params.remaining()];
+		glGetIntegerv(pname, b, 0);
+		params.put(b);
 	}
 
 	public String glGetString(int name) {
@@ -667,8 +774,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glLightModelfv(int pname, float[] params, int offset) {
-		//	FIXME Handle offset
-		gl.glLightModelfv(pname, params);
+		float[] p = params;
+		if (offset > 0) {
+			int length = params.length - offset;
+			p = new float[length];
+			System.arraycopy(params, offset, p, 0, length);
+		}
+		gl.glLightModelfv(pname, p);
 	}
 
 	public void glLightModelfv(int pname, FloatBuffer params) {
@@ -680,8 +792,12 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glLightModelxv(int pname, int[] params, int offset) {
-		// FIXME Handle offset / FP
-		gl.glLightModeliv(pname, params);
+		int length = params.length - offset;
+		float[] p = new float[length];
+		for (int i = 0; i < length; i++) {
+			p[i] = convertFPToFloat(params[i + offset]);
+		}
+		gl.glLightModelfv(pname, p);
 	}
 
 	public void glLightModelxv(int pname, IntBuffer params) {
@@ -693,8 +809,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glLightfv(int light, int pname, float[] params, int offset) {
-		// FIXME Handle the offset
-		gl.glLightfv(light, pname, params);
+		float[] p = params;
+		if (offset > 0) {
+			int length = params.length - offset;
+			p = new float[length];
+			System.arraycopy(params, offset, p, 0, length);
+		}
+		gl.glLightfv(light, pname, p);
 	}
 
 	public void glLightfv(int light, int pname, FloatBuffer params) {
@@ -706,8 +827,12 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glLightxv(int light, int pname, int[] params, int offset) {
-		// FIXME Handle offset / FP
-		gl.glLightiv(light, pname, params);
+		int length = params.length - offset;
+		float[] p = new float[length];
+		for (int i = 0; i < length; i++) {
+			p[i] = convertFPToFloat(params[i + offset]);
+		}
+		gl.glLightfv(light, pname, p);
 	}
 
 	public void glLightxv(int light, int pname, IntBuffer params) {
@@ -727,8 +852,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glLoadMatrixf(float[] m, int offset) {
-		// FIXME Handle offset
-		gl.glLoadMatrixf(m);
+		float[] p = m;
+		if (offset > 0) {
+			int length = m.length - offset;
+			p = new float[length];
+			System.arraycopy(m, offset, p, 0, length);
+		} 
+		gl.glLoadMatrixf(p);
 	}
 
 	public void glLoadMatrixf(FloatBuffer m) {
@@ -736,11 +866,12 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glLoadMatrixx(int[] m, int offset) {
-		float[] fm = new float[m.length];
-		for (int i = 0; i < m.length; i++) {
-			fm[i] = convertFPToFloat(m[i]);
+		int length = m.length - offset;
+		float[] fm = new float[length];
+		for (int i = 0; i < length; i++) {
+			fm[i] = convertFPToFloat(m[i + offset]);
 		}
-		glLoadMatrixf(fm, offset);
+		gl.glLoadMatrixf(fm);
 	}
 
 	public void glLoadMatrixx(IntBuffer m) {
@@ -769,10 +900,10 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glMaterialxv(int face, int pname, int[] params, int offset) {
-		// FIXME Handle offset
-		float[] fm = new float[params.length];
-		for (int i = 0; i < params.length; i++) {
-			fm[i] = convertFPToFloat(params[i]);
+		int length = params.length - offset;
+		float[] fm = new float[length];
+		for (int i = 0; i < length; i++) {
+			fm[i] = convertFPToFloat(params[i + offset]);
 		}
 		gl.glMaterialfv(face, pname, fm);
 	}
@@ -786,8 +917,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glMultMatrixf(float[] m, int offset) {
-		// FIXME Handle offset
-		gl.glMultMatrixf(m);
+		float[] p = m;
+		if (offset > 0) {
+			int length = m.length - offset;
+			p = new float[length];
+			System.arraycopy(m, offset, p, 0, length);
+		} 
+		gl.glMultMatrixf(p);
 	}
 
 	public void glMultMatrixf(FloatBuffer m) {
@@ -807,13 +943,11 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glMultiTexCoord4f(int target, float s, float t, float r, float q) {
-		// TODO
-		System.out.println("glMultiTexCoord4f() is not supported yet");
+		gl.glTexCoord4f(s, t, r, q);
 	}
 
 	public void glMultiTexCoord4x(int target, int s, int t, int r, int q) {
-		//	TODO
-		System.out.println("glMultiTexCoord4x() is not supported yet");
+		gl.glTexCoord4f(convertFPToFloat(s), convertFPToFloat(t), convertFPToFloat(r), convertFPToFloat(q));
 	}
 
 	public void glNormal3f(float nx, float ny, float nz) {
@@ -867,8 +1001,37 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
-		// TODO get pixels in an arry and put it in the given buffer 
-		//gl.glReadPixels(x, y, width, height, format, type, pixels);
+		
+		if ((width < 0) || (height < 0)) {
+			gl.throwGLError(jgl.GL.GL_INVALID_VALUE, "glReadPixels: width or height is negative");
+			return;
+		}
+		
+		if ((format != GL_RGBA) || (type != GL_UNSIGNED_BYTE)) {
+			gl.throwGLError(jgl.GL.GL_INVALID_ENUM, "glReadPixels");
+			gl.throwGLError(jgl.GL.GL_INVALID_OPERATION, "glReadPixels");
+			return;
+		}
+		
+		byte[][][] pixelArray = new byte[width][height][4];
+		gl.glReadPixels(x, y, width, height, jgl.GL.GL_RGBA, jgl.GL.GL_UNSIGNED_BYTE, pixelArray);
+		
+		if(pixels instanceof ByteBuffer) {
+			ByteBuffer buffer = (ByteBuffer)pixels;
+			for (int j = 0; j < height; j++) {
+				int offset = j * width;
+				for (int i = 0; i < width; i++) {
+					buffer.position(offset + i * 4);
+					buffer.put(pixelArray[i][j][0]);
+					buffer.put(pixelArray[i][j][1]);
+					buffer.put(pixelArray[i][j][2]);
+					buffer.put(pixelArray[i][j][3]);
+				}
+			}
+		}
+	
+		// TODO Add IntBuffer and FloatBuffer support
+		
 	}
 
 	public void glRotatef(float angle, float x, float y, float z) {
@@ -881,12 +1044,14 @@ public class JavaGL10 implements GL10 {
 
 	public void glSampleCoverage(float value, boolean invert) {
 		//	TODO
-		System.out.println("glSampleCoverage() is not supported yet");
+		if (DEBUG)
+			System.out.println("glSampleCoverage() is not supported yet");
 	}
 
 	public void glSampleCoveragex(int value, boolean invert) {
 		// TODO
-		System.out.println("glSampleCoveragex() is not supported yet");
+		if (DEBUG)
+			System.out.println("glSampleCoveragex() is not supported yet");
 	}
 
 	public void glScalef(float x, float y, float z) {
@@ -927,8 +1092,13 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glTexEnvfv(int target, int pname, float[] params, int offset) {
-		// FIXME Handle offset
-		gl.glTexEnvfv(target, pname, params);
+		float[] p = params;
+		if (offset > 0) {
+			int length = params.length - offset;
+			p = new float[length];
+			System.arraycopy(params, offset, p, 0, length);
+		} 
+		gl.glTexEnvfv(target, pname, p);
 	}
 
 	public void glTexEnvfv(int target, int pname, FloatBuffer params) {
@@ -940,10 +1110,10 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glTexEnvxv(int target, int pname, int[] params, int offset) {
-		// FIXME Handle offset
-		float[] fm = new float[params.length];
-		for (int i = 0; i < params.length; i++) {
-			fm[i] = convertFPToFloat(params[i]);
+		int length = params.length - offset;
+		float[] fm = new float[length];
+		for (int i = 0; i < length; i++) {
+			fm[i] = convertFPToFloat(params[i + offset]);
 		}
 		gl.glTexEnvfv(target, pname, fm);
 	}
@@ -1123,7 +1293,6 @@ public class JavaGL10 implements GL10 {
 	/* GL10 Ext interface */
 
 	//	public int glQueryMatrixxOES(int[] mantissa, int mantissaOffset, int[] exponent, int exponentOffset) {
-	//		// TODO
 	//		System.out.println("glVertexPointer() is not supported yet");
 	//		return 0;
 	//	}
