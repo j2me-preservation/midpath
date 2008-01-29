@@ -622,6 +622,11 @@ public class GL {
 		this.context = context;
 		this.cc = (gl_object) context;
 	}
+	
+	public void throwGLError(int error, String s) {
+		context.gl_error(error, s);
+	}
+
 
 	/**
 	 *
@@ -6011,7 +6016,7 @@ public class GL {
 	public int glGetError() {
 		return context.lastError;
 	}
-
+	
 	/**
 	 * GLX Functions
 	 *     Java is not X-Window system, the following functions are just 
