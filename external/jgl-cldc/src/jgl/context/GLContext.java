@@ -980,14 +980,26 @@ public class GLContext extends gl_object {
 	public void gl_pop_matrix() {
 		switch (Transform.MatrixMode) {
 		case GL.GL_MODELVIEW:
-			ModelViewMatrix = (float[]) ModelViewStack.pop();
-			ModelViewInvValid = false;
+			if (!ModelViewStack.isEmpty()) {
+				ModelViewMatrix = (float[]) ModelViewStack.pop();
+				ModelViewInvValid = false;
+			} else {
+				gl_error(GL.GL_STACK_UNDERFLOW, "glPopMatrix (GL_MODELVIEW)");
+			}
 			break;
 		case GL.GL_PROJECTION:
-			ProjectionMatrix = (float[]) ProjectionStack.pop();
+			if (!ProjectionStack.isEmpty()) {
+				ProjectionMatrix = (float[]) ProjectionStack.pop();
+			} else {
+				gl_error(GL.GL_STACK_UNDERFLOW, "glPopMatrix (GL_PROJECTION)");
+			}
 			break;
 		case GL.GL_TEXTURE:
-			TextureMatrix = (float[]) TextureStack.pop();
+			if (!TextureStack.isEmpty()) {
+				TextureMatrix = (float[]) TextureStack.pop();
+			} else {
+				gl_error(GL.GL_STACK_UNDERFLOW, "glPopMatrix (GL_TEXTURE)");
+			}
 			break;
 		}
 	}
