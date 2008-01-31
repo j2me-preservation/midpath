@@ -17,9 +17,8 @@ public final class Graphics3D {
 
 	private static Graphics3D instance = null;
 
-	static final int MAX_LIGHT_COUNT = 8;
-
-	private int numTextureUnits = 8; // TODO: get from caps
+	private int maxTextureUnits = 1;
+	private int maxLights = 1;
 
 	private int viewportX = 0;
 	private int viewportY = 0;
@@ -42,6 +41,7 @@ public final class Graphics3D {
 
 	private CompositingMode defaultCompositioningMode = new CompositingMode();
 	private PolygonMode defaultPolygonMode = new PolygonMode();
+	
 
 	private Graphics3D() {
 		initGLES();
@@ -54,16 +54,16 @@ public final class Graphics3D {
 		return instance;
 	}
 	
-	public void initGLES() {
+	private void initGLES() {
+		
+		// Create EGL context
 		this.egl = (EGL10) EGLContext.getEGL();
-
 		this.eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 
 		int[] major_minor = new int[2];
 		egl.eglInitialize(eglDisplay, major_minor);
 
 		int[] num_config = new int[1];
-
 		egl.eglGetConfigs(eglDisplay, null, 0, num_config);
 
 		int redSize = 8;
@@ -72,7 +72,6 @@ public final class Graphics3D {
 		int alphaSize = 0;
 		int depthSize = 32;
 		int stencilSize = EGL10.EGL_DONT_CARE;
-
 		int[] s_configAttribs = { EGL10.EGL_RED_SIZE, redSize, EGL10.EGL_GREEN_SIZE, greenSize, EGL10.EGL_BLUE_SIZE,
 				blueSize, EGL10.EGL_ALPHA_SIZE, alphaSize, EGL10.EGL_DEPTH_SIZE, depthSize, EGL10.EGL_STENCIL_SIZE,
 				stencilSize, EGL10.EGL_NONE };
@@ -82,10 +81,14 @@ public final class Graphics3D {
 		this.eglConfig = eglConfigs[0];
 
 		this.eglContext = egl.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, null);
-
 		this.gl = (GL10) eglContext.getGL();
 
-		
+		// Get the number of texture units and lights available
+		int[] params = new int[1];
+		gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_UNITS, params, 0);
+		maxTextureUnits = params[0]; 
+		gl.glGetIntegerv(GL10.GL_MAX_LIGHTS, params, 0);
+		maxLights = params[0]; 
 	}
 
 	public void bindTarget(Object target) {
@@ -99,32 +102,10 @@ public final class Graphics3D {
 
 			// Perform setup and clear background using GL
 			egl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, g);
-			
-			
-			//canvas.addGLEventListener(renderListener);
-			//canvas.display();
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
-
-//	public void bindTarget(Object target) {
-//		if (target instanceof Graphics) {
-//			this.renderTarget = target;
-//			GLCanvas canvas = MIDPEmulator.getInstance().getRenderTarget((Graphics) target);
-//			this.currentGLCanvas = canvas;
-//
-//			// set the gurrent GL object
-//			setGL(canvas.getGL());
-//
-//			// set the GLContext of the canvas to be the current context
-//			int contextStatus = canvas.getContext().makeCurrent();
-//
-//			// Set default viewport?
-//			if (this.viewportHeight == 0 || this.viewportWidth == 0)
-//				setViewport(0, 0, canvas.getWidth(), canvas.getHeight());
-//		}
-//	}
 
 	public void bindTarget(Object target, boolean depthBuffer, int hints) {
 		bindTarget(target);
@@ -159,7 +140,7 @@ public final class Graphics3D {
 		int index = lights.size() - 1;
 
 		// limit the number of lights
-		if (index < MAX_LIGHT_COUNT) {
+		if (index < maxLights) {
 			gl.glPushMatrix();
 			transform.multGL(gl); // TODO: should this really be setGL? I was thinking multGL...
 
@@ -178,7 +159,7 @@ public final class Graphics3D {
 	public void resetLights() {
 		lights.removeAllElements();
 
-		for (int i = 0; i < MAX_LIGHT_COUNT; ++i)
+		for (int i = 0; i < maxLights; ++i)
 			gl.glDisable(GL10.GL_LIGHT0 + i);
 	}
 
@@ -274,6 +255,7 @@ public final class Graphics3D {
 		if (appearance == null)
 			throw new NullPointerException("appearance == null");
 
+		// Vertices
 		float[] scaleBias = new float[4];
 		VertexArray positions = vertices.getPositions(scaleBias);
 		FloatBuffer pos = positions.getFloatBuffer();
@@ -281,6 +263,7 @@ public final class Graphics3D {
 		gl.glVertexPointer(positions.getComponentCount(), GL10.GL_FLOAT, 0, pos);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
+		// Normals
 		VertexArray normals = vertices.getNormals();
 		if (normals != null) {
 			FloatBuffer norm = normals.getFloatBuffer();
@@ -294,6 +277,7 @@ public final class Graphics3D {
 			gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 		}
 
+		// Colors
 		VertexArray colors = vertices.getColors();
 		if (colors != null) {
 			Buffer buffer = colors.getBuffer();
@@ -302,38 +286,41 @@ public final class Graphics3D {
 			gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		} else
 			gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-
-		for (int i = 0; i < 8; ++i) {
+		
+		// Textures
+		for (int i = 0; i < maxTextureUnits; ++i) {
 			float[] texScaleBias = new float[4];
 			VertexArray texcoords = vertices.getTexCoords(i, texScaleBias);
-			gl.glActiveTexture(GL10.GL_TEXTURE0 + i);
 			gl.glClientActiveTexture(GL10.GL_TEXTURE0 + i);
-			if (texcoords != null) {
+			if ((texcoords != null) && (appearance.getTexture(i) != null)) {
+				// Enable the texture coordinate array 
+				gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 				FloatBuffer tex = texcoords.getFloatBuffer();
 				tex.position(0);
 
-				if (appearance.getTexture(i) != null)
-					appearance.getTexture(i).setupGL(gl, texScaleBias);
-				else
-					gl.glDisable(GL10.GL_TEXTURE_2D);
-
+				// Activate the texture unit
+				gl.glActiveTexture(GL10.GL_TEXTURE0 + i);
+				appearance.getTexture(i).setupGL(gl, texScaleBias);
+				
+				// Set the texture coordinates
 				gl.glTexCoordPointer(texcoords.getComponentCount(), GL10.GL_FLOAT, 0, tex);
-				gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-
 			} else {
 				gl.glDisable(GL10.GL_TEXTURE_2D);
 				gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 			}
 		}
 
+		// Appearance
 		setAppearance(appearance);
 
+		// Scene
 		gl.glPushMatrix();
 		transform.multGL(gl);
 
 		gl.glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3]);
 		gl.glScalef(scaleBias[0], scaleBias[0], scaleBias[0]);
 
+		// Draw
 		if (triangles instanceof TriangleStripArray) {
 			ShortBuffer indices = triangles.getBuffer();
 			indices.position(0);
@@ -438,23 +425,12 @@ public final class Graphics3D {
 		this.gl = gl;
 	}
 
-//	GL10 getGL() {
-//		//if (this.gl != null)
-//			return this.gl;
-//
-//		// try to fecth a gl object from the Emulator eneviroment instead!
-//		// NOTE: experimental, not working
-//		//return MIDPEmulator.getInstance().getGL();
-//	}
-
-	
-
 	int getTextureUnitCount() {
-		return numTextureUnits;
+		return maxTextureUnits;
 	}
 
 	void disableTextureUnits() {
-		for (int i = 0; i < numTextureUnits; i++) {
+		for (int i = 0; i < maxTextureUnits; i++) {
 			gl.glActiveTexture(GL10.GL_TEXTURE0 + i);
 			gl.glDisable(GL10.GL_TEXTURE_2D);
 		}

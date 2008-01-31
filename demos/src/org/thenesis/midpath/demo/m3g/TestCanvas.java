@@ -232,7 +232,7 @@ public class TestCanvas extends Canvas {
 		Image midpImage = null;
 		try {
 			System.out.println("initScene() : loading image 1");
-			midpImage = Image.createImage("data/texture.png");
+			midpImage = Image.createImage("data/texture-small.png");
 			System.out.println("initScene() : image 1 loaded");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -258,7 +258,7 @@ public class TestCanvas extends Canvas {
 		// create the Image2D (we need this so we can make a Texture2D)
 		try {
 			System.out.println("initScene() : loading image 2");
-			midpImage = Image.createImage("data/dirt.png");
+			midpImage = Image.createImage("data/dirt-small.png");
 			System.out.println("initScene() : image 2 loaded");
 		} catch (IOException e) {
 			e.printStackTrace();

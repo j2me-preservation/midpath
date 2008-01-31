@@ -17,9 +17,11 @@ import jgl.GL;
 
 public class JavaGL10 implements GL10 {
 
-	private GL gl;
-
 	static final boolean DEBUG = false;
+
+	private static final int MAX_TEXTURE_UNITS = 1;
+	
+	private GL gl;
 
 	/**
 	 * <code>context</code> is the context the GL10
@@ -102,8 +104,16 @@ public class JavaGL10 implements GL10 {
 	/* GL10 interface */
 
 	public void glActiveTexture(int texture) {
-		if (DEBUG)
-			System.out.println("GL10.glActiveTexture() is not supported yet");
+		
+		int textureUnit = texture - GL10.GL_TEXTURE0;
+		
+		if (textureUnit > MAX_TEXTURE_UNITS) {
+			gl.throwGLError(GL.GL_INVALID_ENUM, "glActiveTexture");
+			return;
+		}
+		
+		// Note: Does nothing really useful as there is only one texture unit supported
+		
 	}
 
 	public void glAlphaFunc(int func, float ref) {
@@ -149,7 +159,14 @@ public class JavaGL10 implements GL10 {
 	}
 
 	public void glClientActiveTexture(int texture) {
-		System.out.println("GL10.glClientActiveTexture() is not supported yet");
+		int textureUnit = texture - GL10.GL_TEXTURE0;
+		
+		if (textureUnit > MAX_TEXTURE_UNITS) {
+			gl.throwGLError(GL.GL_INVALID_ENUM, "glClientActiveTexture");
+			return;
+		}
+		
+		// Note: Does nothing really useful as there is only one texture unit supported
 	}
 
 	public void glColor4f(float red, float green, float blue, float alpha) {
@@ -721,7 +738,7 @@ public class JavaGL10 implements GL10 {
 			params[offset] = 2;
 			break;
 		case GL_MAX_TEXTURE_UNITS:
-			params[offset] = 1;
+			params[offset] = MAX_TEXTURE_UNITS;
 			break;
 		case GL_MAX_VIEWPORT_DIMS:
 			params[offset] = 1024;

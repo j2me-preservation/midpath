@@ -6,6 +6,7 @@ import org.thenesis.m3g.engine.util.Color;
 
 
 public class Texture2D extends Transformable {
+	
 	public static final int FILTER_BASE_LEVEL = 208;
 	public static final int FILTER_LINEAR = 209;
 	public static final int FILTER_NEAREST = 210;
@@ -51,22 +52,6 @@ public class Texture2D extends Transformable {
 
 	public void setImage(Image2D image) {
 		this.image = image;
-
-		// FIXME Move GL calls to setupGL() method (?)
-		
-//		GL10 gl = Graphics3D.getInstance().getGL();
-//
-//		if (gl != null) {
-//			gl.glGenTextures(1, id, 0);
-//			gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
-//
-////			Graphics3D.getInstance().getGLU().gluBuild2DMipmaps(GL.GL_TEXTURE_2D, image.getBytesPerPixel(),
-////					image.getWidth(), image.getHeight(), image.getGLFormat(), GL.GL_UNSIGNED_BYTE, image.getPixels());
-//
-//			// FIXME
-//			System.out.println("[DEBUG] Texture2D.setImage(): not implemented yet: texture will not be set");
-//			//gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 4, image.getWidth(), image.getHeight(), 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, image.getPixels());
-//		}
 	}
 
 	public Image2D getImage() {
@@ -101,15 +86,16 @@ public class Texture2D extends Transformable {
 
 	void setupGL(GL10 gl, float[] scaleBias) {
 		
-		if (textureInitialized) {
+		gl.glEnable(GL10.GL_TEXTURE_2D);
+		
+		if (!textureInitialized) {
 			gl.glGenTextures(1, id, 0);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
-			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, image.getWidth(), image.getHeight(), 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, image.getPixels());
+			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, image.getGLFormat(), image.getWidth(), image.getHeight(), 0, image.getGLFormat(), GL10.GL_UNSIGNED_BYTE, image.getPixels());
 			textureInitialized = true;
+		} else {
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 		}
-		
-		gl.glEnable(GL10.GL_TEXTURE_2D);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 
 		// Set filtering
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, getGLFilter(this.imageFilter)); // Linear Filtering
