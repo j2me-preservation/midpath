@@ -137,9 +137,9 @@ public class Texture2D extends Transformable {
 	int getGLFilter(int filter) {
 		switch (filter) {
 		case FILTER_LINEAR:
-			return GL10.GL_LINEAR_MIPMAP_LINEAR;
+			return GL10.GL_LINEAR; //GL10.GL_LINEAR_MIPMAP_LINEAR;
 		case FILTER_NEAREST:
-			return GL10.GL_NEAREST_MIPMAP_LINEAR;
+			return GL10.GL_NEAREST; //GL10.GL_NEAREST_MIPMAP_LINEAR;
 		default:
 			return GL10.GL_NEAREST;
 		}

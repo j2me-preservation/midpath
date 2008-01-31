@@ -1259,13 +1259,20 @@ public class JavaGL10 implements GL10 {
 
 		gl.glTexImage2D(target, level, GL_RGBA, width, height, border, GL_RGBA, GL_UNSIGNED_BYTE, pArray);
 	}
+	
+	private int getCompatibleTexParameter(int param) {
+		if (param == GL_CLAMP_TO_EDGE) {
+			return GL.GL_CLAMP;
+		}
+		return param;
+	}
 
 	public void glTexParameterf(int target, int pname, float param) {
-		gl.glTexParameterf(target, pname, param);
+		gl.glTexParameterf(target, pname, getCompatibleTexParameter((int)param));
 	}
 
 	public void glTexParameterx(int target, int pname, int param) {
-		gl.glTexParameterf(target, pname, convertFPToFloat(param));
+		gl.glTexParameterf(target, pname, getCompatibleTexParameter((int)convertFPToFloat(param)));
 	}
 
 	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,

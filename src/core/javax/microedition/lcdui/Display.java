@@ -27,6 +27,7 @@ package javax.microedition.lcdui;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.microedition.midlet.MIDlet;
 
@@ -2697,17 +2698,14 @@ public class Display {
  */
 class ChamImageTunnel implements com.sun.midp.chameleon.skins.resources.ImageTunnel {
 
-//	public Image getRomizedImage(int imageDataArrayPtr, int imageDataArrayLength) {
-//		return Image.getRomizedImage(imageDataArrayPtr, imageDataArrayLength);
-//	}
-
 	public Image getRomizedImage(String imageIdentifier) {
 		try {
-			return Image.createImage("/com/sun/midp/chameleon/skins/resources/images/" + imageIdentifier + ".png");
+			InputStream is = getClass().getResourceAsStream("/com/sun/midp/chameleon/skins/resources/images/" + imageIdentifier + ".png");
+			return Image.createImage(is);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
-		//return null;
 	}
+	
 }
