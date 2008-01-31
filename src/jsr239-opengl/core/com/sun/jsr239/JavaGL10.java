@@ -1134,7 +1134,7 @@ public class JavaGL10 implements GL10 {
 			case GL_RGB: {
 				ByteBuffer byteBuf = (ByteBuffer) pixels;
 				for (int j = 0; j < height; j++) {
-					byteBuf.position(j * width);
+					byteBuf.position(j * width * 3);
 					for (int i = 0; i < width; i++) {
 						pArray[i][j][0] = byteBuf.get();
 						pArray[i][j][1] = byteBuf.get();
@@ -1147,7 +1147,7 @@ public class JavaGL10 implements GL10 {
 			case GL_RGBA: {
 				ByteBuffer byteBuf = (ByteBuffer) pixels;
 				for (int j = 0; j < height; j++) {
-					byteBuf.position(j * width);
+					byteBuf.position(j * width * 4);
 					for (int i = 0; i < width; i++) {
 						pArray[i][j][0] = byteBuf.get();
 						pArray[i][j][1] = byteBuf.get();
@@ -1203,7 +1203,7 @@ public class JavaGL10 implements GL10 {
 		case GL_UNSIGNED_SHORT_5_6_5: {
 			ShortBuffer byteBuf = (ShortBuffer) pixels;
 			for (int j = 0; j < height; j++) {
-				byteBuf.position(j * width);
+				byteBuf.position(j * width * 2);
 				for (int i = 0; i < width; i++) {
 					int rgb = byteBuf.get();
 					int r = (rgb >> 11) & 0x1f;
@@ -1221,7 +1221,7 @@ public class JavaGL10 implements GL10 {
 		case GL_UNSIGNED_SHORT_4_4_4_4: {
 			ShortBuffer byteBuf = (ShortBuffer) pixels;
 			for (int j = 0; j < height; j++) {
-				byteBuf.position(j * width);
+				byteBuf.position(j * width * 2);
 				for (int i = 0; i < width; i++) {
 					int rgb = byteBuf.get();
 					int r = (rgb >> 12) & 0xF;
@@ -1240,7 +1240,7 @@ public class JavaGL10 implements GL10 {
 		case GL_UNSIGNED_SHORT_5_5_5_1: {
 			ShortBuffer byteBuf = (ShortBuffer) pixels;
 			for (int j = 0; j < height; j++) {
-				byteBuf.position(j * width);
+				byteBuf.position(j * width * 2);
 				for (int i = 0; i < width; i++) {
 					int rgb = byteBuf.get();
 					int r = (rgb >> 11) & 0x1F;

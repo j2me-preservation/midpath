@@ -24,7 +24,10 @@ public class Texture2D extends Transformable {
 	private int wrappingT = WRAP_REPEAT;
 	private int levelFilter = FILTER_BASE_LEVEL;
 	private int imageFilter = FILTER_NEAREST;
+	
+	private boolean textureInitialized = false;
 	int[] id = { 0 };
+	
 
 	public Texture2D(Image2D image) {
 		setImage(image);
@@ -97,6 +100,14 @@ public class Texture2D extends Transformable {
 	}
 
 	void setupGL(GL10 gl, float[] scaleBias) {
+		
+		if (textureInitialized) {
+			gl.glGenTextures(1, id, 0);
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
+			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, image.getWidth(), image.getHeight(), 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, image.getPixels());
+			textureInitialized = true;
+		}
+		
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 

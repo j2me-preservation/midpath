@@ -2345,91 +2345,91 @@ public class GL {
 
 	/** GLvoid glNormal3b (GLbyte x, GLbyte y, GLbyte z) */
 	public void glNormal3b(byte x, byte y, byte z) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3b");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3b");
+//			return;
+//		}
 		cc.gl_normal(x, y, z);
 	}
 
 	/** GLvoid glNormal3d (GLdouble x, GLdouble y, GLdouble z) */
 	public void glNormal3d(double x, double y, double z) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3d");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3d");
+//			return;
+//		}
 		cc.gl_normal((float) x, (float) y, (float) z);
 	}
 
 	/** GLvoid glNormal3f (GLfloat x, GLfloat y, GLfloat z) */
 	public void glNormal3f(float x, float y, float z) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3f");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3f");
+//			return;
+//		}
 		cc.gl_normal(x, y, z);
 	}
 
 	/** GLvoid glNormal3i (GLint x, GLint y, GLint z) */
 	public void glNormal3i(int x, int y, int z) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3i");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3i");
+//			return;
+//		}
 		cc.gl_normal(x, y, z);
 	}
 
 	/** GLvoid glNormal3s (GLshort x, GLshort y, GLshort z) */
 	public void glNormal3s(short x, short y, short z) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3s");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3s");
+//			return;
+//		}
 		cc.gl_normal(x, y, z);
 	}
 
 	/** GLvoid glNormal3bv (GLbyte *v) */
 	public void glNormal3bv(byte v[]) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3bv");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3bv");
+//			return;
+//		}
 		cc.gl_normal(v[0], v[1], v[2]);
 	}
 
 	/** GLvoid glNormal3dv (GLdouble *v) */
 	public void glNormal3dv(double v[]) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3dv");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3dv");
+//			return;
+//		}
 		cc.gl_normal((float) v[0], (float) v[1], (float) v[2]);
 	}
 
 	/** GLvoid glNormal3fv (GLfloat *v) */
 	public void glNormal3fv(float v[]) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3fv");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3fv");
+//			return;
+//		}
 		cc.gl_normal(v[0], v[1], v[2]);
 	}
 
 	/** GLvoid glNormal3iv (GLint *v) */
 	public void glNormal3iv(int v[]) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3iv");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3iv");
+//			return;
+//		}
 		cc.gl_normal(v[0], v[1], v[2]);
 	}
 
 	/** GLvoid glNormal3sv (GLshort *v) */
 	public void glNormal3sv(short v[]) {
-		if (cc.Mode == None) {
-			cc.gl_error(GL_INVALID_OPERATION, "glNormal3sv");
-			return;
-		}
+//		if (cc.Mode == None) {
+//			cc.gl_error(GL_INVALID_OPERATION, "glNormal3sv");
+//			return;
+//		}
 		cc.gl_normal(v[0], v[1], v[2]);
 	}
 
