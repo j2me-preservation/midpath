@@ -31,6 +31,8 @@
  */
 package org.thenesis.midpath.demo.ui.choicegroup;
 
+import java.io.InputStream;
+
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -70,7 +72,8 @@ public class ChoiceGroupDemo extends MIDlet implements CommandListener {
 
             try {
                 // load the duke image to place in the image array
-                Image duke = Image.createImage("Duke.png");
+            	InputStream is = getClass().getResourceAsStream("Duke.png");
+                Image duke = Image.createImage(is);
 
                 // these are the images and strings for the choices.
                 imageArray = new Image[] { duke, duke, duke, duke };
