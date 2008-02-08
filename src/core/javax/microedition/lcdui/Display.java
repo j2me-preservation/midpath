@@ -535,6 +535,10 @@ public class Display {
 		WIDTH = Constants.CHAM_WIDTH;
 		HEIGHT = Constants.CHAM_HEIGHT;
 		
+		// UIToolkit must be initialized first
+		UIToolkit toolkit = UIToolkit.getToolkit();
+		toolkit.initialize(WIDTH, HEIGHT);
+		
 		graphicsAccessor = new GraphicsAccessImpl();
         GameMap.registerGraphicsAccess(graphicsAccessor);
 
@@ -553,9 +557,6 @@ public class Display {
 		exitCommand = new Command(Resource.getString(ResourceConstants.EXIT), Command.EXIT, 1);
 
 		okCommand = new Command(Resource.getString(ResourceConstants.OK), Command.OK, 2);
-		
-		UIToolkit toolkit = UIToolkit.getToolkit();
-		toolkit.initialize(WIDTH, HEIGHT);
 
 	}
 

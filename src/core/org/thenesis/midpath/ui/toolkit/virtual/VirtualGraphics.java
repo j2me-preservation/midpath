@@ -43,7 +43,7 @@ public class VirtualGraphics extends Graphics {
 	public VirtualSurface getSurface() {
 		return surface;
 	}
-	
+
 	public synchronized void setColor(int red, int green, int blue) {
 		super.setColor(red, green, blue);
 		setInternalColor();
@@ -65,7 +65,7 @@ public class VirtualGraphics extends Graphics {
 	private void setInternalColor() {
 		internalColor = (rgbColor | 0xFF000000);
 	}
-	
+
 	public int getInternalColor() {
 		return internalColor;
 	}
@@ -116,7 +116,7 @@ public class VirtualGraphics extends Graphics {
 
 		//if (Logging.TRACE_ENABLED)
 		//	System.out.println("[DEBUG]VirtualGraphics.drawSpan : surface data size= " + surface.data.length + " dstPosition=" + dstPosition + " w=" + w);
-		
+
 		switch (blendMode) {
 		case REPLACE:
 			for (int x = dstPosition; x < (dstPosition + w); x++) {
@@ -145,8 +145,8 @@ public class VirtualGraphics extends Graphics {
 			return;
 		if (x0 < r.xmin)
 			x0 = r.xmin;
-		if (x1 > r.xmax)
-			x1 = r.xmax;
+		if (x1 > r.xmax - 1)
+			x1 = r.xmax - 1;
 
 		// Draw.
 		drawSpan(surface.data, y * surface.width + x0, x1 - x0 + 1);
@@ -167,8 +167,8 @@ public class VirtualGraphics extends Graphics {
 			return;
 		if (y0 < r.ymin)
 			y0 = r.ymin;
-		if (y1 > r.ymax)
-			y1 = r.ymax;
+		if (y1 > r.ymax - 1)
+			y1 = r.ymax - 1;
 
 		// Draw.
 		int h = y1 - y0 + 1;
@@ -526,7 +526,7 @@ public class VirtualGraphics extends Graphics {
 	}
 
 	// Horn's algorithm.
-	public void drawCircle(int x, int y, int radius) {
+	private void drawCircle(int x, int y, int radius) {
 		if ((radius < 0) || (radius > MAX_CIRCLE_RADIUS))
 			return;
 		x += transX;
@@ -555,7 +555,7 @@ public class VirtualGraphics extends Graphics {
 	}
 
 	// Horn's algorithm.
-	public void fillCircle(int x, int y, int radius) {
+	private void fillCircle(int x, int y, int radius) {
 		if ((radius < 0) || (radius > MAX_CIRCLE_RADIUS))
 			return;
 		x += transX;
@@ -587,7 +587,7 @@ public class VirtualGraphics extends Graphics {
 	// Ellipse.
 	//--------------------------------------------------------------------------------
 	// Cf: Graphics Programming Methods; 2.3 - A fast all-integer ellipse discretization algorithm; page 121.  
-	public void drawEllipse(int x, int y, int rx, int ry) {
+	private void drawEllipse(int x, int y, int rx, int ry) {
 		if ((rx < 0) || (rx > MAX_ELLIPSE_RADIUS) || (ry < 0) || (ry > MAX_ELLIPSE_RADIUS))
 			return;
 
@@ -663,7 +663,7 @@ public class VirtualGraphics extends Graphics {
 		}
 	}
 
-	public void fillEllipse(int x, int y, int rx, int ry) {
+	private void fillEllipse(int x, int y, int rx, int ry) {
 		if ((rx < 0) || (rx > 16384) || (ry < 0) || (ry > MAX_ELLIPSE_RADIUS))
 			return;
 
@@ -782,6 +782,13 @@ public class VirtualGraphics extends Graphics {
 	}
 
 	public void drawArc(int x, int y, int rx, int ry, int startAngle, int arcAngle) {
+		
+		// Change to coordinates  relative to the center of the arc
+		rx = rx / 2;
+		ry = ry / 2;
+		x = x + rx;
+		y = y + ry;
+		
 		if ((rx < 0) || (rx > MAX_ELLIPSE_RADIUS) || (ry < 0) || (ry > MAX_ELLIPSE_RADIUS))
 			return;
 		if (arcAngle == 0)
@@ -1008,12 +1015,18 @@ public class VirtualGraphics extends Graphics {
 	}
 
 	public void fillArc(int x, int y, int rx, int ry, int startAngle, int arcAngle) {
+		
+		// Change coordinates to be relative to the center of the arc
+		rx = rx / 2;
+		ry = ry / 2;
+		x = x + rx;
+		y = y + ry;
 
 		if ((rx < 0) || (rx > MAX_ELLIPSE_RADIUS) || (ry < 0) || (ry > MAX_ELLIPSE_RADIUS))
 			return;
 		if (arcAngle == 0)
 			return;
-
+		
 		int endAngle;
 		startAngle %= 360;
 		if (startAngle < 0)
@@ -1096,7 +1109,9 @@ public class VirtualGraphics extends Graphics {
 
 	public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height,
 			boolean processAlpha) {
-		
+
+		if (Logging.TRACE_ENABLED)
+			System.out.println("VirtualGraphics.drawRGB()");
 		//System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : rgbData.length=" + rgbData.length + "  surface.data.length=" + surface.data.length);
 
 		x += transX;
@@ -1104,14 +1119,6 @@ public class VirtualGraphics extends Graphics {
 
 		// Clip source rectangle in source image.
 		int sxmin = 0, symin = 0, sxmax = width, symax = height;
-		if (sxmin < 0)
-			sxmin = 0;
-		if (symin < 0)
-			symin = 0;
-		if (sxmax > width - 1)
-			sxmax = width - 1;
-		if (symax > height - 1)
-			symax = height - 1;
 
 		// Clip destination rectangle in destination image.
 		int dxmin = x + sxmin, dymin = y + symin, dxmax = x + sxmax, dymax = y + symax;
@@ -1130,7 +1137,7 @@ public class VirtualGraphics extends Graphics {
 		sxmax = dxmax - x;
 		symax = dymax - y;
 
-		int w = sxmax - sxmin + 1, h = symax - symin + 1;
+		int w = sxmax - sxmin, h = symax - symin;
 
 		if (processAlpha) {
 			for (int ry = 0; ry < h; ry++) {
@@ -1153,40 +1160,37 @@ public class VirtualGraphics extends Graphics {
 				int length = w;
 
 				for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
-						//System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : dest=" + (i + dstPosition) + " src=" + (i + srcPosition));
-					surface.data[i + dstPosition] = rgbData[i + srcPosition] |  0xFF000000;
+					//System.out.println("[DEBUG] VirtualGraphics.drawRGB()() : dest=" + (i + dstPosition) + " src=" + (i + srcPosition));
+					surface.data[i + dstPosition] = rgbData[i + srcPosition] | 0xFF000000;
 				}
 
 			}
 		}
 
-		if (Logging.TRACE_ENABLED)
-			System.out.println("VirtualGraphics.drawRGB()");
 	}
-	
+
 	protected void doCopyArea(int x_src, int y_src, int width, int height, int x_dest, int y_dest, int anchor) {
-		
+
 		if (Logging.TRACE_ENABLED)
 			System.out.println("VirtualGraphics.doCopyArea()");
-		
+
 		x_src += transX;
 		y_src += transY;
-		
+
 		VirtualImage image = new VirtualImage(width, height);
-		
+
 		for (int j = 0; j < height; j++) {
-			
+
 			int srcPosition = (y_src + j) * surface.width + x_src;
-			int dstPosition  = j * width;
-			
+			int dstPosition = j * width;
+
 			for (int i = 0; i < width; i++) {
 				image.surface.data[dstPosition + i] = surface.data[srcPosition + i];
 			}
 		}
-		
+
 		drawImage(image, x_dest, y_dest, anchor);
-		
-		
+
 	}
 
 	//
@@ -1205,31 +1209,33 @@ public class VirtualGraphics extends Graphics {
 	public void drawRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
 
 		//Vertical lines
-		drawLine(x, y + arcHeight, x, y + h - arcHeight);
-		drawLine(x + w + 1, y + arcHeight, x + w + 1, y + h - arcHeight);
+		drawLine(x, y + arcHeight / 2, x, y + h - arcHeight /2);
+		drawLine(x + w + 1, y + arcHeight / 2, x + w + 1, y + h - arcHeight / 2);
 
 		// Horizontal lines
-		drawLine(x + arcWidth, y, x + w - arcWidth, y);
-		drawLine(x + arcWidth, y + h + 1, x + w - arcWidth, y + h + 1);
+		drawLine(x + arcWidth / 2, y, x + w - arcWidth / 2, y);
+		drawLine(x + arcWidth / 2, y + h + 1, x + w - arcWidth / 2, y + h + 1);
 
 		// Rounded corners
-		drawArc(x + arcWidth, y + arcHeight, arcWidth, arcHeight, 90, 90); // top left
-		drawArc(x + w - arcWidth, y + arcHeight, arcWidth, arcHeight, 0, 90); // top right
-		drawArc(x + arcWidth, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom left
+		drawArc(x, y, arcWidth, arcHeight, 90, 90); // top left
+		drawArc(x + w - arcWidth, y, arcWidth, arcHeight, 0, 90); // top right
+		drawArc(x, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom left
 		drawArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom right
+
 	}
 
 	public void fillRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
 
-		fillRect(x, y + arcHeight + 1, w, h - 2 * arcHeight); // center
-		fillRect(x + arcWidth + 1, y, w - 2 * arcWidth, arcHeight + 1); // top middle
-		fillRect(x + arcWidth + 1, y + h - arcHeight, w - 2 * arcWidth, arcHeight); // bottom middle
+		fillRect(x, y + arcHeight /2, w + 1, h - arcHeight + 1); // center
+		fillRect(x + arcWidth / 2, y, w - arcWidth, arcHeight); // top middle
+		fillRect(x + arcWidth/2, y + h - arcHeight, w - arcWidth, arcHeight); // bottom middle
 
 		// Rounded corners
-		fillArc(x + arcWidth, y + arcHeight, arcWidth, arcHeight, 90, 90); // top left
-		fillArc(x + w - arcWidth - 1, y + arcHeight, arcWidth, arcHeight, 0, 90); // top right
-		fillArc(x + arcWidth, y + h - arcHeight - 1, arcWidth, arcHeight, 180, 90); // bottom left
-		fillArc(x + w - arcWidth - 1, y + h - arcHeight - 1, arcWidth, arcHeight, 270, 90); // bottom right
+		fillArc(x, y, arcWidth, arcHeight, 90, 90); // top left
+		fillArc(x + w - arcWidth, y, arcWidth, arcHeight, 0, 90); // top right
+		fillArc(x, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom left
+		fillArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom right
+
 	}
 
 }

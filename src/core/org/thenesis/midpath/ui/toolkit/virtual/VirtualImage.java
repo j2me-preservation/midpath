@@ -221,15 +221,15 @@ public class VirtualImage extends Image {
 			return false;
 
 		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
-			y -= surface.getHeight() - 1;
+			y -= surface.getHeight();
 		} else if ((anchor & Graphics.VCENTER) == Graphics.VCENTER) {
-			y -= surface.getHeight() / 2 - 1;
+			y -= surface.getHeight() / 2;
 		}
 
 		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
-			x -= surface.getWidth() - 1;
+			x -= surface.getWidth();
 		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
-			x -= surface.getWidth() / 2 - 1;
+			x -= surface.getWidth() / 2;
 		}
 
 		if (Logging.TRACE_ENABLED)
