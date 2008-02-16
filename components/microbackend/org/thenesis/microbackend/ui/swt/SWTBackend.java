@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -177,12 +177,27 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 
 	public void keyPressed(KeyEvent e) {
 		//System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + e.character);
-		listener.keyPressed(convertKeyCode(e.keyCode), e.character, 0);
+		char c = e.character;
+		int keyCode = e.keyCode;
+		
+		if (c == 0) {
+			listener.keyPressed(convertKeyCode(keyCode), KeyConstants.CHAR_UNDEFINED, 0);
+		} else {
+			listener.keyPressed(convertCharToKeyCode(c), c, 0);
+		}
+		
 	}
 
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("[DEBUG] SWTBackend.keyReleased(): key code: " + e.keyCode + " char: " + e.character);
-		listener.keyReleased(convertKeyCode(e.keyCode), e.character, 0);
+		char c = e.character;
+		int keyCode = e.keyCode;
+		
+		if (c == 0) {
+			listener.keyReleased(convertKeyCode(keyCode), KeyConstants.CHAR_UNDEFINED, 0);
+		} else {
+			listener.keyReleased(convertCharToKeyCode(c), c, 0);
+		}
 	}
 
 	public void keyTyped(KeyEvent e) {
@@ -213,6 +228,8 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 	}
 
 	protected static int convertKeyCode(int keyCode) {
+		
+		// First check if it's a SWT key code
 		switch (keyCode) {
 		case SWT.ARROW_UP:
 			return KeyConstants.VK_UP;
@@ -313,7 +330,64 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		default:
 			return KeyConstants.VK_UNDEFINED;
 		}
-
+	}
+	
+	protected static int convertCharToKeyCode(char c) {
+		
+		if (((c >= '0') && (c <= '9')) || ((c >= 'A') && (c <= 'Z'))) {
+    		return c;
+    	} 
+		
+		if (((c >= 'a') && (c <= 'z'))) {
+			return c - 0x20;
+		}
+		
+		switch (c) {
+		case '@':
+			return KeyConstants.VK_AT;
+		case '`':
+			return KeyConstants.VK_BACK_QUOTE;
+		case '\\':
+			return KeyConstants.VK_BACK_SLASH;
+		case '^':
+			return KeyConstants.VK_CIRCUMFLEX;
+		case ']':
+			return KeyConstants.VK_CLOSE_BRACKET;
+		case ':':
+			return KeyConstants.VK_COLON ;
+		case ',':
+			return KeyConstants.VK_COMMA ;
+		case '$':
+			return KeyConstants.VK_DOLLAR ;
+		case '=':
+			return KeyConstants.VK_EQUALS ;
+		case '!':
+			return KeyConstants.VK_EXCLAMATION_MARK;
+		case '(':
+			return KeyConstants.VK_LEFT_PARENTHESIS;
+		case '-':
+			return KeyConstants.VK_MINUS;
+		case '*':
+			return KeyConstants.VK_MULTIPLY ;
+		case '#':
+			return KeyConstants.VK_NUMBER_SIGN ;
+		case '[':
+			return KeyConstants.VK_OPEN_BRACKET;
+		case '.':
+			return KeyConstants.VK_PERIOD ;
+		case '+':
+			return KeyConstants.VK_PLUS;
+		case ')':
+			return KeyConstants.VK_RIGHT_PARENTHESIS;
+		case ';':
+			return KeyConstants.VK_SEMICOLON ;
+		case '/':
+			return KeyConstants.VK_SLASH;
+		case '_':
+			return KeyConstants.VK_UNDERSCORE;
+		default:
+			return KeyConstants.CHAR_UNDEFINED;
+		}
 	}
 
 }
