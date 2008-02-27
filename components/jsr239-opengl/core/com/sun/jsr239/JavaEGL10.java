@@ -157,12 +157,15 @@ public class JavaEGL10 implements EGL10 {
 		}
 
 		int[] val = new int[1];
+		int width = 0; // Default value in specs
+		int height = 0; // Default value in specs
 		
-		getValue(attrib_list, EGL_WIDTH, val);
-		int width = val[0];	
-		getValue(attrib_list, EGL_HEIGHT, val);
-		int height = val[0];	
-		
+		if(getValue(attrib_list, EGL_WIDTH, val)) {
+			width = val[0];	
+		}
+		if(getValue(attrib_list, EGL_HEIGHT, val)) {
+			height = val[0];
+		}
 
 		EGLSurface surface = new JavaEGLSurface(new int[width * height], width, height);
 
@@ -490,6 +493,10 @@ public class JavaEGL10 implements EGL10 {
 	}
 	
 	private boolean getValue(int[] attrib_list, int attribute, int[] value) {
+		if (attrib_list == null) {
+			return false;
+		}
+		
 		for (int i = 0; i < attrib_list.length; i++) {
 			if (attrib_list[i] == attribute) {
 				value[0] = attrib_list[i + 1];
