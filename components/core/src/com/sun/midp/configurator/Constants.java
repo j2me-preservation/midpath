@@ -219,8 +219,13 @@ public class Constants {
 	/**
 	 * key select code (internal)
 	 */
-	public final static int KEYCODE_SELECT = -5;
-
+	public final static int KEYCODE_SELECT = '\n'; // Line Feed (LF), new line
+	//public final static int KEYCODE_SELECT = -5; 
+	
+	public final static int KEYCODE_END = -8; // Note: -6 and -7 are used by EventConstants.SOFT_BUTTON1/2
+	public final static int KEYCODE_POWER = -9;
+	public final static int KEYCODE_DELETE = 8; // Backspace ASCII code
+	
 	/**
 	 * Turn on/off startup time measurement printouts.
 	 */

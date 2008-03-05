@@ -257,14 +257,9 @@ class VirtualBackendEventListener implements BackendEventListener {
 		
 		// Set event key code (intParam2)
 		int internalCode = eventMapper.mapToInternalEvent(keycode, c);
+		nativeEvent.intParam2 = internalCode;
 		//System.out.println("[DEBUG] VirtualBackendEventListener.fireKeyEvent: key code: " + keycode + " char: " + c + " internalCode: " + internalCode);
-		if (internalCode != 0) {
-			nativeEvent.intParam2 = internalCode;
-		} else if (c != 0) {
-			nativeEvent.intParam2 = c;
-		} else {
-			return;
-		}
+		
 		// Set event source (intParam4). Fake display with id=1
 		nativeEvent.intParam4 = 1;
 
