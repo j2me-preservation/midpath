@@ -29,10 +29,11 @@ import java.util.Hashtable;
 
 import javax.microedition.khronos.opengles.GL;
 
+import org.thenesis.midpath.opengles.ogles.NativeGL10;
+import org.thenesis.midpath.opengles.ogles.NativeGL11;
+
 import com.sun.jsr239.ContextAccess;
 import com.sun.jsr239.GLConfiguration;
-import com.sun.jsr239.NativeGL10;
-import com.sun.jsr239.NativeGL11;
 
 final class NativeEGLContext extends EGLContext implements ContextAccess {
     

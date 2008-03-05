@@ -1,4 +1,4 @@
-package com.sun.jsr239;
+package org.thenesis.midpath.opengles.jgl;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGL11;
@@ -13,29 +13,31 @@ import jgl.context.GLContext;
 
 import org.thenesis.midpath.ui.toolkit.virtual.VirtualGraphics;
 
+import com.sun.jsr239.Errors;
+import com.sun.jsr239.GLConfiguration;
 import com.sun.midp.lcdui.GameMap;
 
 public class JavaEGL10 implements EGL10 {
 
-	static JavaEGL10 theInstance;
-
-	static {
-		theInstance = new JavaEGL10();
-		//		if (GLConfiguration.supportsEGL11) {
-		//			theInstance = new NativeEGL11Impl();
-		//		} else {
-		//			theInstance = new NativeEGL10Impl();
-		//		}
-	}
+//	static JavaEGL10 theInstance;
+//
+//	static {
+//		theInstance = new JavaEGL10();
+//		//		if (GLConfiguration.supportsEGL11) {
+//		//			theInstance = new NativeEGL11Impl();
+//		//		} else {
+//		//			theInstance = new NativeEGL10Impl();
+//		//		}
+//	}
 
 	private JavaEGLConfig defaultConfig = new JavaEGLConfig();
 	
 	private int largestPBufferWidth = 1024;
 	private int largestPBufferHeight = 1024;
 
-	public static JavaEGL10 getInstance() {
-		return theInstance;
-	}
+//	public static JavaEGL10 getInstance() {
+//		return theInstance;
+//	}
 
 	void throwIAE(String message) {
 		throw new IllegalArgumentException(message);

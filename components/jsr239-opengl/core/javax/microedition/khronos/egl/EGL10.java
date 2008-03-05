@@ -24,10 +24,6 @@
 
 package javax.microedition.khronos.egl;
 
-import com.sun.jsr239.JavaEGLContext;
-import com.sun.jsr239.JavaEGLDisplay;
-import com.sun.jsr239.JavaEGLSurface;
-
 /**
  * The EGL10 interface contains the Java(TM) programming language
  * bindings for EGL 1.0.
@@ -311,17 +307,17 @@ public interface EGL10 extends EGL {
 	/**
 	 * An <code>EGLContext</code> object used to indicate a null context.
 	 */
-	public static final EGLContext EGL_NO_CONTEXT = new JavaEGLContext();
+	public static final EGLContext EGL_NO_CONTEXT = EGLToolkit.getInstance().getNoContext();
 
 	/**
 	 * An <code>EGLContext</code> object used to indicate a null display.
 	 */
-	public static final EGLDisplay EGL_NO_DISPLAY = new JavaEGLDisplay();
+	public static final EGLDisplay EGL_NO_DISPLAY = EGLToolkit.getInstance().getNoDisplay();
 
 	/**
 	 * An <code>EGLContext</code> object used to indicate a null surface.
 	 */
-	public static final EGLSurface EGL_NO_SURFACE = new JavaEGLSurface(null, 0, 0);
+	public static final EGLSurface EGL_NO_SURFACE = EGLToolkit.getInstance().getNoSurface();
 
 	// Boolean
 

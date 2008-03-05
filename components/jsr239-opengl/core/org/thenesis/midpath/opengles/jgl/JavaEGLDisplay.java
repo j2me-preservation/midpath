@@ -22,7 +22,7 @@
  * information or have any questions.
  */
 
-package com.sun.jsr239;
+package org.thenesis.midpath.opengles.jgl;
 
 import javax.microedition.khronos.egl.EGLDisplay;
 

@@ -32,6 +32,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.Hashtable;
 
+import org.thenesis.midpath.opengles.ogles.NativeGL10;
+
 public class BufferManager {
 
     // All buffers in use by the native API engine are listed in
@@ -80,49 +82,49 @@ public class BufferManager {
         }
     }
 
-    public static native void _getBytes(int address,
-                                        byte[] dst, int offset, int length);
-
-    // Offsets are in bytes regardless of the buffer's datatype
-    public static void getBytes(Buffer buf, int boffset,
-                         byte[] dst, int offset, int length) {
-        int address = NativeGL10._getNativeAddress(buf, 0);
-        int capacity = buf.capacity();
-        
-        if (buf instanceof ByteBuffer) {
-            ByteBuffer bbi = (ByteBuffer)buf;
-            if (!bbi.isDirect()) {
-                throw new IllegalArgumentException("!isDirect");
-            }
-        } else if (buf instanceof ShortBuffer) {
-            ShortBuffer sbi = (ShortBuffer)buf;
-            if (!sbi.isDirect()) {
-                throw new IllegalArgumentException("!isDirect");
-            }
-            capacity *= 2;
-        } else if (buf instanceof IntBuffer) {
-            IntBuffer ibi = (IntBuffer)buf;
-            if (!ibi.isDirect()) {
-                throw new IllegalArgumentException("!isDirect");
-            }
-            capacity *= 4;
-        } else if (buf instanceof FloatBuffer) {
-            FloatBuffer fbi = (FloatBuffer)buf;
-            if (!fbi.isDirect()) {
-                throw new IllegalArgumentException("!isDirect");
-            }
-            capacity *= 4;
-        } else {
-            throw new IllegalArgumentException("Unknown buffer type!");
-        }
-        
-        if (boffset < 0 || boffset + length > capacity) {
-            throw new IllegalArgumentException("boffset out of bounds");
-        }
-        if (offset < 0 || offset + length > dst.length) {
-            throw new IllegalArgumentException("offset out of bounds");
-        }
-
-        _getBytes(address + boffset, dst, offset, length);
-    }
+//    public static native void _getBytes(int address,
+//                                        byte[] dst, int offset, int length);
+//
+//    // Offsets are in bytes regardless of the buffer's datatype
+//    public static void getBytes(Buffer buf, int boffset,
+//                         byte[] dst, int offset, int length) {
+//        int address = NativeGL10._getNativeAddress(buf, 0);
+//        int capacity = buf.capacity();
+//        
+//        if (buf instanceof ByteBuffer) {
+//            ByteBuffer bbi = (ByteBuffer)buf;
+//            if (!bbi.isDirect()) {
+//                throw new IllegalArgumentException("!isDirect");
+//            }
+//        } else if (buf instanceof ShortBuffer) {
+//            ShortBuffer sbi = (ShortBuffer)buf;
+//            if (!sbi.isDirect()) {
+//                throw new IllegalArgumentException("!isDirect");
+//            }
+//            capacity *= 2;
+//        } else if (buf instanceof IntBuffer) {
+//            IntBuffer ibi = (IntBuffer)buf;
+//            if (!ibi.isDirect()) {
+//                throw new IllegalArgumentException("!isDirect");
+//            }
+//            capacity *= 4;
+//        } else if (buf instanceof FloatBuffer) {
+//            FloatBuffer fbi = (FloatBuffer)buf;
+//            if (!fbi.isDirect()) {
+//                throw new IllegalArgumentException("!isDirect");
+//            }
+//            capacity *= 4;
+//        } else {
+//            throw new IllegalArgumentException("Unknown buffer type!");
+//        }
+//        
+//        if (boffset < 0 || boffset + length > capacity) {
+//            throw new IllegalArgumentException("boffset out of bounds");
+//        }
+//        if (offset < 0 || offset + length > dst.length) {
+//            throw new IllegalArgumentException("offset out of bounds");
+//        }
+//
+//        _getBytes(address + boffset, dst, offset, length);
+//    }
 }

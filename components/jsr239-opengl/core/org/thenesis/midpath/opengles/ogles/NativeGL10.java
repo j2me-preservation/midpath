@@ -22,7 +22,7 @@
  * information or have any questions.
  */
 
-package com.sun.jsr239;
+package org.thenesis.midpath.opengles.ogles;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -39,6 +39,11 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL10Ext;
 import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
+
+import com.sun.jsr239.BufferManager;
+import com.sun.jsr239.ContextAccess;
+import com.sun.jsr239.Errors;
+import com.sun.jsr239.GLConfiguration;
 
 public class NativeGL10 implements GL10, GL10Ext {
 
@@ -1419,7 +1424,13 @@ public class NativeGL10 implements GL10, GL10Ext {
                                  count*nbytes);
             }
             byte[] bufferData = new byte[count*nbytes];
-            BufferManager.getBytes(indices, 0, bufferData, 0, count*nbytes);
+            
+            
+            // FIXME
+            //BufferManager.getBytes(indices, 0, bufferData, 0, count*nbytes);
+            if (true) {
+            	throw new UnsupportedOperationException();
+            }
 
             if (DEBUG_MEM) {
                 System.out.println(": done");
@@ -3217,30 +3228,30 @@ public class NativeGL10 implements GL10, GL10Ext {
         }
     }
     
-    // Records the index data where it can be used for bounds
-    // checking in glDrawElements.
-    void bufferIndexData(Buffer data, int offset, int size,
-                         boolean removeOldData) {
-        Integer key = new Integer(VBOElementArrayBufferBound);
-        byte[] array;
-
-        Object o = VBOBufferIndicesTable.get(key);
-        if (o == null || removeOldData) {
-            array = new byte[offset + size];
-        } else {
-            array = (byte[])o;
-            if (array.length < offset + size) {
-                byte[] narray = new byte[offset + size];
-                System.arraycopy(narray, 0, array, 0, offset + size);
-                array = narray;
-            }
-        }
-        
-        // Copy bytes from 'data' into 'array'
-        BufferManager.getBytes(data, offset, array, offset, size);
-        // (Re-)store the index data
-        VBOBufferIndicesTable.put(key, array);
-    }
+//    // Records the index data where it can be used for bounds
+//    // checking in glDrawElements.
+//    void bufferIndexData(Buffer data, int offset, int size,
+//                         boolean removeOldData) {
+//        Integer key = new Integer(VBOElementArrayBufferBound);
+//        byte[] array;
+//
+//        Object o = VBOBufferIndicesTable.get(key);
+//        if (o == null || removeOldData) {
+//            array = new byte[offset + size];
+//        } else {
+//            array = (byte[])o;
+//            if (array.length < offset + size) {
+//                byte[] narray = new byte[offset + size];
+//                System.arraycopy(narray, 0, array, 0, offset + size);
+//                array = narray;
+//            }
+//        }
+//        
+//        // Copy bytes from 'data' into 'array'
+//        BufferManager.getBytes(data, offset, array, offset, size);
+//        // (Re-)store the index data
+//        VBOBufferIndicesTable.put(key, array);
+//    }
 
 // End VBO Support
 

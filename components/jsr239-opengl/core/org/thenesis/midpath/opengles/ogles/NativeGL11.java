@@ -22,7 +22,7 @@
  * information or have any questions.
  */
 
-package com.sun.jsr239;
+package org.thenesis.midpath.opengles.ogles;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
@@ -33,6 +33,10 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
 import javax.microedition.khronos.opengles.GL11ExtensionPack;
+
+import com.sun.jsr239.BufferManager;
+import com.sun.jsr239.Errors;
+import com.sun.jsr239.GLConfiguration;
 
 public class NativeGL11 extends NativeGL10 implements GL11, GL11Ext, GL11ExtensionPack {
 
@@ -156,45 +160,53 @@ public class NativeGL11 extends NativeGL10 implements GL11, GL11Ext, GL11Extensi
 
 	public synchronized void glBufferData(int target, int size, Buffer data, int usage) {
 		checkThread();
-		check_1_1();
-		if (data != null && !isDirect(data)) {
-			throw new IllegalArgumentException(Errors.GL_NOT_DIRECT);
-		}
-
-		if ((target == GL_ARRAY_BUFFER) && (VBOArrayBufferBound != 0)) {
-			setBufferSize(target, size);
-		} else if ((target == GL_ELEMENT_ARRAY_BUFFER) && (VBOElementArrayBufferBound != 0)) {
-			setBufferSize(target, size);
-			bufferIndexData(data, 0, size, true);
-		}
-
-		q(CMD_BUFFER_DATA, 4);
-		q(target);
-		q(size);
-		q(data == null ? 0 : pointer(data));
-		q(usage);
-
-		qflush();
+		
+		//TODO
+		throw new UnsupportedOperationException();
+		
+//		check_1_1();
+//		if (data != null && !isDirect(data)) {
+//			throw new IllegalArgumentException(Errors.GL_NOT_DIRECT);
+//		}
+//
+//		if ((target == GL_ARRAY_BUFFER) && (VBOArrayBufferBound != 0)) {
+//			setBufferSize(target, size);
+//		} else if ((target == GL_ELEMENT_ARRAY_BUFFER) && (VBOElementArrayBufferBound != 0)) {
+//			setBufferSize(target, size);
+//			bufferIndexData(data, 0, size, true);
+//		}
+//
+//		q(CMD_BUFFER_DATA, 4);
+//		q(target);
+//		q(size);
+//		q(data == null ? 0 : pointer(data));
+//		q(usage);
+//
+//		qflush();
 	}
 
 	public synchronized void glBufferSubData(int target, int offset, int size, Buffer data) {
 		checkThread();
-		check_1_1();
-		if (!isDirect(data)) {
-			throw new IllegalArgumentException(Errors.GL_NOT_DIRECT);
-		}
-
-		if ((target == GL_ELEMENT_ARRAY_BUFFER) && (VBOElementArrayBufferBound != 0)) {
-			bufferIndexData(data, offset, size, false);
-		}
-
-		q(CMD_BUFFER_SUB_DATA, 4);
-		q(target);
-		q(offset);
-		q(size);
-		q(data);
-
-		qflush();
+		
+		// TODO
+		throw new UnsupportedOperationException();
+		
+//		check_1_1();
+//		if (!isDirect(data)) {
+//			throw new IllegalArgumentException(Errors.GL_NOT_DIRECT);
+//		}
+//
+//		if ((target == GL_ELEMENT_ARRAY_BUFFER) && (VBOElementArrayBufferBound != 0)) {
+//			bufferIndexData(data, offset, size, false);
+//		}
+//
+//		q(CMD_BUFFER_SUB_DATA, 4);
+//		q(target);
+//		q(offset);
+//		q(size);
+//		q(data);
+//
+//		qflush();
 	}
 
 	public synchronized void glGetBufferParameteriv(int target, int pname, int[] params, int offset) {

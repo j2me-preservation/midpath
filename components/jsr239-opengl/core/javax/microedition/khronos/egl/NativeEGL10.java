@@ -27,9 +27,10 @@ package javax.microedition.khronos.egl;
 import javax.microedition.khronos.opengles.GL;
 import javax.microedition.lcdui.Graphics;
 
+import org.thenesis.midpath.opengles.ogles.NativeGL10;
+
 import com.sun.jsr239.Errors;
 import com.sun.jsr239.GLConfiguration;
-import com.sun.jsr239.NativeGL10;
 import com.sun.midp.lcdui.GameMap;
 
 class NativeEGL10 implements EGL10 {

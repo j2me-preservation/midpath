@@ -26,7 +26,6 @@ package javax.microedition.khronos.egl;
 
 import javax.microedition.khronos.opengles.GL;
 
-import com.sun.jsr239.JavaEGL10;
 
 /**
  * A class encapsulating the EGL context. The class also contains
@@ -49,8 +48,7 @@ public abstract class EGLContext {
      * @return an <code>EGL</code> instance.
      */
     public static synchronized EGL getEGL() {
-    	return JavaEGL10.getInstance();
-        //return NativeEGL10Impl.getInstance();
+    	return EGLToolkit.getInstance().getEGL();
     }
 
     /**

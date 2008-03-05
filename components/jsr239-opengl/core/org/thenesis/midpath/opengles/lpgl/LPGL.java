@@ -22,13 +22,16 @@
  * information or have any questions.
  */
 
-package com.sun.jsr239;
+package org.thenesis.midpath.opengles.lpgl;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+
+import com.sun.jsr239.Errors;
+import com.sun.jsr239.GLConfiguration;
 
 public class LPGL {
 
