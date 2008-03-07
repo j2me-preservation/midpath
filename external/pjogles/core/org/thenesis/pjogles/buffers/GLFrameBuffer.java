@@ -108,7 +108,7 @@ public final class GLFrameBuffer implements GLConstants {
 			throw new GLInvalidEnumException("GLFrameBuffer.validate(GLSoftwareContext)");
 		}
 
-		// TOMD - sort out !!! where should readBuffer be kept, see GLPixelState
+		// TODO - sort out !!! where should readBuffer be kept, see GLPixelState
 
 		readBuffer = drawBuffer;
 
@@ -148,7 +148,7 @@ public final class GLFrameBuffer implements GLConstants {
 		if (gc.haveStencilBuffer) // && gc.state.enables.stencil)
 			stencilBuffer.resize(width, height);
 
-		// TOMD - (*gc->procs.computeClipBox)(gc);
+		// TODO - (*gc->procs.computeClipBox)(gc);
 	}
 
 	public final void readPixels(final int x, final int y, final int width, final int height, final int format,

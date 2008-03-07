@@ -104,11 +104,11 @@ public class JavaGL10 implements GL10 {
 		return gl;
 	}
 
-	private float convertFPToFloat(int fp) {
+	private float FPtoF(int fp) {
 		return ((float) fp) / 65536;
 	}
 
-	private int convertFloatToFP(float f) {
+	private int FtoFP(float f) {
 		return (int) (f * 65536);
 	}
 	
@@ -166,7 +166,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glClearColorx(int red, int green, int blue, int alpha) {
 		//checkThread();
-		glClearColor(convertFPToFloat(red), convertFPToFloat(green), convertFPToFloat(blue), convertFPToFloat(alpha));
+		glClearColor(FPtoF(red), FPtoF(green), FPtoF(blue), FPtoF(alpha));
 	}
 
 	public void glClearDepthf(float depth) {
@@ -176,7 +176,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glClearDepthx(int depth) {
 		//checkThread();
-		glClearDepthf(convertFPToFloat(depth));
+		glClearDepthf(FPtoF(depth));
 	}
 
 	public void glClearStencil(int s) {
@@ -202,7 +202,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glColor4x(int red, int green, int blue, int alpha) {
 		checkThread();
-		gl.glColor4f(convertFPToFloat(red), convertFPToFloat(green), convertFPToFloat(blue), convertFPToFloat(alpha));
+		gl.glColor4f(FPtoF(red), FPtoF(green), FPtoF(blue), FPtoF(alpha));
 	}
 
 	public void glColorMask(boolean red, boolean green, boolean blue, boolean alpha) {
@@ -288,7 +288,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glDepthRangex(int zNear, int zFar) {
 		//checkThread();
-		glDepthRangef(convertFPToFloat(zNear), convertFPToFloat(zFar));
+		glDepthRangef(FPtoF(zNear), FPtoF(zFar));
 	}
 
 	public void glDisable(int cap) {
@@ -337,10 +337,10 @@ public class JavaGL10 implements GL10 {
 				IntBuffer vBuffer = (IntBuffer) colorPointer.pointer;
 				int offset = indice * colorPointer.size;
 				vBuffer.position(offset);
-				c0 = convertFPToFloat(vBuffer.get());
-				c1 = convertFPToFloat(vBuffer.get());
-				c2 = convertFPToFloat(vBuffer.get());
-				c3 = convertFPToFloat(vBuffer.get());
+				c0 = FPtoF(vBuffer.get());
+				c1 = FPtoF(vBuffer.get());
+				c2 = FPtoF(vBuffer.get());
+				c3 = FPtoF(vBuffer.get());
 				gl.glColor4f(c0, c1, c2, c3);
 			} else if (colorPointer.type == GL_FLOAT) {
 				// FIXME
@@ -393,9 +393,9 @@ public class JavaGL10 implements GL10 {
 					IntBuffer vBuffer = (IntBuffer) vertexPointer.pointer;
 					int offset = indice * vertexPointer.size;
 					vBuffer.position(offset);
-					v0 = convertFPToFloat(vBuffer.get());
-					v1 = convertFPToFloat(vBuffer.get());
-					v2 = convertFPToFloat(vBuffer.get());
+					v0 = FPtoF(vBuffer.get());
+					v1 = FPtoF(vBuffer.get());
+					v2 = FPtoF(vBuffer.get());
 					gl.glVertex3f(v0, v1, v2);
 				} else if (vertexPointer.type == GL_FLOAT) {
 					// FIXME
@@ -447,9 +447,9 @@ public class JavaGL10 implements GL10 {
 				IntBuffer vBuffer = (IntBuffer) normalPointer.pointer;
 				int offset = indice * normalPointer.size;
 				vBuffer.position(offset);
-				v0 = convertFPToFloat(vBuffer.get());
-				v1 = convertFPToFloat(vBuffer.get());
-				v2 = convertFPToFloat(vBuffer.get());
+				v0 = FPtoF(vBuffer.get());
+				v1 = FPtoF(vBuffer.get());
+				v2 = FPtoF(vBuffer.get());
 				gl.glNormal3f(v0, v1, v2);
 			} else if (normalPointer.type == GL_FLOAT) {
 				// FIXME
@@ -529,20 +529,20 @@ public class JavaGL10 implements GL10 {
 				int offset = indice * texCoordPointer.size;
 				vBuffer.position(offset);
 				if (texCoordPointer.size == 2) {
-					v0 = convertFPToFloat(vBuffer.get());
-					v1 = convertFPToFloat(vBuffer.get());
+					v0 = FPtoF(vBuffer.get());
+					v1 = FPtoF(vBuffer.get());
 					gl.glTexCoord2f(v0, v1);
 				} else if (texCoordPointer.size == 3) {
-					v0 = convertFPToFloat(vBuffer.get());
-					v1 = convertFPToFloat(vBuffer.get());
-					v2 = convertFPToFloat(vBuffer.get());
+					v0 = FPtoF(vBuffer.get());
+					v1 = FPtoF(vBuffer.get());
+					v2 = FPtoF(vBuffer.get());
 					float[] fv = { v0, v1, v2 };
 					gl.glTexCoord3fv(fv);
 				} else if (texCoordPointer.size == 4) {
-					v0 = convertFPToFloat(vBuffer.get());
-					v1 = convertFPToFloat(vBuffer.get());
-					v2 = convertFPToFloat(vBuffer.get());
-					v3 = convertFPToFloat(vBuffer.get());
+					v0 = FPtoF(vBuffer.get());
+					v1 = FPtoF(vBuffer.get());
+					v2 = FPtoF(vBuffer.get());
+					v3 = FPtoF(vBuffer.get());
 					float[] fv = { v0, v1, v2, v3 };
 					gl.glTexCoord4fv(fv);
 				}
@@ -687,8 +687,8 @@ public class JavaGL10 implements GL10 {
 
 	public void glFrustumx(int left, int right, int bottom, int top, int near, int far) {
 		//checkThread();
-		glFrustumf(convertFPToFloat(left), convertFPToFloat(right), convertFPToFloat(bottom), convertFPToFloat(top),
-				convertFPToFloat(near), convertFPToFloat(far));
+		glFrustumf(FPtoF(left), FPtoF(right), FPtoF(bottom), FPtoF(top),
+				FPtoF(near), FPtoF(far));
 	}
 
 	public void glGenTextures(int n, int[] textures, int offset) {
@@ -849,7 +849,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glLightModelx(int pname, int param) {
 		checkThread();
-		gl.glLightModelf(pname, convertFPToFloat(param));
+		gl.glLightModelf(pname, FPtoF(param));
 	}
 
 	public void glLightModelxv(int pname, int[] params, int offset) {
@@ -857,7 +857,7 @@ public class JavaGL10 implements GL10 {
 		int length = params.length - offset;
 		float[] p = new float[length];
 		for (int i = 0; i < length; i++) {
-			p[i] = convertFPToFloat(params[i + offset]);
+			p[i] = FPtoF(params[i + offset]);
 		}
 		gl.glLightModelfv(pname, p);
 	}
@@ -890,7 +890,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glLightx(int light, int pname, int param) {
 		checkThread();
-		gl.glLightf(light, pname, convertFPToFloat(param));
+		gl.glLightf(light, pname, FPtoF(param));
 	}
 
 	public void glLightxv(int light, int pname, int[] params, int offset) {
@@ -898,7 +898,7 @@ public class JavaGL10 implements GL10 {
 		int length = params.length - offset;
 		float[] p = new float[length];
 		for (int i = 0; i < length; i++) {
-			p[i] = convertFPToFloat(params[i + offset]);
+			p[i] = FPtoF(params[i + offset]);
 		}
 		gl.glLightfv(light, pname, p);
 	}
@@ -915,7 +915,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glLineWidthx(int width) {
 		//checkThread();
-		glLineWidth(convertFPToFloat(width));
+		glLineWidth(FPtoF(width));
 	}
 
 	public void glLoadIdentity() {
@@ -944,7 +944,7 @@ public class JavaGL10 implements GL10 {
 		int length = m.length - offset;
 		float[] fm = new float[length];
 		for (int i = 0; i < length; i++) {
-			fm[i] = convertFPToFloat(m[i + offset]);
+			fm[i] = FPtoF(m[i + offset]);
 		}
 		gl.glLoadMatrixf(fm);
 	}
@@ -977,7 +977,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glMaterialx(int face, int pname, int param) {
 		checkThread();
-		gl.glMaterialf(face, pname, convertFPToFloat(param));
+		gl.glMaterialf(face, pname, FPtoF(param));
 	}
 
 	public void glMaterialxv(int face, int pname, int[] params, int offset) {
@@ -985,7 +985,7 @@ public class JavaGL10 implements GL10 {
 		int length = params.length - offset;
 		float[] fm = new float[length];
 		for (int i = 0; i < length; i++) {
-			fm[i] = convertFPToFloat(params[i + offset]);
+			fm[i] = FPtoF(params[i + offset]);
 		}
 		gl.glMaterialfv(face, pname, fm);
 	}
@@ -1020,7 +1020,7 @@ public class JavaGL10 implements GL10 {
 		//checkThread();
 		float[] fm = new float[m.length];
 		for (int i = 0; i < m.length; i++) {
-			fm[i] = convertFPToFloat(m[i]);
+			fm[i] = FPtoF(m[i]);
 		}
 		glMultMatrixf(fm, offset);
 	}
@@ -1038,7 +1038,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glMultiTexCoord4x(int target, int s, int t, int r, int q) {
 		checkThread();
-		float[] fv = { convertFPToFloat(s), convertFPToFloat(t), convertFPToFloat(r), convertFPToFloat(q) };
+		float[] fv = { FPtoF(s), FPtoF(t), FPtoF(r), FPtoF(q) };
 		gl.glTexCoord4fv(fv);
 	}
 
@@ -1049,7 +1049,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glNormal3x(int nx, int ny, int nz) {
 		checkThread();
-		gl.glNormal3f(convertFPToFloat(nx), convertFPToFloat(ny), convertFPToFloat(nz));
+		gl.glNormal3f(FPtoF(nx), FPtoF(ny), FPtoF(nz));
 	}
 
 	public void glNormalPointer(int type, int stride, Buffer pointer) {
@@ -1064,8 +1064,8 @@ public class JavaGL10 implements GL10 {
 
 	public void glOrthox(int left, int right, int bottom, int top, int near, int far) {
 		//checkThread();
-		glOrthof(convertFPToFloat(left), convertFPToFloat(right), convertFPToFloat(bottom), convertFPToFloat(top),
-				convertFPToFloat(near), convertFPToFloat(far));
+		glOrthof(FPtoF(left), FPtoF(right), FPtoF(bottom), FPtoF(top),
+				FPtoF(near), FPtoF(far));
 	}
 
 	public void glPixelStorei(int pname, int param) {
@@ -1080,7 +1080,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glPointSizex(int size) {
 		//checkThread();
-		glPointSize(convertFPToFloat(size));
+		glPointSize(FPtoF(size));
 	}
 
 	public void glPolygonOffset(float factor, float units) {
@@ -1147,7 +1147,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glRotatex(int angle, int x, int y, int z) {
 		//checkThread();
-		glRotatef(convertFPToFloat(angle), convertFPToFloat(x), convertFPToFloat(y), convertFPToFloat(z));
+		glRotatef(FPtoF(angle), FPtoF(x), FPtoF(y), FPtoF(z));
 	}
 
 	public void glSampleCoverage(float value, boolean invert) {
@@ -1171,7 +1171,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glScalex(int x, int y, int z) {
 		//checkThread();
-		glScalef(convertFPToFloat(x), convertFPToFloat(y), convertFPToFloat(z));
+		glScalef(FPtoF(x), FPtoF(y), FPtoF(z));
 	}
 
 	public void glScissor(int x, int y, int width, int height) {
@@ -1228,7 +1228,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glTexEnvx(int target, int pname, int param) {
 		checkThread();
-		gl.glTexEnvf(target, pname, convertFPToFloat(param));
+		gl.glTexEnvf(target, pname, FPtoF(param));
 	}
 
 	public void glTexEnvxv(int target, int pname, int[] params, int offset) {
@@ -1236,7 +1236,7 @@ public class JavaGL10 implements GL10 {
 		int length = params.length - offset;
 		float[] fm = new float[length];
 		for (int i = 0; i < length; i++) {
-			fm[i] = convertFPToFloat(params[i + offset]);
+			fm[i] = FPtoF(params[i + offset]);
 		}
 		gl.glTexEnvfv(target, pname, fm);
 	}
@@ -1392,7 +1392,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glTexParameterx(int target, int pname, int param) {
 		checkThread();
-		gl.glTexParameterf(target, pname, convertFPToFloat(param));
+		gl.glTexParameterf(target, pname, FPtoF(param));
 	}
 
 	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,
@@ -1412,7 +1412,7 @@ public class JavaGL10 implements GL10 {
 
 	public void glTranslatex(int x, int y, int z) {
 		//checkThread();
-		glTranslatef(convertFPToFloat(x), convertFPToFloat(y), convertFPToFloat(z));
+		glTranslatef(FPtoF(x), FPtoF(y), FPtoF(z));
 	}
 
 	public void glVertexPointer(int size, int type, int stride, Buffer pointer) {

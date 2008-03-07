@@ -107,7 +107,7 @@ public class GL11Software implements GL11 {
 	}
 
 	public final void glDrawBuffer(final int mode) {
-		// TOMD - needs to be implemented
+		// TODO - needs to be implemented
 	}
 
 	public final void glReadBuffer(final int mode) {
@@ -201,7 +201,7 @@ public class GL11Software implements GL11 {
 	public final void glClearIndex(final float c) {
 		__GL_SETUP_NOT_IN_BEGIN("glClearIndex(float)");
 
-		// TOMD - we're not masking c with redMax !!
+		// TODO - we're not masking c with redMax !!
 
 		gc.state.colorBuffer.clearIndex = c;
 	}
@@ -361,7 +361,11 @@ public class GL11Software implements GL11 {
 	}
 
 	public final void glLoadMatrixf(final float[] m) {
-		// TOMD - need to implement
+		
+		// TODO - need to implement
+		glLoadIdentity();
+		glMultMatrixf(m);
+		
 	}
 
 	public final void glMultMatrixf(final float[] m) {
@@ -1299,7 +1303,7 @@ public class GL11Software implements GL11 {
 			final int type, final Object pixels) {
 		__GL_SETUP_NOT_IN_BEGIN("glReadPixels(int, int, int, int, int, int, Object)");
 
-		glFlush(); // TOMD - why is this here ?
+		glFlush(); // TODO - why is this here ?
 
 		if (width < 0 || height < 0)
 			throw new GLInvalidValueException("glReadPixels(int, int, int, int, int, int, Object)");
@@ -1333,7 +1337,7 @@ public class GL11Software implements GL11 {
 
 		// You cannot include glGenTextures in display lists.
 
-		// TOMD - should we do something ?
+		// TODO - should we do something ?
 		// if (gc.pipeline.displayList.currentList != 0)
 
 		if (textures == null)
@@ -1637,7 +1641,7 @@ public class GL11Software implements GL11 {
 
 		switch (pname) {
 		case GL_TEXTURE_ENV_MODE:
-			// TOMD - should we try / catch
+			// TODO - should we try / catch
 			glTexEnvfv(target, pname, new float[] { i });
 			break;
 		default:
@@ -1652,7 +1656,7 @@ public class GL11Software implements GL11 {
 
 		switch (pname) {
 		case GL_TEXTURE_ENV_MODE:
-			// TOMD - should we try / catch
+			// TODO - should we try / catch
 			glTexEnvfv(target, pname, new float[] { f });
 			break;
 		default:
@@ -2956,7 +2960,7 @@ public class GL11Software implements GL11 {
 			if ((mask & GL_PIXEL_MODE_BIT) != 0) {
 				gc.state.pixel.set(attribute.pixel);
 
-				// TOMD - haven't done the following, including enable flags
+				// TODO - haven't done the following, including enable flags
 
 				//                GLint i;
 				//                gc - > gc.state.pixel.transferMode = stackIndex - > pixel.transferMode;
@@ -3012,7 +3016,7 @@ public class GL11Software implements GL11 {
 			if ((mask & GL_TEXTURE_BIT) != 0) {
 				gc.state.texture.set(attribute.texture);
 
-				// TOMD - haven't done the following, including enable flags
+				// TODO - haven't done the following, including enable flags
 
 				//                GLint i, j;
 				//
@@ -3752,7 +3756,7 @@ public class GL11Software implements GL11 {
 	public final void glVertexPointer(final int size, final int type, final int stride, final float[] pointer) {
 		__GL_SETUP_NOT_IN_BEGIN("glVertexPointer(int, int, int, float[])");
 
-		// TOMD - what about inside a display list ???
+		// TODO - what about inside a display list ???
 
 		if (stride < 0 || size < 2 || size > 4)
 			throw new GLInvalidValueException("glVertexPointer(int, int, int, float[])");
@@ -3766,7 +3770,7 @@ public class GL11Software implements GL11 {
 	public final void glNormalPointer(final int type, final int stride, final float[] pointer) {
 		__GL_SETUP_NOT_IN_BEGIN("glNormalPointer(int, int, float[])");
 
-		// TOMD - what about inside a display list ???
+		// TODO - what about inside a display list ???
 
 		if (stride < 0)
 			throw new GLInvalidValueException("glNormalPointer(int, int, float[])");
@@ -3780,7 +3784,7 @@ public class GL11Software implements GL11 {
 	public final void glColorPointer(final int size, final int type, final int stride, final float[] pointer) {
 		__GL_SETUP_NOT_IN_BEGIN("glColorPointer(int, int, int, float[])");
 
-		// TOMD - what about inside a display list ???
+		// TODO - what about inside a display list ???
 
 		if (stride < 0 || size < 3 || size > 4)
 			throw new GLInvalidValueException("glColorPointer(int, int, int, float[])");
@@ -3821,7 +3825,7 @@ public class GL11Software implements GL11 {
 		if (i < 0)
 			throw new GLInvalidValueException("glArrayElement(int)");
 
-		// TOMD - what about inside a display list ???
+		// TODO - what about inside a display list ???
 
 		interleavedArray.glArrayElement(i, this);
 	}
@@ -3840,7 +3844,7 @@ public class GL11Software implements GL11 {
 		if (count == 0)
 			return;
 
-		// TOMD - what about inside a display list ???
+		// TODO - what about inside a display list ???
 
 		interleavedArray.glDrawArrays(mode, first, count, this);
 	}
@@ -4606,7 +4610,7 @@ public class GL11Software implements GL11 {
 
 			// x11.XPutImage(display, drawable, null, ximage, 0, 0, 0, 0, ximage.width, ximage.height);
 
-			//            x11.XLoadFont(display, null); // TOMD - a bit of a hack
+			//            x11.XLoadFont(display, null); // TODO - a bit of a hack
 			//            final XFontStruct fontStruct = x11.XQueryFont(display, drawable, 0);
 			//
 			//            String string = buffer.toString();

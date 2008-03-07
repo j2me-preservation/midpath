@@ -98,7 +98,7 @@ public final class GLFragmentOperations implements GLConstants {
 			fogging.apply(span);
 		}
 
-		// TOMD - note we don't do logical operations !!!
+		// TODO - note we don't do logical operations !!!
 
 		span.mapColor(gc, drawBuffer);
 
