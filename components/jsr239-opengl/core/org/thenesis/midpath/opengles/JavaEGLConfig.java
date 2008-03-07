@@ -22,37 +22,22 @@
  * information or have any questions.
  */
 
-package org.thenesis.midpath.opengles.jgl;
+package org.thenesis.midpath.opengles;
 
-import javax.microedition.khronos.opengles.GL;
-
-import jgl.context.GLContext;
-
-import org.thenesis.midpath.opengles.AbstractJavaEGLContext;
-
-public class JavaEGLContext extends AbstractJavaEGLContext {
+import javax.microedition.khronos.egl.EGLConfig;
 
 
-	private GLContext jglContext;
+/**
+ * A class encapsulating an EGL configuration.
+ */
+public class JavaEGLConfig extends EGLConfig {
 
-	public JavaEGLContext() {
-		jglContext = new GLContext();
-	}
 
-	public GL getGL() {
-		synchronized (this) {
-			if (gl == null) {
-				gl = new JavaGL10(this);
-
-			}
-			return gl;
-		}
-	}
-
-	/**
-	 * @return the jglContext
-	 */
-	GLContext getJGLContext() {
-		return jglContext;
-	}
+    public JavaEGLConfig() {
+        
+    }
+    
+    void dispose() {
+	
+    }
 }

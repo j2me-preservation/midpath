@@ -22,12 +22,17 @@
  * information or have any questions.
  */
 
-package javax.microedition.khronos.egl;
+package org.thenesis.midpath.opengles.ogles;
 
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGL11;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL;
 import javax.microedition.lcdui.Graphics;
 
-import org.thenesis.midpath.opengles.ogles.NativeGL10;
 
 import com.sun.jsr239.Errors;
 import com.sun.jsr239.GLConfiguration;

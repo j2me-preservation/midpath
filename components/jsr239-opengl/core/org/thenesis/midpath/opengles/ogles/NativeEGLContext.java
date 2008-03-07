@@ -22,15 +22,16 @@
  * information or have any questions.
  */
 
-package javax.microedition.khronos.egl;
+package org.thenesis.midpath.opengles.ogles;
 
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
 
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL;
 
-import org.thenesis.midpath.opengles.ogles.NativeGL10;
-import org.thenesis.midpath.opengles.ogles.NativeGL11;
 
 import com.sun.jsr239.ContextAccess;
 import com.sun.jsr239.GLConfiguration;

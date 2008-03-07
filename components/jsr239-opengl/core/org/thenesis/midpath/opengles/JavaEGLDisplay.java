@@ -22,24 +22,28 @@
  * information or have any questions.
  */
 
-package org.thenesis.midpath.opengles.jgl;
+package org.thenesis.midpath.opengles;
 
-import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLDisplay;
 
 
 /**
- * A class encapsulating an EGL configuration.
+ * A class encapsulating an EGL display.  An <code>EGLDisplay</code>
+ * instance may be obtained from <code>EGL.eglGetDisplay</code>.
  */
-final class JavaEGLConfig extends EGLConfig {
+public class JavaEGLDisplay extends EGLDisplay {
 
 
-    public JavaEGLConfig() {
-        
-    }
-
-   
-    
-    void dispose() {
+	public JavaEGLDisplay() {
+		
+	}
 	
-    }
+
+//	public String toString() {
+//		return "EGLDisplayImpl[" + nativeId + "]";
+//	}
+
+	public void dispose() {
+		
+	}
 }

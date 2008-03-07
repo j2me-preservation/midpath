@@ -22,10 +22,12 @@
  * information or have any questions.
  */
 
-package javax.microedition.khronos.egl;
+package org.thenesis.midpath.opengles.ogles;
 
 import java.util.Hashtable;
 import java.lang.ref.WeakReference;
+
+import javax.microedition.khronos.egl.EGLDisplay;
 
 /**
  * A class encapsulating an EGL display.  An <code>EGLDisplay</code>

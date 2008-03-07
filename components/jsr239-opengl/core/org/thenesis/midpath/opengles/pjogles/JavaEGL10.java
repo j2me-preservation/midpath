@@ -1,4 +1,4 @@
-package org.thenesis.midpath.opengles.jgl;
+package org.thenesis.midpath.opengles.pjogles;
 
 import java.util.Hashtable;
 
@@ -6,11 +6,10 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
-import jgl.GLBackend;
-import jgl.context.GLContext;
-
 import org.thenesis.midpath.opengles.AbstractJavaEGL10;
 import org.thenesis.midpath.opengles.JavaEGLSurface;
+import org.thenesis.pjogles.GLBackend;
+import org.thenesis.pjogles.GLSoftwareContext;
 
 public class JavaEGL10 extends AbstractJavaEGL10 {
 
@@ -18,18 +17,20 @@ public class JavaEGL10 extends AbstractJavaEGL10 {
 	public void makeCurrent(EGLDisplay display, EGLSurface draw, EGLSurface read, EGLContext context) {
 		JavaEGLContext jContext = (JavaEGLContext) context;
 		MIDPBackend backend = new MIDPBackend(((JavaEGLSurface) draw));
-		GLContext jglContext = jContext.getJGLContext();
+		GLSoftwareContext jglContext = jContext.getPJOGLESContext();
 		JavaGL10 gl = (JavaGL10)jContext.getGL();
-		gl.getJGL().glXMakeCurrent(jglContext, backend);
+		gl.getGL11Software().glXMakeCurrent(jglContext, backend);
 	}
 	
 	public Hashtable getContextsByThread() {
 		return JavaGL10.contextsByThread;
 	}
 
+
 	public void grabContext() {
 		JavaGL10.grabContext();
 	}
+
 
 	public void setCurrentContext(EGLContext context) {
 		JavaGL10.currentContext = context;
@@ -38,7 +39,8 @@ public class JavaEGL10 extends AbstractJavaEGL10 {
 	public EGLContext createEGLContext() {
 		return new JavaEGLContext();
 	}
-
+	
+	
 	private class MIDPBackend implements GLBackend {
 		
 		private JavaEGLSurface surface;
@@ -79,12 +81,13 @@ public class JavaEGL10 extends AbstractJavaEGL10 {
 			// Not used because direct drawing
 		}
 
-		public void updatePixels(int w, int h, int[] pix, int off, int scan) {
+
+		public void updatePixels(int x, int y, int w, int h, int[] pix, int off, int scan) {
 			// Not used because direct drawing
+			
 		}
 		
 	}
 
 
-	
 }

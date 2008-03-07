@@ -22,73 +22,36 @@
  * information or have any questions.
  */
 
-package javax.microedition.khronos.egl;
+package org.thenesis.midpath.opengles;
 
+import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.lcdui.Graphics;
-import java.util.Hashtable;
-import java.lang.ref.WeakReference;
 
 /**
  * A class encapsulating an EGL surface.
  */
-final class NativeEGLSurface extends EGLSurface {
+public class JavaEGLSurface extends EGLSurface {
 
-	static final Hashtable byId = new Hashtable();
-	private int nativeId;
 	private int width, height;
-
-	/**
-	 * A native pointer (cast to int) to the JSR239_Pixmap object
-	 * backing the surface, or 0 for null.
-	 */
-	private int pixmapPointer = 0;
+	private boolean largestPBuffer = false;
+	private static int id = -1;
+	private int[] buffer;
 
 	/**
 	 * An LCDUI Graphics object referencing the surface.
 	 */
 	private Graphics target;
 
-	public NativeEGLSurface(int nativeId, int width, int height) {
-		synchronized (byId) {
-			this.nativeId = nativeId;
+	public JavaEGLSurface(int[] buf, int width, int height) {
+			//this.largestPBuffer = largestPBuffer;
+			this.buffer = buf;
 			this.width = width;
 			this.height = height;
-			byId.put(new Integer(nativeId), new WeakReference(this));
-		}
-	}
-
-	protected native void finalize();
-
-	public int nativeId() {
-		return nativeId;
-	}
-
-	public static NativeEGLSurface getInstance(int nativeId, int width, int height) {
-		synchronized (byId) {
-			WeakReference ref = (WeakReference) byId.get(new Integer(nativeId));
-			NativeEGLSurface surface = ref != null ? (NativeEGLSurface) ref.get() : null;
-			if (surface == null) {
-				return new NativeEGLSurface(nativeId, width, height);
-			} else {
-				return surface;
-			}
-		}
-	}
-
-	public static NativeEGLSurface getInstance(int nativeId) {
-		return getInstance(nativeId, -1, -1);
+			id++;
 	}
 
 	public String toString() {
-		return "EGLSurfaceImpl[" + nativeId + "]";
-	}
-
-	public void setPixmapPointer(int pixmapPointer) {
-		this.pixmapPointer = pixmapPointer;
-	}
-
-	public int getPixmapPointer() {
-		return this.pixmapPointer;
+		return "EGLSurfaceImpl[" + id + "]";
 	}
 
 	public void setTarget(Graphics target) {
@@ -106,11 +69,25 @@ final class NativeEGLSurface extends EGLSurface {
 	public int getHeight() {
 		return this.height;
 	}
+	
+	boolean isLargestPBuffer() {
+		return largestPBuffer;
+	}
 
 	public void dispose() {
-		synchronized (byId) {
-			byId.remove(new Integer(nativeId));
-			this.nativeId = 0;
-		}
+		
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @return the buffer
+	 */
+	public int[] getBuffer() {
+		return buffer;
+	}
+
+	
 }

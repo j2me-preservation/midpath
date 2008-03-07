@@ -1,4 +1,4 @@
-package org.thenesis.midpath.opengles.jgl;
+package org.thenesis.midpath.opengles.pjogles;
 
 import javax.microedition.khronos.egl.EGL;
 import javax.microedition.khronos.egl.EGLContext;
@@ -9,16 +9,14 @@ import javax.microedition.khronos.egl.EGLToolkit;
 import org.thenesis.midpath.opengles.JavaEGLDisplay;
 import org.thenesis.midpath.opengles.JavaEGLSurface;
 
-public class JGLToolkit extends EGLToolkit {
-	
-	private JavaEGL10 egl = new JavaEGL10();
+public class PJOGLESToolkit extends EGLToolkit {
 	
 	private EGLContext noContext = new JavaEGLContext();
 	private EGLDisplay noDisplay = new JavaEGLDisplay();
 	private EGLSurface noSurface = new JavaEGLSurface(null, 0, 0);
 
 	public EGL getEGL() {
-		return egl;
+		return new JavaEGL10();
 	}
 
 	public EGLContext getNoContext() {
@@ -32,7 +30,6 @@ public class JGLToolkit extends EGLToolkit {
 	public EGLSurface getNoSurface() {
 		return noSurface;
 	}
-
 
 }
 

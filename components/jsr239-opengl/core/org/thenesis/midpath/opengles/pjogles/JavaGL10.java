@@ -1,4 +1,4 @@
-package org.thenesis.midpath.opengles.jgl;
+package org.thenesis.midpath.opengles.pjogles;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -13,10 +13,10 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
 
-import jgl.GL;
-
 import com.sun.jsr239.ContextAccess;
 import com.sun.jsr239.GLConfiguration;
+
+import org.thenesis.pjogles.GL11Software;
 
 public class JavaGL10 implements GL10 {
 
@@ -24,7 +24,7 @@ public class JavaGL10 implements GL10 {
 
 	private static final int MAX_TEXTURE_UNITS = 1;
 
-	private GL gl;
+	private GL11Software gl;
 
 	/**
 	 * <code>context</code> is the context the GL10
@@ -62,7 +62,7 @@ public class JavaGL10 implements GL10 {
 
 	public JavaGL10(JavaEGLContext context) {
 		this.context = context;
-		gl = new jgl.GL(context.getJGLContext());
+		gl = new GL11Software(context.getPJOGLESContext());
 		egl = (EGL10) EGLContext.getEGL();
 	}
 
@@ -100,7 +100,7 @@ public class JavaGL10 implements GL10 {
 		}
 	}
 
-	GL getJGL() {
+	GL11Software getGL11Software() {
 		return gl;
 	}
 
@@ -111,6 +111,10 @@ public class JavaGL10 implements GL10 {
 	private int convertFloatToFP(float f) {
 		return (int) (f * 65536);
 	}
+	
+	private static float BtoF(byte x) {
+		return (float) (x & 0xff) / 255.0f;
+	}
 
 	/* GL10 interface */
 
@@ -120,7 +124,7 @@ public class JavaGL10 implements GL10 {
 		int textureUnit = texture - GL10.GL_TEXTURE0;
 
 		if (textureUnit > MAX_TEXTURE_UNITS) {
-			gl.throwGLError(GL.GL_INVALID_ENUM, "glActiveTexture");
+			gl.throwGLError(GL11Software.GL_INVALID_ENUM, "glActiveTexture");
 			return;
 		}
 
@@ -184,7 +188,7 @@ public class JavaGL10 implements GL10 {
 		checkThread();
 		int textureUnit = texture - GL10.GL_TEXTURE0;
 		if (textureUnit > MAX_TEXTURE_UNITS) {
-			gl.throwGLError(GL.GL_INVALID_ENUM, "glClientActiveTexture");
+			gl.throwGLError(GL11Software.GL_INVALID_ENUM, "glClientActiveTexture");
 			return;
 		}
 
@@ -226,12 +230,20 @@ public class JavaGL10 implements GL10 {
 	public void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height,
 			int border) {
 		checkThread();
-		gl.glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+		
+		// TODO
+		throw new UnsupportedOperationException();
+		
+		//gl.glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
 	}
 
 	public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height) {
 		checkThread();
-		gl.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+		
+		// TODO
+		throw new UnsupportedOperationException();
+		
+		//gl.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 	}
 
 	public void glCullFace(int mode) {
@@ -241,13 +253,17 @@ public class JavaGL10 implements GL10 {
 
 	public void glDeleteTextures(int n, int[] textures, int offset) {
 		checkThread();
-		int[] t = textures;
-		if (offset > 0) {
-			int length = textures.length - offset;
-			t = new int[length];
-			System.arraycopy(textures, offset, t, 0, length);
-		}
-		gl.glDeleteTextures(n, t);
+		
+		// TODO
+		throw new UnsupportedOperationException();
+		
+//		int[] t = textures;
+//		if (offset > 0) {
+//			int length = textures.length - offset;
+//			t = new int[length];
+//			System.arraycopy(textures, offset, t, 0, length);
+//		}
+//		gl.glDeleteTextures(n, t);
 	}
 
 	public void glDeleteTextures(int n, IntBuffer textures) {
@@ -311,7 +327,7 @@ public class JavaGL10 implements GL10 {
 				c1 = vBuffer.get();
 				c2 = vBuffer.get();
 				c3 = vBuffer.get();
-				gl.glColor4b(c0, c1, c2, c3);
+				gl.glColor4f(BtoF(c0), BtoF(c1), BtoF(c2), BtoF(c3));
 			} else if (colorPointer.type == GL_FIXED) {
 				// FIXME
 				if (colorPointer.stride != 0) {
@@ -367,7 +383,7 @@ public class JavaGL10 implements GL10 {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
-					gl.glVertex3s(v0, v1, v2);
+					gl.glVertex3f(v0, v1, v2);
 				} else if (vertexPointer.type == GL_FIXED) {
 					// FIXME
 					if (vertexPointer.stride != 0) {
@@ -408,7 +424,7 @@ public class JavaGL10 implements GL10 {
 				v0 = vBuffer.get();
 				v1 = vBuffer.get();
 				v2 = vBuffer.get();
-				gl.glNormal3b(v0, v1, v2);
+				gl.glNormal3f(v0, v1, v2);
 			} else if (normalPointer.type == GL_SHORT) {
 				// FIXME
 				if (normalPointer.stride != 0) {
@@ -421,7 +437,7 @@ public class JavaGL10 implements GL10 {
 				v0 = vBuffer.get();
 				v1 = vBuffer.get();
 				v2 = vBuffer.get();
-				gl.glNormal3s(v0, v1, v2);
+				gl.glNormal3f(v0, v1, v2);
 			} else if (normalPointer.type == GL_FIXED) {
 				// FIXME
 				if (normalPointer.stride != 0) {
@@ -461,18 +477,20 @@ public class JavaGL10 implements GL10 {
 				if (texCoordPointer.size == 2) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
-					gl.glTexCoord2i(v0, v1);
+					gl.glTexCoord2f(v0, v1);
 				} else if (texCoordPointer.size == 3) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
-					gl.glTexCoord3i(v0, v1, v2);
+					float[] fv = { v0, v1, v2 };
+					gl.glTexCoord3fv(fv);
 				} else if (texCoordPointer.size == 4) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
 					v3 = vBuffer.get();
-					gl.glTexCoord4i(v0, v1, v2, v3);
+					float[] fv = { v0, v1, v2, v3 };
+					gl.glTexCoord4fv(fv);
 				}
 			} else if (texCoordPointer.type == GL_SHORT) {
 				// FIXME
@@ -486,18 +504,20 @@ public class JavaGL10 implements GL10 {
 				if (texCoordPointer.size == 2) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
-					gl.glTexCoord2s(v0, v1);
+					gl.glTexCoord2f(v0, v1);
 				} else if (texCoordPointer.size == 3) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
-					gl.glTexCoord3s(v0, v1, v2);
+					float[] fv = { v0, v1, v2 };
+					gl.glTexCoord3fv(fv);
 				} else if (texCoordPointer.size == 4) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
 					v3 = vBuffer.get();
-					gl.glTexCoord4s(v0, v1, v2, v3);
+					float[] fv = { v0, v1, v2, v3 };
+					gl.glTexCoord4fv(fv);
 				}
 			} else if (texCoordPointer.type == GL_FIXED) {
 				// FIXME
@@ -516,13 +536,15 @@ public class JavaGL10 implements GL10 {
 					v0 = convertFPToFloat(vBuffer.get());
 					v1 = convertFPToFloat(vBuffer.get());
 					v2 = convertFPToFloat(vBuffer.get());
-					gl.glTexCoord3f(v0, v1, v2);
+					float[] fv = { v0, v1, v2 };
+					gl.glTexCoord3fv(fv);
 				} else if (texCoordPointer.size == 4) {
 					v0 = convertFPToFloat(vBuffer.get());
 					v1 = convertFPToFloat(vBuffer.get());
 					v2 = convertFPToFloat(vBuffer.get());
 					v3 = convertFPToFloat(vBuffer.get());
-					gl.glTexCoord4f(v0, v1, v2, v3);
+					float[] fv = { v0, v1, v2, v3 };
+					gl.glTexCoord4fv(fv);
 				}
 			} else if (texCoordPointer.type == GL_FLOAT) {
 				// FIXME
@@ -541,58 +563,24 @@ public class JavaGL10 implements GL10 {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
-					gl.glTexCoord3f(v0, v1, v2);
+					float[] fv = { v0, v1, v2 };
+					gl.glTexCoord3fv(fv);
 				} else if (texCoordPointer.size == 4) {
 					v0 = vBuffer.get();
 					v1 = vBuffer.get();
 					v2 = vBuffer.get();
 					v3 = vBuffer.get();
-					gl.glTexCoord4f(v0, v1, v2, v3);
+					float[] fv = { v0, v1, v2, v3 };
+					gl.glTexCoord4fv(fv);
 				}
 			}
 		}
 	}
 
-	/** 
-	 * Convert jGL rendering mode values to OpenGL ES compliant values 
-	 * @param mode
-	 * @return
-	 */
-	private int convertMode(int mode) {
-		// Convert type
-		int targetMode = -1;
-		switch (mode) {
-		case GL_POINTS:
-			targetMode = GL.GL_POINTS;
-			break;
-		case GL_LINE_STRIP:
-			targetMode = GL.GL_LINE_STRIP;
-			break;
-		case GL_LINE_LOOP:
-			targetMode = GL.GL_LINE_LOOP;
-			break;
-		case GL_LINES:
-			targetMode = GL.GL_LINES;
-			break;
-		case GL_TRIANGLES:
-			targetMode = GL.GL_TRIANGLES;
-			break;
-		case GL_TRIANGLE_STRIP:
-			targetMode = GL.GL_TRIANGLE_STRIP;
-			break;
-		case GL_TRIANGLE_FAN:
-			targetMode = GL.GL_TRIANGLE_FAN;
-			break;
-		}
-
-		return targetMode;
-	}
-
 	public void glDrawArrays(int mode, int first, int count) {
 		checkThread();
-		int targetMode = convertMode(mode);
 
-		gl.glBegin(targetMode);
+		gl.glBegin(mode);
 		for (int i = 0; i < count; i++) {
 			drawElement(first + i);
 		}
@@ -602,9 +590,8 @@ public class JavaGL10 implements GL10 {
 
 	public void glDrawElements(int mode, int count, int type, Buffer indices) {
 		checkThread();
-		int targetMode = convertMode(mode);
 
-		gl.glBegin(targetMode);
+		gl.glBegin(mode);
 		for (int i = 0; i < count; i++) {
 
 			// Get the current indice
@@ -1045,12 +1032,14 @@ public class JavaGL10 implements GL10 {
 
 	public void glMultiTexCoord4f(int target, float s, float t, float r, float q) {
 		checkThread();
-		gl.glTexCoord4f(s, t, r, q);
+		float[] fv = { s, t, r, q };
+		gl.glTexCoord4fv(fv);
 	}
 
 	public void glMultiTexCoord4x(int target, int s, int t, int r, int q) {
 		checkThread();
-		gl.glTexCoord4f(convertFPToFloat(s), convertFPToFloat(t), convertFPToFloat(r), convertFPToFloat(q));
+		float[] fv = { convertFPToFloat(s), convertFPToFloat(t), convertFPToFloat(r), convertFPToFloat(q) };
+		gl.glTexCoord4fv(fv);
 	}
 
 	public void glNormal3f(float nx, float ny, float nz) {
@@ -1396,28 +1385,24 @@ public class JavaGL10 implements GL10 {
 		gl.glTexImage2D(target, level, GL_RGBA, width, height, border, GL_RGBA, GL_UNSIGNED_BYTE, pArray);
 	}
 
-	private int getCompatibleTexParameter(int param) {
-		checkThread();
-		if (param == GL_CLAMP_TO_EDGE) {
-			return GL.GL_CLAMP;
-		}
-		return param;
-	}
-
 	public void glTexParameterf(int target, int pname, float param) {
 		checkThread();
-		gl.glTexParameterf(target, pname, getCompatibleTexParameter((int) param));
+		gl.glTexParameterf(target, pname, param);
 	}
 
 	public void glTexParameterx(int target, int pname, int param) {
 		checkThread();
-		gl.glTexParameterf(target, pname, getCompatibleTexParameter((int) convertFPToFloat(param)));
+		gl.glTexParameterf(target, pname, convertFPToFloat(param));
 	}
 
 	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,
 			int type, Buffer pixels) {
 		checkThread();
-		gl.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+		
+		// TODO
+		throw new UnsupportedOperationException();
+		
+		//gl.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 	}
 
 	public void glTranslatef(float x, float y, float z) {
@@ -1461,7 +1446,5 @@ public class JavaGL10 implements GL10 {
 			this.pointer = pointer;
 		}
 	}
-
-	
 
 }

@@ -22,28 +22,36 @@
  * information or have any questions.
  */
 
-package org.thenesis.midpath.opengles.jgl;
+package org.thenesis.midpath.opengles.pjogles;
 
-import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.opengles.GL;
 
+import org.thenesis.midpath.opengles.AbstractJavaEGLContext;
+import org.thenesis.pjogles.GLSoftwareContext;
 
-/**
- * A class encapsulating an EGL display.  An <code>EGLDisplay</code>
- * instance may be obtained from <code>EGL.eglGetDisplay</code>.
- */
-public class JavaEGLDisplay extends EGLDisplay {
+public class JavaEGLContext extends AbstractJavaEGLContext {
 
 
-	public JavaEGLDisplay() {
-		
+	private GLSoftwareContext pjContext;
+
+	public JavaEGLContext() {
+		pjContext = new GLSoftwareContext(null, null);
 	}
-	
 
-//	public String toString() {
-//		return "EGLDisplayImpl[" + nativeId + "]";
-//	}
+	public GL getGL() {
+		synchronized (this) {
+			if (gl == null) {
+				gl = new JavaGL10(this);
 
-	public void dispose() {
-		
+			}
+			return gl;
+		}
+	}
+
+	/**
+	 * @return the jglContext
+	 */
+	GLSoftwareContext getPJOGLESContext() {
+		return pjContext;
 	}
 }
