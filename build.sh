@@ -77,8 +77,8 @@ cd $DIST_HOME/external/cldc1.1/src
 make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath . -source 1.3 -target 1.1" || exit 1
 make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath . -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/external/cldc1.1/classes || exit 1
 # Build CLDC extra classes for MIDP2
-cd $DIST_HOME/src/cldc-glue
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/external/cldc1.1/classes -sourcepath $DIST_HOME/src/cldc-glue -source 1.3 -target 1.1"
+cd $DIST_HOME/components/cldc-glue
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/external/cldc1.1/classes -sourcepath $DIST_HOME/components/cldc-glue -source 1.3 -target 1.1"
 make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/external/cldc1.1/classes -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/external/cldc1.1/classes
 # Make a jar
 jar cvf  $DIST_HOME/dist/cldc1.1.jar -C $DIST_HOME/external/cldc1.1/classes .
@@ -116,27 +116,28 @@ make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -ta
 cp $DIST_HOME/external/avetanabt-cldc/src/avetanabt-cldc.jar $DIST_HOME/dist
 
 # Build MicroBackend library
-cd $DIST_HOME/src/microbackend
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/src/microbackend -source 1.3 -target 1.1" || exit 1
+cd $DIST_HOME/components/microbackend
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/components/microbackend -source 1.3 -target 1.1" || exit 1
 make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -source 1.3 -target 1.1" JAR_FILE="microbackend.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/src/microbackend/microbackend.jar $DIST_HOME/dist
+cp $DIST_HOME/components/microbackend/microbackend.jar $DIST_HOME/dist
 
 # Build MIDPath
-cd $DIST_HOME/src/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -sourcepath $DIST_HOME/src/core -source 1.3 -target 1.1" || exit 1
-make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/src/core/classes || exit 1
-jar cvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/src/core/classes .
-
-# Include com.sun.cldchi.jvm.JVM class (J2SE glue) in jars which could be used in a J2SE environment  
-mkdir -p $DIST_HOME/src/j2se-glue/classes
-cd $DIST_HOME/src/j2se-glue
-ecj -bootclasspath $GNU_CLASSPATH_PATH -source 1.3 -target 1.1 -d $DIST_HOME/src/j2se-glue/classes com/sun/cldchi/jvm/JVM.java
-jar uvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/src/j2se-glue/classes .
-jar uvf $DIST_HOME/dist/microbackend.jar -C $DIST_HOME/src/j2se-glue/classes .
+cd $DIST_HOME/components/core/src
+make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -sourcepath $DIST_HOME/components/core/src -source 1.3 -target 1.1" || exit 1
+make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$GNU_CLASSPATH_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/components/core/src/classes || exit 1
+jar cvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/components/core/src/classes .
 
 # Add resources to the midpath.jar
-#(cd $DIST_HOME/resources-embedded && find | grep -v "/.svn") > resources.list
-#jar uvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/resources-embedded/ @resources.list
+(cd $DIST_HOME/components/core/resources && find -type f | grep -v "/.svn") > $DIST_HOME/components/core/resources.list
+cd $DIST_HOME/components/core/resources
+jar uvf $DIST_HOME/dist/midpath.jar @$DIST_HOME/components/core/resources.list
+
+# Include com.sun.cldchi.jvm.JVM class (J2SE glue) in jars which could be used in a J2SE environment  
+mkdir -p $DIST_HOME/components/j2se-glue/classes
+cd $DIST_HOME/components/j2se-glue
+ecj -bootclasspath $GNU_CLASSPATH_PATH -source 1.3 -target 1.1 -d $DIST_HOME/components/j2se-glue/classes com/sun/cldchi/jvm/JVM.java
+jar uvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/components/j2se-glue/classes .
+jar uvf $DIST_HOME/dist/microbackend.jar -C $DIST_HOME/components/j2se-glue/classes .
 
 cd $DIST_HOME/tests
 make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/dist/midpath.jar:$CLDC_PATH -sourcepath $DIST_HOME/tests -source 1.3 -target 1.1" || exit 1
