@@ -14,13 +14,25 @@ import org.thenesis.midpath.opengles.JavaEGLSurface;
 
 public class JavaEGL10 extends AbstractJavaEGL10 {
 
+	private EGLContext currentContext;
+	private EGLSurface currentSurface;
 	
 	public void makeCurrent(EGLDisplay display, EGLSurface draw, EGLSurface read, EGLContext context) {
-		JavaEGLContext jContext = (JavaEGLContext) context;
-		MIDPBackend backend = new MIDPBackend(((JavaEGLSurface) draw));
-		GLContext jglContext = jContext.getJGLContext();
-		JavaGL10 gl = (JavaGL10)jContext.getGL();
-		gl.getJGL().glXMakeCurrent(jglContext, backend);
+		
+		if ((draw == EGL_NO_SURFACE) || (read == EGL_NO_SURFACE) || (context == EGL_NO_CONTEXT)) {
+			return;
+		}
+			
+		// Call glXMakeCurrent only if needed (it clears all the jGL buffers !)
+		if ((currentContext != context) || (currentSurface != draw)) {
+			currentContext = context;
+			currentSurface = draw;
+			JavaEGLContext jContext = (JavaEGLContext) context;
+			MIDPBackend backend = new MIDPBackend(((JavaEGLSurface) draw));
+			GLContext jglContext = jContext.getJGLContext();
+			JavaGL10 gl = (JavaGL10)jContext.getGL();
+			gl.getJGL().glXMakeCurrent(jglContext, backend);
+		}
 	}
 	
 	public Hashtable getContextsByThread() {
