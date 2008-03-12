@@ -343,61 +343,6 @@ public class JavaGL10 implements GL10 {
 			}
 		}
 
-		// Vertex
-		if (isGLVertexArrayEnabled) {
-			if (vertexPointer.size == 3) {
-				if (vertexPointer.type == GL_BYTE) {
-					int v0 = 0, v1 = 0, v2 = 0;
-					ByteBuffer vBuffer = (ByteBuffer) vertexPointer.pointer;
-					int offset = indice * (vertexPointer.size + vertexPointer.stride);
-					vBuffer.position(offset);
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					v2 = vBuffer.get();
-					gl.glVertex3i(v0, v1, v2);
-				} else if (vertexPointer.type == GL_SHORT) {
-					// FIXME
-					if (vertexPointer.stride != 0) {
-						throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
-					}
-					short v0 = 0, v1 = 0, v2 = 0;
-					ShortBuffer vBuffer = (ShortBuffer) vertexPointer.pointer;
-					int offset = indice * vertexPointer.size;
-					vBuffer.position(offset);
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					v2 = vBuffer.get();
-					gl.glVertex3s(v0, v1, v2);
-				} else if (vertexPointer.type == GL_FIXED) {
-					// FIXME
-					if (vertexPointer.stride != 0) {
-						throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
-					}
-					float v0 = 0, v1 = 0, v2 = 0;
-					IntBuffer vBuffer = (IntBuffer) vertexPointer.pointer;
-					int offset = indice * vertexPointer.size;
-					vBuffer.position(offset);
-					v0 = convertFPToFloat(vBuffer.get());
-					v1 = convertFPToFloat(vBuffer.get());
-					v2 = convertFPToFloat(vBuffer.get());
-					gl.glVertex3f(v0, v1, v2);
-				} else if (vertexPointer.type == GL_FLOAT) {
-					// FIXME
-					if (vertexPointer.stride != 0) {
-						throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
-					}
-					float v0 = 0, v1 = 0, v2 = 0;
-					FloatBuffer vBuffer = (FloatBuffer) vertexPointer.pointer;
-					int offset = indice * vertexPointer.size;
-					vBuffer.position(offset);
-					v0 = vBuffer.get();
-					v1 = vBuffer.get();
-					v2 = vBuffer.get();
-					gl.glVertex3f(v0, v1, v2);
-				}
-			}
-		}
-
 		// Normal
 		if (isGLNormalArrayEnabled) {
 			if (normalPointer.type == GL_BYTE) {
@@ -551,6 +496,62 @@ public class JavaGL10 implements GL10 {
 				}
 			}
 		}
+		
+		// Vertex
+		if (isGLVertexArrayEnabled) {
+			if (vertexPointer.size == 3) {
+				if (vertexPointer.type == GL_BYTE) {
+					int v0 = 0, v1 = 0, v2 = 0;
+					ByteBuffer vBuffer = (ByteBuffer) vertexPointer.pointer;
+					int offset = indice * (vertexPointer.size + vertexPointer.stride);
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3i(v0, v1, v2);
+				} else if (vertexPointer.type == GL_SHORT) {
+					// FIXME
+					if (vertexPointer.stride != 0) {
+						throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+					}
+					short v0 = 0, v1 = 0, v2 = 0;
+					ShortBuffer vBuffer = (ShortBuffer) vertexPointer.pointer;
+					int offset = indice * vertexPointer.size;
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3s(v0, v1, v2);
+				} else if (vertexPointer.type == GL_FIXED) {
+					// FIXME
+					if (vertexPointer.stride != 0) {
+						throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+					}
+					float v0 = 0, v1 = 0, v2 = 0;
+					IntBuffer vBuffer = (IntBuffer) vertexPointer.pointer;
+					int offset = indice * vertexPointer.size;
+					vBuffer.position(offset);
+					v0 = convertFPToFloat(vBuffer.get());
+					v1 = convertFPToFloat(vBuffer.get());
+					v2 = convertFPToFloat(vBuffer.get());
+					gl.glVertex3f(v0, v1, v2);
+				} else if (vertexPointer.type == GL_FLOAT) {
+					// FIXME
+					if (vertexPointer.stride != 0) {
+						throw new UnsupportedOperationException("stride != 0 : not supported by this implementation");
+					}
+					float v0 = 0, v1 = 0, v2 = 0;
+					FloatBuffer vBuffer = (FloatBuffer) vertexPointer.pointer;
+					int offset = indice * vertexPointer.size;
+					vBuffer.position(offset);
+					v0 = vBuffer.get();
+					v1 = vBuffer.get();
+					v2 = vBuffer.get();
+					gl.glVertex3f(v0, v1, v2);
+				}
+			}
+		}
+		
 	}
 
 	/** 
