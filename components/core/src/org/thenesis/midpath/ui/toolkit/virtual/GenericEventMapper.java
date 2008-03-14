@@ -27,11 +27,11 @@ import com.sun.midp.lcdui.EventConstants;
 import com.sun.midp.main.Configuration;
 
 public class GenericEventMapper implements EventMapper {
-	
+
 	private static int KEY_LEFT;
 	private static int KEY_UP;
 	private static int KEY_RIGHT;
-	private static  int KEY_DOWN;
+	private static int KEY_DOWN;
 	private static int KEY_GAME_A;
 	private static int KEY_GAME_B;
 	private static int KEY_GAME_C;
@@ -44,7 +44,7 @@ public class GenericEventMapper implements EventMapper {
 	private static int KEY_POWER;
 	private static int KEY_SOFT_BUTTON1;
 	private static int KEY_SOFT_BUTTON2;
-	
+
 	static {
 		KEY_LEFT = Configuration.getIntProperty("org.thenesis.midpath.ui.keys.LEFT", KeyConstants.VK_LEFT);
 		KEY_UP = Configuration.getIntProperty("org.thenesis.midpath.ui.keys.UP", KeyConstants.VK_UP);
@@ -65,7 +65,7 @@ public class GenericEventMapper implements EventMapper {
 	}
 
 	public int getGameAction(int keyCode) {
-		
+
 		if (keyCode == KEY_GAME_A)
 			return Canvas.GAME_A;
 		else if (keyCode == KEY_GAME_B)
@@ -114,13 +114,24 @@ public class GenericEventMapper implements EventMapper {
 	}
 
 	public String getKeyName(int keyCode) {
-		
-		if (keyCode == Canvas.KEY_POUND) {
-			return "#";
-		} else if (keyCode == Canvas.KEY_STAR) {
-			return "*";
-		}
-		return KeyConstants.getName(keyCode);
+
+		if (keyCode == Canvas.KEY_POUND)
+			return KeyConstants.getName(KEY_POUND);
+		else if (keyCode == Canvas.KEY_STAR)
+			return KeyConstants.getName(KEY_STAR);
+		else if (keyCode == Constants.KEYCODE_SELECT)
+			return KeyConstants.getName(KEY_FIRE);
+		else if (keyCode == Constants.KEYCODE_DOWN)
+			return KeyConstants.getName(KEY_DOWN);
+		else if (keyCode == Constants.KEYCODE_LEFT)
+			return KeyConstants.getName(KEY_LEFT);
+		else if (keyCode == Constants.KEYCODE_RIGHT)
+			return KeyConstants.getName(KEY_RIGHT);
+		else if (keyCode == Constants.KEYCODE_UP)
+			return KeyConstants.getName(KEY_UP);
+		else
+			return KeyConstants.getName(keyCode);
+
 	}
 
 	public int getSystemKey(int keyCode) {
@@ -163,7 +174,7 @@ public class GenericEventMapper implements EventMapper {
 			return Constants.KEYCODE_END;
 		else if (keyCode == KEY_POWER)
 			return Constants.KEYCODE_POWER;
-		
+
 		// Return the visible character
 		if (c != KeyConstants.CHAR_UNDEFINED) {
 			return c;
