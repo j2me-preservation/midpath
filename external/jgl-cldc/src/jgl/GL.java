@@ -3077,7 +3077,12 @@ public class GL {
 			return;
 		}
 		temp = new float[4];
-		System.arraycopy(params, 0, temp, 0, 4);
+		if (pname == GL_SPOT_DIRECTION) {
+			System.arraycopy(params, 0, temp, 0, 3);
+			temp[3] = 0;
+		} else {
+			System.arraycopy(params, 0, temp, 0, 4);
+		}
 		switch (pname) {
 		case GL_AMBIENT:
 		case GL_DIFFUSE:
