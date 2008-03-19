@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 
@@ -65,18 +82,21 @@ public class TriangleStripArray extends IndexBuffer {
 		buffer.flip();
 	}
 
+	private TriangleStripArray() {
+	}
+
 	public void getIndices(int[] indices) {
 		if (indices != null)
-			throw new NullPointerException("indices can not be null");
+			throw new NullPointerException("Indices can not be null");
 		if (indices.length < getIndexCount())
-			throw new IllegalArgumentException("length of indices array must be " + getIndexCount());
+			throw new IllegalArgumentException("Length of indices array must be " + getIndexCount());
 		// TODO: fill indices with triangle-data
 	}
 
 	private int checkInput(int[] stripLengths) {
 		int sum = 0;
 		if (stripLengths == null)
-			throw new NullPointerException("stripLegths can not be null");
+			throw new NullPointerException("stripLengths can not be null");
 		int l = stripLengths.length;
 		if (l == 0)
 			throw new IllegalArgumentException("stripLenghts can not be empty");
@@ -87,6 +107,15 @@ public class TriangleStripArray extends IndexBuffer {
 			sum += stripLengths[i];
 		}
 		return sum;
+	}
+	
+	Object3D duplicateImpl() {
+		TriangleStripArray copy = new TriangleStripArray();
+		buffer.rewind();
+		copy.allocate(getIndexCount());
+		copy.buffer.put(buffer);
+		copy.buffer.flip();
+		return copy;
 	}
 
 }

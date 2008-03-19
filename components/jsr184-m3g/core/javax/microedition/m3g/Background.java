@@ -1,15 +1,34 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
+
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import org.thenesis.m3g.engine.util.Color;
 
-
 public class Background extends Object3D {
 
 	public static final int BORDER = 32;
 	public static final int REPEAT = 33;
-	private int backgroundColor = 0;
+	private int backgroundColor = 0x00000000; // Default color is black
 	private Image2D backgroundImage = null;
 	private int backgroundImageModeX = BORDER;
 	private int backgroundImageModeY = BORDER;
@@ -17,12 +36,42 @@ public class Background extends Object3D {
 	private int cropY;
 	private int cropWidth;
 	private int cropHeight;
-	private boolean colorClearEnabled = true;
-	private boolean depthClearEnabled = true;
-
+	private boolean colorClearEnabled = true; // Default
+	private boolean depthClearEnabled = true; // Default
 	private Texture2D backgroundTexture = null;
+	
+	private FloatBuffer vertexBuffer;
+	private FloatBuffer textureBuffer;
+	// top right, top left, bottom right, bottom left coordinates
+	private float[] vertexArray = { 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f, -1.0f, -1.0f, 0.0f };
+	private float[] textureArray;
 
 	public Background() {
+		// 4 elements, 3 coordinates per element, float type
+		vertexBuffer = ByteBuffer.allocateDirect(4 * 3 * 4).asFloatBuffer();
+		vertexBuffer.put(vertexArray);
+		vertexBuffer.flip();
+		//	4 elements, 2 coordinates per element, float type
+		textureBuffer = ByteBuffer.allocateDirect(4 * 2 * 4).asFloatBuffer();
+		textureArray = new float[4 * 2];
+	}
+	
+	Object3D duplicateImpl() {
+		Background copy = new Background();
+		copy.backgroundColor = backgroundColor;
+		copy.backgroundImage = backgroundImage;
+		copy.backgroundImageModeX = backgroundImageModeX;
+		copy.backgroundImageModeY = backgroundImageModeY;
+		copy.cropX = cropX;
+		copy.cropY = cropY;
+		copy.cropWidth = cropWidth;
+		copy.cropHeight = cropHeight;
+		copy.cropY = cropY;
+		copy.colorClearEnabled = colorClearEnabled;
+		copy.depthClearEnabled = depthClearEnabled;
+		copy.colorClearEnabled = colorClearEnabled;
+		copy.backgroundTexture = backgroundTexture;
+		return copy;
 	}
 
 	public int getColor() {
@@ -50,6 +99,9 @@ public class Background extends Object3D {
 	}
 
 	public void setCrop(int x, int y, int width, int height) {
+		if ((width < 0) || (height < 0)) {
+			throw new IllegalArgumentException("Width and height must be positive or zero");
+		}
 		this.cropX = x;
 		this.cropY = y;
 		this.cropWidth = width;
@@ -73,6 +125,10 @@ public class Background extends Object3D {
 	}
 
 	public void setImageMode(int modeX, int modeY) {
+		if (((modeX != BORDER) && (modeX != REPEAT)) || ((modeY != BORDER) && (modeY != REPEAT))) {
+			throw new IllegalArgumentException("Bad image mode");
+		}
+
 		this.backgroundImageModeX = modeX;
 		this.backgroundImageModeY = modeY;
 	}
@@ -86,8 +142,19 @@ public class Background extends Object3D {
 	}
 
 	public void setImage(Image2D image) {
+		if ((image != null) && (image.getFormat() != Image2D.RGB) && (image.getFormat() != Image2D.RGBA)) {
+			throw new IllegalArgumentException("Image format must be RGB or RGBA");
+		}
 		this.backgroundImage = image;
-
+		
+		if (image != null) {
+			backgroundTexture = new Texture2D(backgroundImage);
+			backgroundTexture.setFiltering(Texture2D.FILTER_LINEAR, Texture2D.FILTER_LINEAR);
+			backgroundTexture.setWrapping(Texture2D.WRAP_CLAMP, Texture2D.WRAP_CLAMP);
+			backgroundTexture.setBlending(Texture2D.FUNC_REPLACE);
+		} else {
+			backgroundTexture = null;
+		}
 	}
 
 	public Image2D getImage() {
@@ -95,11 +162,12 @@ public class Background extends Object3D {
 	}
 
 	void setupGL(GL10 gl) {
-		int clearBits = 0;
 
+		// Clear the buffers
 		Color c = new Color(backgroundColor);
 		gl.glClearColor(c.r, c.g, c.b, c.a);
 
+		int clearBits = 0;
 		if (isColorClearEnabled())
 			clearBits |= GL10.GL_COLOR_BUFFER_BIT;
 		if (isDepthClearEnabled())
@@ -108,13 +176,8 @@ public class Background extends Object3D {
 		if (clearBits != 0)
 			gl.glClear(clearBits);
 
+		// Draw the background image if any
 		if (backgroundImage != null) {
-			if (backgroundTexture == null) {
-				backgroundTexture = new Texture2D(backgroundImage);
-				backgroundTexture.setFiltering(Texture2D.FILTER_LINEAR, Texture2D.FILTER_LINEAR);
-				backgroundTexture.setWrapping(Texture2D.WRAP_CLAMP, Texture2D.WRAP_CLAMP);
-				backgroundTexture.setBlending(Texture2D.FUNC_REPLACE);
-			}
 
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glPushMatrix();
@@ -132,9 +195,10 @@ public class Background extends Object3D {
 			Graphics3D.getInstance().disableTextureUnits();
 
 			gl.glActiveTexture(GL10.GL_TEXTURE0);
+			gl.glClientActiveTexture(GL10.GL_TEXTURE0);
 			backgroundTexture.setupGL(gl, new float[] { 1, 0, 0, 0 });
 
-			// calc crop
+			// Calculate crop
 			int w = Graphics3D.getInstance().getViewportWidth();
 			int h = Graphics3D.getInstance().getViewportHeight();
 
@@ -148,26 +212,37 @@ public class Background extends Object3D {
 			float v0 = (float) cropY / (float) h;
 			float v1 = v0 + (float) cropHeight / (float) h;
 
-			System.out.println("[DEBUG] Background.setupGL(): not implemented yet");
+			// Set texture coordinates
+			// Top right
+			textureArray[0] = u1;
+			textureArray[1] = v0;
+			// Top left
+			textureArray[2] = u0;
+			textureArray[3] = v0;
+			// Bottom Right
+			textureArray[4] = u1;
+			textureArray[5] = v1;
+			// Bottom Left
+			textureArray[6] = u0;
+			textureArray[7] = v1;
+			textureBuffer.put(textureArray);
+			textureBuffer.flip();
 
-			// FIXME
-			//	        gl.glBegin(GL.GL_QUADS);           	// Draw A Quad
-			//	        gl.glTexCoord2f(u0, u0);	
-			//	        gl.glVertex3f(-1.0f, 1.0f, 0);	// Top Left
-			//	        gl.glTexCoord2f(u1, v0);	
-			//	        gl.glVertex3f(1.0f, 1.0f, 0);	// Top Right
-			//	        gl.glTexCoord2f(u1, v1);	
-			//	        gl.glVertex3f(1.0f, -1.0f, 0);	// Bottom Right
-			//	        gl.glTexCoord2f(u0, v1);	
-			//	        gl.glVertex3f(-1.0f, -1.0f, 0);	// Bottom Left
-			//	        gl.glEnd();	
+			// Draw the background
+			gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
+			gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 
+			// Remove local context
 			gl.glMatrixMode(GL10.GL_PROJECTION);
 			gl.glPopMatrix();
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glPopMatrix();
-
 			gl.glDisable(GL10.GL_TEXTURE_2D);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		}
 	}
 

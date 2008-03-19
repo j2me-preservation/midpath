@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import java.nio.ByteBuffer;
@@ -85,6 +102,16 @@ public class Image2D extends Object3D {
 		//		else
 		//			throw new IllegalArgumentException("Unrecognized image object.");
 	}
+	
+	Object3D duplicateImpl() {
+		Image2D copy = new Image2D(format, width, height);
+		pixels.rewind();
+		int length = pixels.remaining();
+		copy.pixels = ByteBuffer.allocateDirect(length);
+		copy.pixels.put(pixels);
+		copy.pixels.flip();
+		return copy;
+	}
 
 	public void set(int x, int y, int width, int height, byte[] image) {
 		// TODO
@@ -93,8 +120,6 @@ public class Image2D extends Object3D {
 	private void loadFromImage(Image image) {
 		this.width = image.getWidth();
 		this.height = image.getHeight();
-
-		System.out.println("Image2D.loadFromImage() 1");
 		
 		if (width == -1 || height == -1)
 			throw new IllegalArgumentException("Failed to get width/height.");
@@ -103,8 +128,6 @@ public class Image2D extends Object3D {
 
 		int[] packedPixels = new int[width * height];
 		image.getRGB(packedPixels, 0, width, 0, 0, width, height);
-		
-		System.out.println("Image2D.loadFromImage() 2");
 
 		//        PixelGrabber pixelgrabber = new PixelGrabber(img, 0, 0, width, height, packedPixels, 0, width);
 		//        try {
@@ -115,8 +138,6 @@ public class Image2D extends Object3D {
 
 		int bpp = getBytesPerPixel();
 		pixels = ByteBuffer.allocateDirect(packedPixels.length * bpp);
-		
-		System.out.println("Image2D.loadFromImage() 2.1");
 
 		for (int row = 0; row < height; ++row) {
 			for (int col = 0; col < width; ++col) {
@@ -135,10 +156,8 @@ public class Image2D extends Object3D {
 				}
 			}
 		}
-		System.out.println("Image2D.loadFromImage() 2.2");
 		pixels.flip();
-		
-		System.out.println("Image2D.loadFromImage() 3");
+	
 	}
 
 	public void setWidth(int width) {
@@ -165,7 +184,7 @@ public class Image2D extends Object3D {
 		return format;
 	}
 
-	public ByteBuffer getPixels() {
+	ByteBuffer getPixels() {
 		return pixels;
 	}
 

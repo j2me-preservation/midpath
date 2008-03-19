@@ -1,4 +1,25 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
+
+import java.nio.ByteBuffer;
+
+import org.thenesis.m3g.engine.util.Tools;
 
 public class VertexBuffer extends Object3D {
 
@@ -23,6 +44,32 @@ public class VertexBuffer extends Object3D {
 		positionBias = new float[3];
 		texCoordsBias = new float[numTextureUnits][3];
 		texCoordsScale = new float[numTextureUnits];
+	}
+	
+	Object3D duplicateImpl() {
+		// Copy references
+		VertexBuffer copy = new VertexBuffer();
+		copy.numVertices = numVertices;
+		copy.positions = positions;
+		copy.normals = normals;
+		copy.colors = colors;
+		
+		// Copy data
+		if (texCoords != null) {
+			for (int i = 0; i < texCoords.length; i++) {
+				if (texCoords[i] != null) {
+					copy.texCoords[i] = (VertexArray)texCoords[i].duplicateImpl();
+				}
+			}
+		}
+		copy.positionBias = Tools.clone(positionBias);
+		copy.positionScale = positionScale;
+		copy.texCoordsBias = Tools.clone(texCoordsBias);
+		copy.texCoordsScale = Tools.clone(texCoordsScale);
+		
+		copy.maxTextureUnitIndex = maxTextureUnitIndex;
+		copy.defaultColor = defaultColor;
+		return copy;
 	}
 
 	public void setPositions(VertexArray positions, float scale, float[] bias) {
@@ -110,6 +157,30 @@ public class VertexBuffer extends Object3D {
 
 			numVertices = colors.getVertexCount();
 			this.colors = colors;
+
+			// Hack required because OpenGL ES 1.0 supports only RGBA colors
+			if (colors.getComponentCount() == 3) {
+				int count = colors.getVertexCount();
+				byte[] srcBuffer = new byte[count * 3];
+				colors.get(0, count, srcBuffer);
+				byte[] dstBuffer = new byte[count * 4];
+				for (int i = 0; i < count; i++) {
+					int srcOffset = i * 3;
+					int dstOffset = i * 4;
+					dstBuffer[dstOffset] = srcBuffer[srcOffset];
+					dstBuffer[dstOffset + 1] = srcBuffer[srcOffset + 1];
+					dstBuffer[dstOffset + 2] = srcBuffer[srcOffset + 2];
+					dstBuffer[dstOffset + 3] = -1;
+				}
+
+				ByteBuffer argbBuffer = ByteBuffer.allocateDirect(count * 4);
+				argbBuffer.put(dstBuffer);
+				colors.setARGBBuffer(argbBuffer);
+			} else {
+				// FIXME 
+				colors.setARGBBuffer((ByteBuffer)colors.getBuffer());
+			}
+
 		} else {
 			this.colors = colors;
 			resetVertexCount();

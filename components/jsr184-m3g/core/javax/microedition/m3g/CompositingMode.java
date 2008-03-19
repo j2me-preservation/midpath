@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -10,12 +27,13 @@ public class CompositingMode extends Object3D {
 	public static final int MODULATE_X2 = 67;
 	public static final int REPLACE = 68;
 
-	private boolean depthTestEnabled = true;
-	private boolean depthWriteEnabled = true;
-	private boolean colorWriteEnabled = true;
+	/* Attributes set to default values */
+	private boolean depthTestEnabled = true; 
+	private boolean depthWriteEnabled = true; 
+	private boolean colorWriteEnabled = true; 
 	private boolean alphaWriteEnabled = true;
 	private int blending = REPLACE;
-	private float alphaThreshold = 0.0f;
+	private float alphaThreshold = 0.0f; 
 	private float depthOffsetFactor = 0.0f;
 	private float depthOffsetUnits = 0.0f;
 
@@ -24,6 +42,19 @@ public class CompositingMode extends Object3D {
 		depthWriteEnabled = true;
 		colorWriteEnabled = true;
 		alphaWriteEnabled = true;
+	}
+	
+	Object3D duplicateImpl() {
+		CompositingMode copy = new CompositingMode();
+		copy.depthTestEnabled = depthTestEnabled;
+		copy.depthWriteEnabled = depthWriteEnabled;
+		copy.colorWriteEnabled = colorWriteEnabled;
+		copy.alphaWriteEnabled = alphaWriteEnabled;
+		copy.blending = blending;
+		copy.alphaThreshold = alphaThreshold;
+		copy.depthOffsetFactor = depthOffsetFactor;
+		copy.depthOffsetUnits = depthOffsetUnits;
+		return copy;
 	}
 
 	public void setDepthTestEnabled(boolean depthTestEnabled) {
@@ -90,13 +121,13 @@ public class CompositingMode extends Object3D {
 		return depthOffsetUnits;
 	}
 
-	void setupGL(GL10 gl) {
+	void setupGL(GL10 gl, boolean depthBufferEnabled) {
 		// TODO: move to one-time-initilize func
 		gl.glDepthFunc(GL10.GL_LEQUAL);
 		//gl.glBlendEquation(GL.GL_FUNC_ADD); // TODO Replace by an OES 1.0 call
 
 		// Setup depth testing		
-		if (depthTestEnabled)
+		if (depthBufferEnabled && depthTestEnabled)
 			gl.glEnable(GL10.GL_DEPTH_TEST);
 		else
 			gl.glDisable(GL10.GL_DEPTH_TEST);

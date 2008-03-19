@@ -1,9 +1,25 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import org.thenesis.m3g.engine.util.Color;
-
 
 public class Light extends Node {
 	public static final int AMBIENT = 128;
@@ -20,10 +36,21 @@ public class Light extends Node {
 	private float spotAngle = 45.0f;
 	private float spotExponent = 0.0f;
 
-	private int lightId = -1;
-
 	public Light() {
-
+	}
+	
+	Object3D duplicateImpl() {
+		Light copy = new Light();
+		duplicate((Node)copy);
+		copy.attenuationConstant = attenuationConstant;
+		copy.attenuationLinear = attenuationLinear;
+		copy.attenuationQuadratic = attenuationQuadratic;
+		copy.color = color;
+		copy.mode = mode;
+		copy.intensity = intensity;
+		copy.spotAngle = spotAngle;
+		copy.spotExponent = spotExponent;
+		return copy;
 	}
 
 	public int getColor() {
@@ -84,22 +111,19 @@ public class Light extends Node {
 		spotExponent = exponent;
 	}
 
-	void setupGL(GL10 gl) {
+	void setupGL(GL10 gl, int lightId) {
+
 		// TODO: color and intensity
-		float[] col = (new Color(color)).toArray();
+		float[] col = (new Color(color)).toRBGAArray();
 
 		col[0] *= intensity;
 		col[1] *= intensity;
 		col[2] *= intensity;
 		col[3] *= intensity;
 
-		if (mode == Light.AMBIENT)
+		if (mode == Light.AMBIENT) {
 			gl.glLightModelfv(GL10.GL_LIGHT_MODEL_AMBIENT, col, 0);
-		else {
-			getFreeLightId(gl);
-
-			if (lightId == -1)
-				return;
+		} else {
 
 			gl.glLightfv(lightId, GL10.GL_DIFFUSE, col, 0);
 			gl.glLightfv(lightId, GL10.GL_AMBIENT, new float[] { 0, 0, 0, 0 }, 0);
@@ -121,7 +145,7 @@ public class Light extends Node {
 				gl.glLightf(lightId, GL10.GL_SPOT_EXPONENT, spotExponent);
 
 				// Set default spot direction
-				gl.glLightfv(lightId, GL10.GL_SPOT_DIRECTION, new float[] { 0, 0, 1 }, 0);
+				gl.glLightfv(lightId, GL10.GL_SPOT_DIRECTION, new float[] { 0, 0, -1 }, 0);
 			} else if (mode == Light.DIRECTIONAL) {
 				// set direction (w=0 meaning directional instead of positional)
 				gl.glLightfv(lightId, GL10.GL_POSITION, new float[] { 0, 0, 1, 0 }, 0);
@@ -137,19 +161,6 @@ public class Light extends Node {
 		}
 	}
 
-	private void getFreeLightId(GL10 gl) {
-		
-		// FIXME Search for a _really_ free id
-		lightId = GL10.GL_LIGHT0;
-		gl.glEnable(lightId);
-		
-//		lightId = -1;
-//		for (int i = 0; i < Graphics3D.MAX_LIGHT_COUNT; i++) {
-//			if (!gl.glIsEnabled(GL10.GL_LIGHT0 + i)) {
-//				lightId = GL10.GL_LIGHT0 + i;
-//				gl.glEnable(lightId);
-//				return;
-//			}
-//		}
-	}
+	
+	
 }

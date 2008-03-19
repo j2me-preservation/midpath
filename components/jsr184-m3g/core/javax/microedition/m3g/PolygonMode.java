@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -18,6 +35,17 @@ public class PolygonMode extends Object3D {
 	private boolean twoSidedLightingEnabled = false;
 	private boolean localCameraLightingEnabled = false;
 	private boolean perspectiveCorrectionEnabled = true;
+	
+	Object3D duplicateImpl() {
+		PolygonMode copy = new PolygonMode();
+		copy.culling = culling;
+		copy.shading = shading;
+		copy.winding = winding;
+		copy.twoSidedLightingEnabled = twoSidedLightingEnabled;
+		copy.localCameraLightingEnabled = localCameraLightingEnabled;
+		copy.perspectiveCorrectionEnabled = perspectiveCorrectionEnabled;
+		return copy;
+	}
 
 	public void setCulling(int culling) {
 		this.culling = culling;
@@ -43,24 +71,24 @@ public class PolygonMode extends Object3D {
 		return winding;
 	}
 
-	public void setTwoSidedLightingEnabled(boolean twoSidedLightingEnabled) {
-		this.twoSidedLightingEnabled = twoSidedLightingEnabled;
+	public void setTwoSidedLightingEnable(boolean  enable) {
+		this.twoSidedLightingEnabled =  enable;
 	}
 
 	public boolean isTwoSidedLightingEnabled() {
 		return twoSidedLightingEnabled;
 	}
 
-	public void setLocalCameraLightingEnabled(boolean localCameraLightingEnabled) {
-		this.localCameraLightingEnabled = localCameraLightingEnabled;
+	public void setLocalCameraLightingEnable(boolean enable) {
+		this.localCameraLightingEnabled =  enable;
 	}
 
 	public boolean isLocalCameraLightingEnabled() {
 		return localCameraLightingEnabled;
 	}
 
-	public void setPerspectiveCorrectionEnabled(boolean perspectiveCorrectionEnabled) {
-		this.perspectiveCorrectionEnabled = perspectiveCorrectionEnabled;
+	public void setPerspectiveCorrectionEnable(boolean  enable) {
+		this.perspectiveCorrectionEnabled =  enable;
 	}
 
 	public boolean isPerspectiveCorrectionEnabled() {

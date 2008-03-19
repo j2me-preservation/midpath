@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -5,7 +22,6 @@ import javax.microedition.khronos.opengles.GL10;
 import org.thenesis.m3g.engine.vecMath.Constants;
 import org.thenesis.m3g.engine.vecMath.Vector3;
 import org.thenesis.m3g.engine.vecMath.Vector4;
-
 
 public class Transform {
 
@@ -142,10 +158,10 @@ public class Transform {
 				float z = (cc >= 3 ? (float) values[i + 2] : 0.0f);
 				float w = (cc >= 4 ? (float) values[i + 3] : (W ? 1 : 0));
 
-				out[i] = x * m[0] + y * m[1] + z * m[2] + w * m[3];
-				out[i + 1] = x * m[4] + y * m[5] + z * m[6] + w * m[7];
-				out[i + 2] = x * m[8] + y * m[9] + z * m[10] + w * m[11];
-				out[i + 3] = x * m[12] + y * m[13] + z * m[14] + w * m[15];
+				out[j] = x * m[0] + y * m[1] + z * m[2] + w * m[3];
+				out[j + 1] = x * m[4] + y * m[5] + z * m[6] + w * m[7];
+				out[j + 2] = x * m[8] + y * m[9] + z * m[10] + w * m[11];
+				out[j + 3] = x * m[12] + y * m[13] + z * m[14] + w * m[15];
 			}
 		} else {
 			short[] values = new short[vc * cc];
@@ -164,45 +180,111 @@ public class Transform {
 		}
 	}
 
-	public void invert() {
-		//	float det = determinant();
-		//	if (det == 0)
-		//		throw new ArithmeticException("This transform is not invertible");
+		public void invert() {
+			//	float det = determinant();
+			//	if (det == 0)
+			//		throw new ArithmeticException("This transform is not invertible");
+	
+			// This will only work for ON-matrices, but it's really fast! :)
+			float[] n = { m[0], m[4], m[8], -m[0] * m[3] - m[4] * m[7] - m[8] * m[11], m[1], m[5], m[9],
+					-m[1] * m[3] - m[5] * m[7] - m[9] * m[11], m[2], m[6], m[10],
+					-m[2] * m[3] - m[6] * m[7] - m[10] * m[11], 0, 0, 0, 1 };
+			set(n);
+		}
 
-		// This will only work for ON-matrices, but it's really fast! :)
-		float[] n = { m[0], m[4], m[8], -m[0] * m[3] - m[4] * m[7] - m[8] * m[11], m[1], m[5], m[9],
-				-m[1] * m[3] - m[5] * m[7] - m[9] * m[11], m[2], m[6], m[10],
-				-m[2] * m[3] - m[6] * m[7] - m[10] * m[11], 0, 0, 0, 1 };
-		set(n);
-	}
+//	public void invert() {
+//		
+//		// cf. http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+//		
+//		float m00 = m[0];
+//		float m01 = m[1];
+//		float m02 = m[2];
+//		float m03 = m[3];
+//		float m10 = m[4];
+//		float m11 = m[5];
+//		float m12 = m[6];
+//		float m13 = m[7];
+//		float m20 = m[8];
+//		float m21 = m[9];
+//		float m22 = m[10];
+//		float m23 = m[11];
+//		float m30 = m[12];
+//		float m31 = m[13];
+//		float m32 = m[14];
+//		float m33 = m[15];
+//		
+//		
+//		float invDet = 1 / (m03 * m12 * m21 * m30 - m02 * m13 * m21 * m30 - m03 * m11 * m22 * m30 + m01 * m13 * m22
+//				* m30 + m02 * m11 * m23 * m30 - m01 * m12 * m23 * m30 - m03 * m12 * m20 * m31 + m02 * m13 * m20 * m31
+//				+ m03 * m10 * m22 * m31 - m00 * m13 * m22 * m31 - m02 * m10 * m23 * m31 + m00 * m12 * m23 * m31 + m03
+//				* m11 * m20 * m32 - m01 * m13 * m20 * m32 - m03 * m10 * m21 * m32 + m00 * m13 * m21 * m32 + m01 * m10
+//				* m23 * m32 - m00 * m11 * m23 * m32 - m02 * m11 * m20 * m33 + m01 * m12 * m20 * m33 + m02 * m10 * m21
+//				* m33 - m00 * m12 * m21 * m33 - m01 * m10 * m22 * m33 + m00 * m11 * m22 * m33);
+//
+//		m00 = m12 * m23 * m31 - m13 * m22 * m31 + m13 * m21 * m32 - m11 * m23 * m32 - m12 * m21 * m33 + m11 * m22 * m33;
+//		m01 = m03 * m22 * m31 - m02 * m23 * m31 - m03 * m21 * m32 + m01 * m23 * m32 + m02 * m21 * m33 - m01 * m22 * m33;
+//		m02 = m02 * m13 * m31 - m03 * m12 * m31 + m03 * m11 * m32 - m01 * m13 * m32 - m02 * m11 * m33 + m01 * m12 * m33;
+//		m03 = m03 * m12 * m21 - m02 * m13 * m21 - m03 * m11 * m22 + m01 * m13 * m22 + m02 * m11 * m23 - m01 * m12 * m23;
+//		m10 = m13 * m22 * m30 - m12 * m23 * m30 - m13 * m20 * m32 + m10 * m23 * m32 + m12 * m20 * m33 - m10 * m22 * m33;
+//		m11 = m02 * m23 * m30 - m03 * m22 * m30 + m03 * m20 * m32 - m00 * m23 * m32 - m02 * m20 * m33 + m00 * m22 * m33;
+//		m12 = m03 * m12 * m30 - m02 * m13 * m30 - m03 * m10 * m32 + m00 * m13 * m32 + m02 * m10 * m33 - m00 * m12 * m33;
+//		m13 = m02 * m13 * m20 - m03 * m12 * m20 + m03 * m10 * m22 - m00 * m13 * m22 - m02 * m10 * m23 + m00 * m12 * m23;
+//		m20 = m11 * m23 * m30 - m13 * m21 * m30 + m13 * m20 * m31 - m10 * m23 * m31 - m11 * m20 * m33 + m10 * m21 * m33;
+//		m21 = m03 * m21 * m30 - m01 * m23 * m30 - m03 * m20 * m31 + m00 * m23 * m31 + m01 * m20 * m33 - m00 * m21 * m33;
+//		m22 = m01 * m13 * m30 - m03 * m11 * m30 + m03 * m10 * m31 - m00 * m13 * m31 - m01 * m10 * m33 + m00 * m11 * m33;
+//		m23 = m03 * m11 * m20 - m01 * m13 * m20 - m03 * m10 * m21 + m00 * m13 * m21 + m01 * m10 * m23 - m00 * m11 * m23;
+//		m30 = m12 * m21 * m30 - m11 * m22 * m30 - m12 * m20 * m31 + m10 * m22 * m31 + m11 * m20 * m32 - m10 * m21 * m32;
+//		m31 = m01 * m22 * m30 - m02 * m21 * m30 + m02 * m20 * m31 - m00 * m22 * m31 - m01 * m20 * m32 + m00 * m21 * m32;
+//		m32 = m02 * m11 * m30 - m01 * m12 * m30 - m02 * m10 * m31 + m00 * m12 * m31 + m01 * m10 * m32 - m00 * m11 * m32;
+//		m33 = m01 * m12 * m20 - m02 * m11 * m20 + m02 * m10 * m21 - m00 * m12 * m21 - m01 * m10 * m22 + m00 * m11 * m22;
+//
+//		
+//		m[0] = m00 * invDet;
+//		m[1] = m01 * invDet;
+//		m[2] = m02 * invDet;
+//		m[3] = m03 * invDet;
+//		m[4] = m10 * invDet;
+//		m[5] = m11 * invDet;
+//		m[6] = m12 * invDet;
+//		m[7] = m13 * invDet;
+//		m[8] = m20 * invDet;
+//		m[9] = m21 * invDet;
+//		m[10] = m22 * invDet;
+//		m[11] = m23 * invDet;
+//		m[12] = m30 * invDet;
+//		m[13] = m31 * invDet;
+//		m[14] = m32 * invDet;
+//		m[15] = m33 * invDet;
+//
+//	}
 
 	public void transpose() {
-		
+
 		transpose(m);
-		
-//		float t = m[1];
-//		m[1] = m[4];
-//		m[4] = t;
-//
-//		t = m[2];
-//		m[2] = m[8];
-//		m[8] = t;
-//
-//		t = m[3];
-//		m[12] = m[3];
-//		m[3] = t;
-//
-//		t = m[6];
-//		m[6] = m[9];
-//		m[9] = t;
-//
-//		t = m[7];
-//		m[7] = m[13];
-//		m[13] = t;
-//
-//		t = m[11];
-//		m[11] = m[14];
-//		m[14] = t;
+
+		//		float t = m[1];
+		//		m[1] = m[4];
+		//		m[4] = t;
+		//
+		//		t = m[2];
+		//		m[2] = m[8];
+		//		m[8] = t;
+		//
+		//		t = m[3];
+		//		m[12] = m[3];
+		//		m[3] = t;
+		//
+		//		t = m[6];
+		//		m[6] = m[9];
+		//		m[9] = t;
+		//
+		//		t = m[7];
+		//		m[7] = m[13];
+		//		m[13] = t;
+		//
+		//		t = m[11];
+		//		m[11] = m[14];
+		//		m[14] = t;
 	}
 
 	public void postMultiply(Transform transform) {
@@ -237,7 +319,7 @@ public class Transform {
 	public void postRotate(float angle, float ax, float ay, float az) {
 		Vector3 v = new Vector3(ax, ay, az);
 
-		if (angle < 0.000001) // TODO: use constant
+		if (Math.abs(angle) < 0.000001) // TODO: use constant
 			return;
 
 		if (ax == 0 && ay == 0 && az == 0)
@@ -348,8 +430,9 @@ public class Transform {
 		float[] matrix = new float[16];
 		System.arraycopy(m, 0, matrix, 0, 16);
 		transpose(matrix);
+		//System.out.println("setGL: " + this);
 		gl.glLoadMatrixf(matrix, 0);
-		
+
 		//gl.glLoadTransposeMatrixf(m, 0);
 	}
 
@@ -357,11 +440,12 @@ public class Transform {
 		float[] matrix = new float[16];
 		System.arraycopy(m, 0, matrix, 0, 16);
 		transpose(matrix);
+		//System.out.println("multGL: " + this);
 		gl.glMultMatrixf(matrix, 0);
 		
 		//gl.glMultTransposeMatrixf(m, 0);
 	}
-	
+
 	private void transpose(float[] matrix) {
 		float t = matrix[1];
 		matrix[1] = matrix[4];
@@ -372,8 +456,8 @@ public class Transform {
 		matrix[8] = t;
 
 		t = matrix[3];
-		matrix[12] = matrix[3];
-		matrix[3] = t;
+		matrix[3] = matrix[12];
+		matrix[12] = t;
 
 		t = matrix[6];
 		matrix[6] = matrix[9];
@@ -388,10 +472,10 @@ public class Transform {
 		matrix[14] = t;
 	}
 
-//	void getGL(GL11 gl, int matrixMode) {
-//		gl.glGetFloatv(matrixMode, m, 0);
-//		transpose();
-//	}
+	//	void getGL(GL11 gl, int matrixMode) {
+	//		gl.glGetFloatv(matrixMode, m, 0);
+	//		transpose();
+	//	}
 
 	public String toString() {
 		String ret = "{";

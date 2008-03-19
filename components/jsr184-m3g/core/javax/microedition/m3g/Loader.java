@@ -1,9 +1,30 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Vector;
+
+import org.thenesis.m3g.engine.util.PushbackInputStream;
+import org.thenesis.m3g.engine.util.ResourceLoader;
 
 //import java.util.zip.Inflater;
 
@@ -11,66 +32,94 @@ public class Loader {
 	private static final byte[] IDENTIFIER = { (byte) 0xAB, 0x4A, 0x53, 0x52, 0x31, 0x38, 0x34, (byte) 0xBB, 0x0D,
 			0x0A, 0x1A, 0x0A };
 
-	private static DataInputStream in;
+	private static DataInputStream dis;
 	private static Vector objs;
+	private static ResourceLoader resourceLoader = new ResourceLoader();
 
-	public static Object3D[] load(String name) {
-		objs = new Vector();
-		try {
-			in = new DataInputStream(Loader.class.getResourceAsStream(name));
+	public static Object3D[] load(String name) throws IOException {
 
-			byte[] identifier = new byte[12];
-			int read = in.read(identifier, 0, 12);
+		// Determine if the given name is a embedded resource or an URI 
+		InputStream is;
+		if (name.startsWith("/")) {
+			is = Loader.class.getResourceAsStream(name);
+		} else {
+			is = resourceLoader.getInputStreamFromURI(name);
+		}
+		
+		if (is == null) {
+			throw new IOException("Can't load " + name);
+		}
+		
+		PushbackInputStream pis = new PushbackInputStream(is, 12);
 
-			for (int i = 0; i < 12; ++i)
-				if (identifier[i] != IDENTIFIER[i])
-					throw new Exception("Invalid format");
-
-			/*
-			 * Byte                        CompressionScheme
-			 * UInt32                      TotalSectionLength
-			 * UInt32                      UncompressedLength
-			 * Byte[TotalSectionLength-13] Objects
-			 * UInt32                      Checksum
-			 */
-
-			while (in.available() > 0) {
-				int compressionScheme = readByte();
-				int totalSectionLength = readInt();
-				int uncompressedLength = readInt();
-				//System.out.println("compressionScheme: " + compressionScheme);
-				//System.out.println("totalSectionLength: " + totalSectionLength);
-				//System.out.println("uncompressedLength: " + uncompressedLength);
-
-				byte[] uncompressedData = new byte[uncompressedLength];
-
-				if (compressionScheme == 0) {
-					in.readFully(uncompressedData);
-				} else if (compressionScheme == 1) {
-
-					throw new UnsupportedOperationException("ZLib compression is not supported yet");
-
-					//					int compressedLength = totalSectionLength-13;
-					//					byte[] compressedData = new byte[compressedLength];
-					//					in.readFully(compressedData);
-					//					
-					//					Inflater decompresser = new Inflater();
-					//					decompresser.setInput(compressedData, 0, compressedLength);
-					//					int resultLength = decompresser.inflate(uncompressedData);
-					//					decompresser.end();
-					//					
-					//					if(resultLength != uncompressedLength)
-					//						throw new IOException("Unable to decompress data.");
-				} else {
-					throw new IOException("Unknown compression scheme.");
-				}
-
-				int checkSum = in.readInt();
-
-				load(uncompressedData, 0);
+		// Check if the resource has a M3G header
+		byte[] identifier = new byte[12];
+		int read = pis.read(identifier, 0, 12);
+		boolean isM3GFile = true;
+		for (int i = 0; i < 12; i++) {
+			if (identifier[i] != IDENTIFIER[i]) {
+				isM3GFile = false;
 			}
-		} catch (Exception e) {
-			System.out.println("EXCEPTION!" + e.getMessage());
+		}
+
+		// Load the resource
+		if (isM3GFile) {
+			return loadM3G(is);
+		} else {
+			pis.unread(identifier);
+			Object image = resourceLoader.createImage(pis);
+			Image2D image2D = new Image2D(Image2D.RGB, image);
+			return new Object3D[] { image2D };
+		}
+
+	}
+
+	private static Object3D[] loadM3G(InputStream is) throws IOException {
+
+		objs = new Vector();
+		dis = new DataInputStream(is);
+
+		/*
+		 * Byte                        CompressionScheme
+		 * UInt32                      TotalSectionLength
+		 * UInt32                      UncompressedLength
+		 * Byte[TotalSectionLength-13] Objects
+		 * UInt32                      Checksum
+		 */
+		while (dis.available() > 0) {
+			int compressionScheme = readByte();
+			int totalSectionLength = readInt();
+			int uncompressedLength = readInt();
+			//System.out.println("compressionScheme: " + compressionScheme);
+			//System.out.println("totalSectionLength: " + totalSectionLength);
+			//System.out.println("uncompressedLength: " + uncompressedLength);
+
+			byte[] uncompressedData = new byte[uncompressedLength];
+
+			if (compressionScheme == 0) {
+				dis.readFully(uncompressedData);
+			} else if (compressionScheme == 1) {
+
+				throw new UnsupportedOperationException("ZLib compression is not supported yet");
+
+				//					int compressedLength = totalSectionLength-13;
+				//					byte[] compressedData = new byte[compressedLength];
+				//					in.readFully(compressedData);
+				//					
+				//					Inflater decompresser = new Inflater();
+				//					decompresser.setInput(compressedData, 0, compressedLength);
+				//					int resultLength = decompresser.inflate(uncompressedData);
+				//					decompresser.end();
+				//					
+				//					if(resultLength != uncompressedLength)
+				//						throw new IOException("Unable to decompress data.");
+			} else {
+				throw new IOException("Unknown compression scheme.");
+			}
+
+			int checkSum = dis.readInt();
+
+			load(uncompressedData, 0);
 		}
 
 		Object3D[] obj = new Object3D[objs.size()];
@@ -82,21 +131,22 @@ public class Loader {
 		//return (Object3D[]) objects.toArray(typeof(Object3D));
 		//return new Object3D[] { (Object3D)objects.get(objects.size()-1) };
 		//return null;
+
 	}
 
 	public static Object3D[] load(byte[] data, int offset) {
-		DataInputStream old = in;
-		in = new DataInputStream(new ByteArrayInputStream(data));
+		DataInputStream old = dis;
+		dis = new DataInputStream(new ByteArrayInputStream(data));
 
 		try {
-			while (in.available() > 0) {
+			while (dis.available() > 0) {
 				int objectType = readByte();
 				int length = readInt();
 
-				//System.out.println("objectType: " + objectType);
-				//System.out.println("length: " + length);
+				System.out.println("objectType: " + objectType);
+				System.out.println("length: " + length);
 
-				in.mark(Integer.MAX_VALUE);
+				dis.mark(Integer.MAX_VALUE);
 
 				if (objectType == 0) {
 					int versionHigh = readByte();
@@ -214,12 +264,12 @@ public class Loader {
 						byte[] palette = null;
 						if (paletteSize > 0) {
 							palette = new byte[paletteSize];
-							in.readFully(palette);
+							dis.readFully(palette);
 						}
 						// Read pixels
 						int pixelSize = readInt();
 						byte[] pixel = new byte[pixelSize];
-						in.readFully(pixel);
+						dis.readFully(pixel);
 						// Create image
 						if (palette != null)
 							image = new Image2D(format, width, height, pixel, palette);
@@ -228,7 +278,7 @@ public class Loader {
 					} else
 						image = new Image2D(format, width, height);
 
-					in.reset();
+					dis.reset();
 					loadObject3D(image);
 
 					objs.addElement(image);
@@ -304,7 +354,7 @@ public class Loader {
 					material.setColor(Material.EMISSIVE, readRGB());
 					material.setColor(Material.SPECULAR, readRGB());
 					material.setShininess(readFloat());
-					material.setVertexColorTrackingEnabled(readBoolean());
+					material.setVertexColorTrackingEnable(readBoolean());
 					objs.addElement(material);
 				} else if (objectType == 14) {
 					//System.out.println("Mesh");
@@ -322,7 +372,7 @@ public class Loader {
 					}
 					Mesh mesh = new Mesh(vertices, submeshes, appearances);
 
-					in.reset();
+					dis.reset();
 					loadNode(mesh);
 
 					objs.addElement(mesh);
@@ -346,9 +396,9 @@ public class Loader {
 					polygonMode.setCulling(readByte());
 					polygonMode.setShading(readByte());
 					polygonMode.setWinding(readByte());
-					polygonMode.setTwoSidedLightingEnabled(readBoolean());
-					polygonMode.setLocalCameraLightingEnabled(readBoolean());
-					polygonMode.setPerspectiveCorrectionEnabled(readBoolean());
+					polygonMode.setTwoSidedLightingEnable(readBoolean());
+					polygonMode.setLocalCameraLightingEnable(readBoolean());
+					polygonMode.setPerspectiveCorrectionEnable(readBoolean());
 					objs.addElement(polygonMode);
 				} else if (objectType == 16) {
 					System.out.println("Loader: SkinnedMesh not implemented.");
@@ -396,7 +446,7 @@ public class Loader {
 					int imageFilter = readByte();
 					texture.setFiltering(levelFilter, imageFilter);
 
-					in.reset();
+					dis.reset();
 					loadTransformable(texture);
 
 					objs.addElement(texture);
@@ -436,7 +486,7 @@ public class Loader {
 					for (int i = 0; i < numStripLengths; ++i)
 						stripLengths[i] = readInt();
 
-					in.reset();
+					dis.reset();
 
 					TriangleStripArray triStrip = null;
 					if (indices == null)
@@ -462,7 +512,7 @@ public class Loader {
 					if (componentSize == 1) {
 						byte[] values = new byte[componentCount * vertexCount];
 						if (encoding == 0)
-							in.readFully(values);
+							dis.readFully(values);
 						else {
 							byte last = 0;
 							for (int i = 0; i < vertexCount * componentCount; ++i) {
@@ -485,7 +535,7 @@ public class Loader {
 						vertices.set(0, vertexCount, values);
 					}
 
-					in.reset();
+					dis.reset();
 					loadObject3D(vertices);
 
 					objs.addElement(vertices);
@@ -532,22 +582,22 @@ public class Loader {
 					System.out.println("Loader: unsupported objectType " + objectType + ".");
 				}
 
-				in.reset();
-				in.skipBytes(length);
+				dis.reset();
+				dis.skipBytes(length);
 			}
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
 
-		in = old;
+		dis = old;
 		return null;
 	}
 
 	// Fundamental data types
 
 	private static int readByte() throws IOException {
-		return in.readUnsignedByte();
+		return dis.readUnsignedByte();
 	}
 
 	private static int readShort() throws IOException {
@@ -557,17 +607,17 @@ public class Loader {
 	}
 
 	private static int readRGB() throws IOException {
-		byte r = in.readByte();
-		byte g = in.readByte();
-		byte b = in.readByte();
+		byte r = dis.readByte();
+		byte g = dis.readByte();
+		byte b = dis.readByte();
 		return (r << 16) + (g << 8) + b;
 	}
 
 	private static int readRGBA() throws IOException {
-		byte r = in.readByte();
-		byte g = in.readByte();
-		byte b = in.readByte();
-		byte a = in.readByte();
+		byte r = dis.readByte();
+		byte g = dis.readByte();
+		byte b = dis.readByte();
+		byte a = dis.readByte();
 		return (a << 24) + (r << 16) + (g << 8) + b;
 	}
 
@@ -576,10 +626,10 @@ public class Loader {
 	}
 
 	private static int readInt() throws IOException {
-		int a = in.readUnsignedByte();
-		int b = in.readUnsignedByte();
-		int c = in.readUnsignedByte();
-		int d = in.readUnsignedByte();
+		int a = dis.readUnsignedByte();
+		int b = dis.readUnsignedByte();
+		int c = dis.readUnsignedByte();
+		int d = dis.readUnsignedByte();
 		int i = (d << 24) | (c << 16) | (b << 8) | a;
 		return i;
 	}
@@ -622,7 +672,7 @@ public class Loader {
 			int parameterID = readInt();
 			int numBytes = readInt();
 			byte[] parameterBytes = new byte[numBytes];
-			in.readFully(parameterBytes);
+			dis.readFully(parameterBytes);
 		}
 	}
 

@@ -1,3 +1,20 @@
+/*
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA  
+ */
 package javax.microedition.m3g;
 
 import org.thenesis.m3g.engine.vecMath.Constants;
@@ -15,7 +32,18 @@ public class Camera extends Node {
 	private Transform transform = new Transform();
 
 	public Camera() {
-
+	}
+	
+	Object3D duplicateImpl() {
+		Camera copy = new Camera();
+		duplicate((Node)copy);
+		copy.projectionType = projectionType;
+		copy.fovy = fovy;
+		copy.aspectRatio = aspectRatio;
+		copy.near = near;
+		copy.far = far;
+		copy.transform = new Transform(transform);
+		return copy;
 	}
 
 	public void setParallel(float fovy, float aspectRatio, float near, float far) {
