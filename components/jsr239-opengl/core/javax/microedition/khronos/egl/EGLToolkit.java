@@ -1,10 +1,8 @@
 package javax.microedition.khronos.egl;
 
-import org.thenesis.midpath.opengles.jgl.JGLToolkit;
-
 public abstract class EGLToolkit {
 
-	private static EGLToolkit instance = new JGLToolkit();
+	private static EGLToolkit instance;
 
 	protected static EGLToolkit getInstance() {
 		if (instance == null) {

@@ -24,15 +24,8 @@
 
 package com.sun.jsr239;
 
-import java.lang.ref.WeakReference;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 import java.util.Hashtable;
-
-import org.thenesis.midpath.opengles.ogles.NativeGL10;
 
 public class BufferManager {
 
