@@ -318,7 +318,7 @@ public class gl_texture {
 
 		int i = get_map_nearest_index(s, img.Width, CurrentObj.WrapS);
 
-		return (0xff000000 | (img.ImageData[i][0][0][0] & 0x000000ff) << 16
+		return ((img.ImageData[i][0][0][3] & 0x000000ff) << 24 | (img.ImageData[i][0][0][0] & 0x000000ff) << 16
 				| (img.ImageData[i][0][0][1] & 0x000000ff) << 8 | (img.ImageData[i][0][0][2] & 0x000000ff));
 	}
 
@@ -327,9 +327,10 @@ public class gl_texture {
 
 		int i = get_map_nearest_index(s, img.Width, CurrentObj.WrapS);
 		int j = get_map_nearest_index(t, img.Height, CurrentObj.WrapT);
+		
+		return ((img.ImageData[i][j][0][3] & 0x000000ff) << 24 | (img.ImageData[i][j][0][0] & 0x000000ff) << 16
+		| (img.ImageData[i][j][0][1] & 0x000000ff) << 8 | (img.ImageData[i][j][0][2] & 0x000000ff));
 
-		return (0xff000000 | (img.ImageData[i][j][0][0] & 0x000000ff) << 16
-				| (img.ImageData[i][j][0][1] & 0x000000ff) << 8 | (img.ImageData[i][j][0][2] & 0x000000ff));
 	}
 
 	private int tex_map_nearest_3d(float s, float t, float r, int l) {
@@ -339,7 +340,7 @@ public class gl_texture {
 		int j = get_map_nearest_index(t, img.Height, CurrentObj.WrapT);
 		int k = get_map_nearest_index(r, img.Depth, CurrentObj.WrapR);
 
-		return (0xff000000 | (img.ImageData[i][j][k][0] & 0x000000ff) << 16
+		return ((img.ImageData[i][j][0][3] & 0x000000ff) << 24 | (img.ImageData[i][j][k][0] & 0x000000ff) << 16
 				| (img.ImageData[i][j][k][1] & 0x000000ff) << 8 | (img.ImageData[i][j][k][2] & 0x000000ff));
 	}
 
@@ -371,7 +372,7 @@ public class gl_texture {
 		float w000 = (1 - a);
 		float w001 = a;
 
-		int rgb[] = new int[3];
+		int rgb[] = new int[4];
 
 		rgb[0] = (int) (((float) (img.ImageData[i[0]][0][0][0] & 0x000000ff)) * w000 + ((float) (img.ImageData[i[1]][0][0][0] & 0x000000ff))
 				* w001);
@@ -379,8 +380,10 @@ public class gl_texture {
 				* w001);
 		rgb[2] = (int) (((float) (img.ImageData[i[0]][0][0][2] & 0x000000ff)) * w000 + ((float) (img.ImageData[i[1]][0][0][2] & 0x000000ff))
 				* w001);
+		rgb[3] = (int) (((float) (img.ImageData[i[0]][0][0][3] & 0x000000ff)) * w000 + ((float) (img.ImageData[i[1]][0][0][3] & 0x000000ff))
+				* w001);
 
-		return gl_util.RGBtoI(rgb[0], rgb[1], rgb[2]);
+		return gl_util.RGBAtoI(rgb[0], rgb[1], rgb[2], rgb[3]);
 	}
 
 	private int tex_map_linear_2d(float s, float t, int l) {
@@ -397,7 +400,7 @@ public class gl_texture {
 		float w010 = (1 - a) * b;
 		float w011 = a * b;
 
-		int rgb[] = new int[3];
+		int rgb[] = new int[4];
 
 		rgb[0] = (int) (((float) (img.ImageData[i[0]][j[0]][0][0] & 0x000000ff)) * w000
 				+ ((float) (img.ImageData[i[1]][j[0]][0][0] & 0x000000ff)) * w001
@@ -411,8 +414,13 @@ public class gl_texture {
 				+ ((float) (img.ImageData[i[1]][j[0]][0][2] & 0x000000ff)) * w001
 				+ ((float) (img.ImageData[i[0]][j[1]][0][2] & 0x000000ff)) * w010 + ((float) (img.ImageData[i[1]][j[1]][0][2] & 0x000000ff))
 				* w011);
+		
+		rgb[3] = (int) (((float) (img.ImageData[i[0]][j[0]][0][3] & 0x000000ff)) * w000
+				+ ((float) (img.ImageData[i[1]][j[0]][0][3] & 0x000000ff)) * w001
+				+ ((float) (img.ImageData[i[0]][j[1]][0][3] & 0x000000ff)) * w010 + ((float) (img.ImageData[i[1]][j[1]][0][3] & 0x000000ff))
+				* w011);
 
-		return gl_util.RGBtoI(rgb[0], rgb[1], rgb[2]);
+		return gl_util.RGBAtoI(rgb[0], rgb[1], rgb[2], rgb[3]);
 	}
 
 	private int tex_map_linear_3d(float s, float t, float r, int l) {
@@ -435,7 +443,7 @@ public class gl_texture {
 		float w110 = (1 - a) * b * c;
 		float w111 = a * b * c;
 
-		int rgb[] = new int[3];
+		int rgb[] = new int[4];
 
 		rgb[0] = (int) (((float) (img.ImageData[i[0]][j[0]][k[0]][0] & 0x000000ff)) * w000
 				+ ((float) (img.ImageData[i[1]][j[0]][k[0]][0] & 0x000000ff)) * w001
@@ -461,8 +469,16 @@ public class gl_texture {
 				+ ((float) (img.ImageData[i[1]][j[0]][k[1]][2] & 0x000000ff)) * w101
 				+ ((float) (img.ImageData[i[0]][j[1]][k[1]][2] & 0x000000ff)) * w110 + ((float) (img.ImageData[i[1]][j[1]][k[1]][2] & 0x000000ff))
 				* w111);
+		rgb[3] = (int) (((float) (img.ImageData[i[0]][j[0]][k[0]][3] & 0x000000ff)) * w000
+				+ ((float) (img.ImageData[i[1]][j[0]][k[0]][3] & 0x000000ff)) * w001
+				+ ((float) (img.ImageData[i[0]][j[1]][k[0]][3] & 0x000000ff)) * w010
+				+ ((float) (img.ImageData[i[1]][j[1]][k[0]][3] & 0x000000ff)) * w011
+				+ ((float) (img.ImageData[i[0]][j[0]][k[1]][3] & 0x000000ff)) * w100
+				+ ((float) (img.ImageData[i[1]][j[0]][k[1]][3] & 0x000000ff)) * w101
+				+ ((float) (img.ImageData[i[0]][j[1]][k[1]][3] & 0x000000ff)) * w110 + ((float) (img.ImageData[i[1]][j[1]][k[1]][3] & 0x000000ff))
+				* w111);
 
-		return gl_util.RGBtoI(rgb[0], rgb[1], rgb[2]);
+		return gl_util.RGBAtoI(rgb[0], rgb[1], rgb[2], rgb[3]);
 	}
 
 	private int tex_map(float s, float t, float r) {

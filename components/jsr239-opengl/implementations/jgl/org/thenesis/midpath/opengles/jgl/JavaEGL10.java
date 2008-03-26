@@ -35,6 +35,19 @@ public class JavaEGL10 extends AbstractJavaEGL10 {
 		}
 	}
 	
+	public boolean eglWaitGL() {
+		super.eglWaitGL();
+		
+		// Make the surface opaque. TODO: don't do it the EGLConfig required surface transparency
+		JavaEGLSurface s = (JavaEGLSurface)currentSurface;
+		int[] buffer = s.getBuffer();
+		int length = buffer.length;
+		for (int i = 0; i < length; i++) {
+			buffer[i] = buffer[i] | 0xFF000000;
+		}
+		return true;
+	}
+	
 	public Hashtable getContextsByThread() {
 		return JavaGL10.contextsByThread;
 	}
