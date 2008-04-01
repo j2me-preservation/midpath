@@ -77,7 +77,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 		midletList.setCommandListener(this);  
 		midletList.setSelectCommand(CMD_START_MIDLET);
 
-		repository = MIDletLauncherSE.repository;
+		repository = SuiteManager.repository;
 		try {
 			buildUI();
 		} catch (IOException e) {

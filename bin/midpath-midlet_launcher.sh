@@ -15,7 +15,7 @@ CP=$CP:$MIDPATH_HOME/dist/midpath-tests.jar
 # Path of the native libraries
 JLP=$MIDPATH_HOME/dist
 
-CLASS=org.thenesis.midpath.main.StandardMIDletLauncher
+CLASS=org.thenesis.midpath.main.MIDletLauncher
 # The classname of the MIDlet
 #MIDLET=org.thenesis.midpath.test.HelloWorldMidlet
 MIDLET=org.thenesis.midpath.test.TextFieldTest

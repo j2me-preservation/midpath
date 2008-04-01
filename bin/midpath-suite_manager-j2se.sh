@@ -14,7 +14,7 @@ CP=$MIDPATH_HOME/dist/midpath.jar:$MIDPATH_HOME/configuration:$MIDPATH_HOME/dist
 JLP=$MIDPATH_HOME/dist
 
 # The MIDlet launcher for J2SE
-CLASS=org.thenesis.midpath.main.J2SEMIDletLauncher
+CLASS=org.thenesis.midpath.main.SuiteManager
 
 $JAVA_CMD -Djava.library.path=${JLP} -cp ${CP} ${CLASS}
 

@@ -19,7 +19,7 @@ export LD_LIBRARY_PATH=$JLP
 
 SYSTEM_PROPERTIES="-Djavax.microedition.io.Connector.protocolpath=com.sun.midp.io -Dfile.separator=/"
 
-CLASS=org.thenesis.midpath.main.StandardMIDletLauncher
+CLASS=org.thenesis.midpath.main.MIDletLauncher
 # The classname of the MIDlet (we have to set it manually yet)
 MIDLET=org.thenesis.midpath.test.HelloWorldMidlet
 #MIDLET=org.thenesis.midpath.test.TextFieldTest

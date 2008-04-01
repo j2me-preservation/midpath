@@ -37,7 +37,7 @@ import com.sun.midp.midlet.InternalMIDletSuiteImpl;
 import com.sun.midp.midlet.MIDletSuite;
 import com.sun.midp.midletsuite.MIDletInfo;
 
-public class MIDletLauncherSE {
+public class SuiteManager {
 
 	static MIDletRespository repository;
 	static String repositoryPath;
@@ -48,7 +48,7 @@ public class MIDletLauncherSE {
 		repository = new MIDletRespository(repositoryPath);
 	}
 
-	public MIDletLauncherSE() {
+	public SuiteManager() {
 	}
 
 	public void launchManager() throws Exception {
@@ -273,7 +273,7 @@ public class MIDletLauncherSE {
 	public static void main(String[] args) {
 
 		try {
-			MIDletLauncherSE launcher = new MIDletLauncherSE();
+			SuiteManager launcher = new SuiteManager();
 			launcher.launchManager();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -32,7 +32,7 @@ import com.sun.midp.midlet.InternalMIDletSuiteImpl;
 import com.sun.midp.midlet.MIDletSuite;
 import com.sun.midp.midletsuite.MIDletInfo;
 
-public class MIDletLauncherME {
+public class MIDletLauncher {
 	
 	static JarInspectorME jarInspector;
 
@@ -40,12 +40,12 @@ public class MIDletLauncherME {
 
 		if (args.length < 1) {
 			System.out.println("Usage:");
-			System.out.println("java org.thenesis.midpath.main.MIDletLauncherME <midlet-class-name> [midlet-name]");
-			System.out.println("java org.thenesis.midpath.main.MIDletLauncherME -jar <absolute-jar-path>");
+			System.out.println("java org.thenesis.midpath.main.MIDletLauncher <midlet-class-name> [midlet-name]");
+			System.out.println("java org.thenesis.midpath.main.MIDletLauncher -jar <absolute-jar-path>");
 			System.exit(1);
 		}
 
-		MIDletLauncherME launcher = new MIDletLauncherME();
+		MIDletLauncher launcher = new MIDletLauncher();
 		try {
 			launcher.launch(args);
 		} catch (Exception e) {
