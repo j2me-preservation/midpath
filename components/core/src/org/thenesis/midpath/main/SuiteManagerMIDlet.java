@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -15,23 +15,6 @@
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
- * 
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library.  Thus, the terms and
- * conditions of the GNU General Public License cover the whole
- * combination.
- *
- * As a special exception, the copyright holders of this library give you
- * permission to link this library with independent modules to produce an
- * executable, regardless of the license terms of these independent
- * modules, and to copy and distribute the resulting executable under
- * terms of your choice, provided that you also meet, for each linked
- * independent module, the terms and conditions of the license of that
- * module.  An independent module is a module which is not derived from
- * or based on this library.  If you modify this library, you may extend
- * this exception to your version of the library, but you are not
- * obligated to do so.  If you do not wish to do so, delete this
- * exception statement from your version.
  */
 package org.thenesis.midpath.main;
 
@@ -64,8 +47,8 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 	private static final Command CMD_REMOVE_JAR = new Command("Remove", Command.ITEM, 2);
 	private static final Command CMD_INSTALL = new Command("Install", Command.ITEM, 1);
 
-	public static MIDletSuiteJar launchMidletSuiteJar;
-	public static MIDletInfo launchMidletInfo;
+	static JarInspectorSE jarInspector;
+	static MIDletInfo launchMidletInfo;
 
 	private Display display;
 	private Form mainForm;
@@ -94,7 +77,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 		midletList.setCommandListener(this);  
 		midletList.setSelectCommand(CMD_START_MIDLET);
 
-		repository = J2SEMIDletLauncher.repository;
+		repository = MIDletLauncherSE.repository;
 		try {
 			buildUI();
 		} catch (IOException e) {
@@ -113,7 +96,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 
 		Vector installedList = repository.getInstalledJars();
 		for (int i = 0; i < installedList.size(); i++) {
-			MIDletSuiteJar jar = (MIDletSuiteJar) installedList.elementAt(i);
+			JarInspectorSE jar = (JarInspectorSE) installedList.elementAt(i);
 			try {
 				installedGroup.append(jar.getSuiteName(), null);
 			} catch (IOException e) {
@@ -132,7 +115,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 
 		Vector notInstalledList = repository.getNotInstalledJars();
 		for (int i = 0; i < notInstalledList.size(); i++) {
-			MIDletSuiteJar jar = (MIDletSuiteJar) notInstalledList.elementAt(i);
+			JarInspectorSE jar = (JarInspectorSE) notInstalledList.elementAt(i);
 			notInstalledGroup.append(jar.getFile().getName(), null);
 		}
 
@@ -173,8 +156,8 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 				ChoiceGroup cg = (ChoiceGroup) item;
 				int index = cg.getSelectedIndex();
 				if (index >= 0) {
-					launchMidletSuiteJar = repository.getJarFromSuiteName(cg.getString(index));
-					MIDletInfo[] infos = launchMidletSuiteJar.getMIDletInfo();
+					jarInspector = repository.getJarFromSuiteName(cg.getString(index));
+					MIDletInfo[] infos = jarInspector.getMIDletInfo();
 					// If there are many MIDlets, let the user choose from a list
 					if (infos.length > 1) {
 						for (int i = 0; i < infos.length; i++) {
@@ -215,7 +198,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 			try {
 				int index = midletList.getSelectedIndex();
 				if (index >= 0) {
-					MIDletInfo[] infos = launchMidletSuiteJar.getMIDletInfo();
+					MIDletInfo[] infos = jarInspector.getMIDletInfo();
 					launchMidletInfo = infos[index];
 					destroyApp(false);
 					notifyDestroyed();

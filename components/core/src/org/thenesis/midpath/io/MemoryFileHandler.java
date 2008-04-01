@@ -23,12 +23,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.sun.midp.io.j2me.file.BaseFileHandler;
 import com.sun.midp.io.j2me.file.RandomAccessStream;
 import com.sun.midp.log.Logging;
 
 
-public class MemoryFileHandler extends AbstractFileHandler implements BaseFileHandler, RandomAccessStream {
+public class MemoryFileHandler extends AbstractFileHandler {
 	
 	private static Hashtable fileSystem = new Hashtable();
 	private static String DEFAULT_ROOT_NAME = "/";
@@ -263,7 +262,5 @@ public class MemoryFileHandler extends AbstractFileHandler implements BaseFileHa
 	public RandomAccessStream getRandomAccessStream() {
 		return this;
 	}
-	
-	
 
 }

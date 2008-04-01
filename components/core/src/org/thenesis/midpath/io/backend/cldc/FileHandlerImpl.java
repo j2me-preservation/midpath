@@ -27,12 +27,11 @@ import java.util.Vector;
 
 import org.thenesis.midpath.io.AbstractFileHandler;
 
-import com.sun.midp.io.j2me.file.BaseFileHandler;
 import com.sun.midp.io.j2me.file.RandomAccessStream;
 import com.sun.midp.log.Logging;
 
 
-public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHandler, RandomAccessStream {
+public class FileHandlerImpl extends AbstractFileHandler {
 	
 	private File file;
 	//private String rootName;
@@ -317,6 +316,5 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 	public RandomAccessStream getRandomAccessStream() {
 		return this;
 	}
-
 
 }

@@ -1,8 +1,13 @@
 package org.thenesis.midpath.io;
 
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.Vector;
 
-public class AbstractFileHandler {
+import com.sun.midp.io.j2me.file.BaseFileHandler;
+import com.sun.midp.io.j2me.file.RandomAccessStream;
+
+public abstract class AbstractFileHandler implements BaseFileHandler, RandomAccessStream{
 
 	/**
 	 * Parses a separated list of strings into a string array.
@@ -117,9 +122,19 @@ public class AbstractFileHandler {
 	    // If we got here string is accepted
 	    return true;
 	}
-
-	public AbstractFileHandler() {
-		super();
-	}
+	
+	public void readFully(byte b[], int off, int len) throws IOException {
+        if (len < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        int n = 0;
+        while (n < len) {
+            int count = read(b, off + n, len - n);
+            if (count < 0) {
+                throw new EOFException();
+            }
+            n += count;
+        }
+    }
 
 }

@@ -130,5 +130,7 @@ public interface BaseFileHandler {
     // JAVADOC COMMENT ELIDED
     public void close() throws IOException;
     
+    public void readFully(byte b[], int off, int len) throws IOException;
+    
     public RandomAccessStream getRandomAccessStream();
 }

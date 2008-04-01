@@ -30,19 +30,18 @@ import java.util.Vector;
 
 import org.thenesis.midpath.io.AbstractFileHandler;
 
-import com.sun.midp.io.j2me.file.BaseFileHandler;
 import com.sun.midp.io.j2me.file.RandomAccessStream;
 import com.sun.midp.log.Logging;
 
+public class FileHandlerImpl extends AbstractFileHandler {
 
-public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHandler, RandomAccessStream {
-	
 	private File file;
 	//private String rootName;
 	//private String absFile;
 	private RandomAccessFile randomAccessFile;
-	
-	public FileHandlerImpl() {}
+
+	public FileHandlerImpl() {
+	}
 
 	public long availableSize() {
 		if (Logging.TRACE_ENABLED)
@@ -80,7 +79,7 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 			file = new File(rootName, absFile);
 		}
 		file = file.getAbsoluteFile();
-		
+
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] FileHandlerImpl.connect(): " + file.getPath());
 	}
@@ -101,7 +100,7 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 		if (randomAccessFile != null) {
 			randomAccessFile.close();
 		}
-		
+
 		file.delete();
 	}
 
@@ -131,11 +130,11 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 	}
 
 	public Vector list(final String filter, boolean includeHidden) throws IOException {
-		
-		if(!file.isDirectory()) {
+
+		if (!file.isDirectory()) {
 			new IOException("File is not a directory");
 		}
-		
+
 		FilenameFilter fileFilter = new FilenameFilter() {
 			public boolean accept(File dir, String filename) {
 				boolean res = filterAccept(filter, filename);
@@ -143,28 +142,27 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 				return res;
 			}
 		};
-		
+
 		String[] filenames;
-		if(filter == null) {
+		if (filter == null) {
 			filenames = file.list();
 		} else {
 			filenames = file.list(fileFilter);
 		}
-		
+
 		Vector v = new Vector();
-		
+
 		if (filenames != null) {
 			for (int i = 0; i < filenames.length; i++) {
 				v.addElement(filenames[i]);
 			}
 		}
-		
+
 		return v;
 	}
-	
 
 	public Vector listRoots() {
-		
+
 		File[] files = File.listRoots();
 		Vector v = new Vector();
 		for (int i = 0; i < files.length; i++) {
@@ -176,14 +174,14 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 			}
 			v.addElement(rootFilename);
 		}
-		
+
 		return v;
-		
+
 	}
 
 	public void mkdir() throws IOException {
 		file.mkdir();
-		
+
 	}
 
 	public void openForRead() throws IOException {
@@ -203,34 +201,34 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 		if (randomAccessFile == null) {
 			throw new IOException();
 		}
-		
-		seek((int)offset);
+
+		seek((int) offset);
 	}
 
 	public void rename(String newName) throws IOException {
-		
+
 		if (randomAccessFile != null) {
 			randomAccessFile.close();
 		}
-		
+
 		// FIXME Hack ?
 		if (newName.startsWith("/")) {
 			newName = newName.substring(1, newName.length());
 		}
 		File newFile = new File(newName);
-		
-//		int index = newName.lastIndexOf("/");
-//		if (index != -1) {
-//			newName = newName.substring(index + 1, newName.length());
-//		}
-//		
-//		File newFile = new File(file.getParent(), newName);
-		
-		if(!file.renameTo(newFile)) {
+
+		//		int index = newName.lastIndexOf("/");
+		//		if (index != -1) {
+		//			newName = newName.substring(index + 1, newName.length());
+		//		}
+		//		
+		//		File newFile = new File(file.getParent(), newName);
+
+		if (!file.renameTo(newFile)) {
 			throw new IOException("Can't rename file");
 		}
-//		System.out.println("[DEBUG] FileHandlerImpl.rename(): " + file);
-//		System.out.println("[DEBUG] FileHandlerImpl.rename(): " + newFile);
+		//		System.out.println("[DEBUG] FileHandlerImpl.rename(): " + file);
+		//		System.out.println("[DEBUG] FileHandlerImpl.rename(): " + newFile);
 	}
 
 	public void setHidden(boolean hidden) throws IOException {
@@ -243,7 +241,7 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 		// TODO Auto-generated method stub
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] FileHandlerImpl.setReadable: not implemented yet");
-		
+
 	}
 
 	public void setWritable(boolean writable) throws IOException {
@@ -263,7 +261,7 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 		if (randomAccessFile == null) {
 			throw new IOException();
 		}
-		setLength((int)byteOffset);
+		setLength((int) byteOffset);
 	}
 
 	public long usedSize() {
@@ -276,7 +274,7 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 	public int read(byte[] buf) throws IOException {
 		return read(buf, 0, buf.length);
 	}
-	
+
 	public int read(byte[] b, int off, int len) throws IOException {
 		if (randomAccessFile == null) {
 			throw new IOException();
@@ -287,14 +285,14 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 
 	public void seek(int pos) throws IOException {
 		randomAccessFile.seek(pos);
-		
+
 	}
 
 	public void setLength(int size) throws IOException {
 		randomAccessFile.setLength(size);
-		
+
 	}
-	
+
 	public int write(byte[] b, int off, int len) throws IOException {
 		randomAccessFile.write(b, off, len);
 		return len;
@@ -303,11 +301,11 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 	public int write(byte[] buf) throws IOException {
 		return write(buf, 0, buf.length);
 	}
-	
+
 	public void flush() throws IOException {
 		// TODO Auto-generated method stub
 	}
-	
+
 	public void close() throws IOException {
 		if (randomAccessFile != null) {
 			randomAccessFile.close();
@@ -317,6 +315,5 @@ public class FileHandlerImpl extends AbstractFileHandler implements BaseFileHand
 	public RandomAccessStream getRandomAccessStream() {
 		return this;
 	}
-
 
 }
