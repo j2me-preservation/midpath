@@ -105,11 +105,6 @@ public class LogChannels {
 	public final static int LC_TOOL = 9000;
 
 	/**
-	 * JSR180 module channel
-	 */
-	public final static int LC_JSR180 = 10000;
-
-	/**
 	 * Event queue module channel
 	 */
 	public final static int LC_EVENTS = 9500;
@@ -123,5 +118,17 @@ public class LogChannels {
 	 * Push registry module channel
 	 */
 	public final static int LC_PUSH = 10500;
+	
+	/**
+	 * JSR179 module channel
+	 */
+	public final static int LC_JSR179 = 11000;
+	
+	/**
+	 * JSR180 module channel
+	 */
+	public final static int LC_JSR180 = 12000;
+	
+	
 
 }
