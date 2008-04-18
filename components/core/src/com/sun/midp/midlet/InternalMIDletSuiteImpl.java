@@ -69,7 +69,7 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	public static MIDletSuite create(String theDisplayName, String theId) {
 		return new InternalMIDletSuiteImpl(new Properties(), theDisplayName, theId);
 	}
-	
+
 	public static MIDletSuite create(Properties properties, String theDisplayName, String theId) {
 		return new InternalMIDletSuiteImpl(properties, theDisplayName, theId);
 	}
@@ -129,7 +129,26 @@ public class InternalMIDletSuiteImpl implements MIDletSuite {
 	public String getID() {
 		return id;
 	}
-	
+
+	public int getUniqueID() {
+		return hash(id);
+	}
+
+	/* Bob Jenkins hash function */
+	private int hash(String key) {
+		int hash = 0;
+		byte[] keyBytes = key.getBytes();
+		for (int i = 0; i < keyBytes.length; i++) {
+			hash += keyBytes[i];
+			hash += (hash << 10);
+			hash ^= (hash >> 6);
+		}
+		hash += (hash << 3);
+		hash ^= (hash >> 11);
+		hash += (hash << 15);
+		return hash;
+	}
+
 	public static String buildSuiteID(String suiteName) {
 		return suiteName.replace(' ', '_');
 	}

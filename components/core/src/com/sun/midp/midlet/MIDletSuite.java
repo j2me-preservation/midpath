@@ -146,6 +146,8 @@ public interface MIDletSuite {
      * @return suite ID
      */
     public String getID();
+    
+    public int getUniqueID();
 
     /**
      * Ask the user want to interrupt the current MIDlet with
