@@ -29,6 +29,8 @@ import javax.microedition.midlet.MIDlet;
 
 import com.sun.midp.midletsuite.MIDletInfo;
 
+import org.thenesis.midpath.main.JarInspectorME;
+
 public class MIDletChooserMIDlet extends MIDlet implements CommandListener {
 
 	private static final Command CMD_EXIT = new Command("Exit", Command.EXIT, 1);
@@ -75,8 +77,6 @@ public class MIDletChooserMIDlet extends MIDlet implements CommandListener {
 		}
 
 	}
-
-	
 
 	public void commandAction(Command c, Displayable d) {
 		
