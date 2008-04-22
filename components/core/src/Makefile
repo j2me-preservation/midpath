@@ -1,5 +1,5 @@
 #
-# Makefile created at Sat Nov 10 11:38:02 2007, by mmake
+# Makefile created at Tue Apr 22 15:32:20 2008, by mmake
 #
 
 # Programs (with common options):
@@ -130,6 +130,7 @@ PACKAGES = \
 	com.sun.midp.i18n \
 	com.sun.midp.io.j2me.serversocket \
 	org.thenesis.midpath.sound.backend.esd \
+	com.sun.midp.io.j2me.push \
 	org.thenesis.midpath.sound \
 	org.thenesis.midpath.sound.backend.pulseaudio \
 	com.sun.midp.main \
@@ -507,6 +508,7 @@ com.sun.midp.io : $(call PACKAGE_OBJS,com.sun.midp.io)
 com.sun.midp.i18n : $(call PACKAGE_OBJS,com.sun.midp.i18n)
 com.sun.midp.io.j2me.serversocket : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.serversocket)
 org.thenesis.midpath.sound.backend.esd : $(call PACKAGE_OBJS,org.thenesis.midpath.sound.backend.esd)
+com.sun.midp.io.j2me.push : $(call PACKAGE_OBJS,com.sun.midp.io.j2me.push)
 org.thenesis.midpath.sound : $(call PACKAGE_OBJS,org.thenesis.midpath.sound)
 org.thenesis.midpath.sound.backend.pulseaudio : $(call PACKAGE_OBJS,org.thenesis.midpath.sound.backend.pulseaudio)
 com.sun.midp.main : $(call PACKAGE_OBJS,com.sun.midp.main)
