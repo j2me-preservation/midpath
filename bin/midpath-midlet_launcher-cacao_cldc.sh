@@ -24,5 +24,6 @@ CLASS=org.thenesis.midpath.main.MIDletLauncher
 MIDLET=org.thenesis.midpath.test.HelloWorldMidlet
 #MIDLET=org.thenesis.midpath.test.TextFieldTest
 
-$JAVA_CMD -Xbootclasspath:${BCP} ${SYSTEM_PROPERTIES} ${CLASS} ${MIDLET}
+# Note: "-Xbootclasspath/c" argument prepends the CLDC classes (defined at cacao configure time) and vm.zip (created at cacao compile time) to the bootclasspath. Use "-Xbootclasspath" instead if you need to override these paths.
+$JAVA_CMD -Xbootclasspath/c:${BCP} ${SYSTEM_PROPERTIES} ${CLASS} ${MIDLET}
 
