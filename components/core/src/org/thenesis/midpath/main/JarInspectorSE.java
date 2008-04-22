@@ -20,7 +20,7 @@ public class JarInspectorSE extends AbstractJarInspector {
 		try {
 			this.url = new URI(file.getAbsolutePath()).toURL();
 		} catch (URISyntaxException e) {
-			throw new IOException(e);
+			throw new IOException(e.getMessage());
 		}
 	}
 
