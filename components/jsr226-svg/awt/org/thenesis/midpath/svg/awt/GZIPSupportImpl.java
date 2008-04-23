@@ -60,7 +60,7 @@ public class GZIPSupportImpl extends GZIPSupport {
 		try {
 			uri = new URI(svgURI);
 		} catch (URISyntaxException e) {
-			throw new IOException(e);
+			throw new IOException(e.getMessage());
 		}
 		URL url = uri.toURL();
 		URLConnection connection = url.openConnection();
