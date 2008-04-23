@@ -206,8 +206,11 @@ public class LandmarkStore {
 	 */
 	public static LandmarkStore getInstance(String storeName)
 			throws SecurityException {
-		return new LandmarkStore(com.openlapi.LandmarkStore
-				.getInstance(storeName));
+		com.openlapi.LandmarkStore lStore = com.openlapi.LandmarkStore.getInstance(storeName);
+		if (lStore == null) {
+			return null;
+		}
+		return new LandmarkStore(lStore);
 	}
 
 	/**

@@ -564,7 +564,7 @@ public class CityGuideMIDlet extends MIDlet implements CommandListener {
      * Load landmarks from text resources
      */
     private void loadLandmarks() {
-        final InputStream is = getClass().getResourceAsStream("/waypoints.txt");
+        final InputStream is = getClass().getResourceAsStream("data/waypoints.txt");
 
         try {
             landmarkStore = LandmarkStore.getInstance(LANDMARKSTORE_NAME);
