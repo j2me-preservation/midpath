@@ -34,6 +34,11 @@ SYSTEM_PROPERTIES="\
 -Dmicroedition.m2g.version=1.1 \
 -Dmicroedition.m2g.svg.version=1.1 \
 -Dmicroedition.m2g.svg.baseProfile=tiny \
+-Dxml.jaxp.subset.version=1.0 \
+-Dxml.rpc.subset.version=1.0 \
+-Dwireless.messaging.version=2.0 \
+-Dwireless.messaging.sms.smsc=+17815511212 \
+-Dwireless.messaging.mms.mmsc=+17815511212 \
 "
 
 # -Dmicroedition.pim.version=
