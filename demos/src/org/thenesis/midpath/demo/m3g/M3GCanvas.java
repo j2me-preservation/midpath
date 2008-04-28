@@ -16,8 +16,10 @@ import javax.microedition.m3g.Fog;
 import javax.microedition.m3g.Graphics3D;
 import javax.microedition.m3g.Image2D;
 import javax.microedition.m3g.Light;
+import javax.microedition.m3g.Loader;
 import javax.microedition.m3g.Material;
 import javax.microedition.m3g.Mesh;
+import javax.microedition.m3g.Object3D;
 import javax.microedition.m3g.PolygonMode;
 import javax.microedition.m3g.Texture2D;
 import javax.microedition.m3g.TriangleStripArray;
@@ -26,7 +28,7 @@ import javax.microedition.m3g.VertexBuffer;
 import javax.microedition.m3g.World;
 
 
-public class TestCanvas extends Canvas {
+public class M3GCanvas extends Canvas {
 	private World world = null;
 	private Graphics3D g3d = null;
 
@@ -41,13 +43,13 @@ public class TestCanvas extends Canvas {
 
 	private float a = 0.0f;
 
-	public TestCanvas() {
+	public M3GCanvas() {
 		// set up this Displayable to listen to command events 
 		setCommandListener(new CommandListener() {
 			public void commandAction(Command c, Displayable d) {
 				if (c.getCommandType() == Command.EXIT) {
 					// exit the MIDlet
-					TestMidlet.quitApp();
+					M3GDemo.quitApp();
 				}
 			}
 		});
@@ -69,7 +71,7 @@ public class TestCanvas extends Canvas {
 		g3d = Graphics3D.getInstance();
 		
 		// Load world
-//		Object3D[] objects = Loader.load("data/scene.m3g");
+//		Object3D[] objects = Loader.load("/org/thenesis/midpath/demo/m3g/data/scene.m3g");
 //		for (int i = 0; i < objects.length; ++i) {
 //			if (objects[i] instanceof World) {
 //				world = (World) objects[i];
@@ -81,7 +83,7 @@ public class TestCanvas extends Canvas {
 
 	protected void paint(Graphics g) {
 		
-		System.out.println("TestCanvas.paint(): start");
+		//System.out.println("M3GCanvas.paint(): start");
 
 		g3d.bindTarget(g);
 		g3d.setViewport(0, 0, getWidth(), getHeight());
@@ -90,7 +92,7 @@ public class TestCanvas extends Canvas {
 
 		g3d.releaseTarget();
 		
-		System.out.println("TestCanvas.paint(): end");
+		//System.out.println("M3GCanvas.paint(): end");
 	}
 
 	private void drawScene() {
@@ -145,7 +147,7 @@ public class TestCanvas extends Canvas {
 
 	private void initScene() {
 		
-		System.out.println("initScene() start");
+		//System.out.println("initScene() start");
 
 		// Create new world
 		world = new World();
@@ -231,16 +233,16 @@ public class TestCanvas extends Canvas {
 		// create the Image2D (we need this so we can make a Texture2D)
 		Image midpImage = null;
 		try {
-			System.out.println("initScene() : loading image 1");
-			midpImage = Image.createImage("data/texture-small.png");
-			System.out.println("initScene() : image 1 loaded");
+			//System.out.println("initScene() : loading image 1");
+			midpImage = Image.createImage("data/texture.png");
+			//System.out.println("initScene() : image 1 loaded");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
 		Image2D image2D = new Image2D(Image2D.RGB, midpImage);
 		
-		System.out.println("initScene() : after image2D creation");
+		//System.out.println("initScene() : after image2D creation");
 
 		// Setup background (blue)
 		Background bg = new Background();
@@ -257,9 +259,9 @@ public class TestCanvas extends Canvas {
 
 		// create the Image2D (we need this so we can make a Texture2D)
 		try {
-			System.out.println("initScene() : loading image 2");
-			midpImage = Image.createImage("data/dirt-small.png");
-			System.out.println("initScene() : image 2 loaded");
+			//System.out.println("initScene() : loading image 2");
+			midpImage = Image.createImage("data/dirt.png");
+			//System.out.println("initScene() : image 2 loaded");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -284,14 +286,14 @@ public class TestCanvas extends Canvas {
 		fog.setLinear(0, 150);
 
 		CompositingMode compMode = new CompositingMode();
-		//compMode.setColorWriteEnabled(false);
-		//compMode.setDepthTestEnabled(false);
-		//compMode.setBlending(CompositingMode.MODULATE);
-		//compMode.setDepthOffsetFactor(-10.0f);
+//		compMode.setColorWriteEnabled(false);
+//		compMode.setDepthTestEnabled(false);
+//		compMode.setBlending(CompositingMode.MODULATE);
+//		compMode.setDepthOffsetFactor(-10.0f);
 
 		PolygonMode polyMode = new PolygonMode();
-		//polyMode.setCulling(PolygonMode.CULL_FRONT);
-		//polyMode.setWinding(PolygonMode.WINDING_CW);
+//		polyMode.setCulling(PolygonMode.CULL_FRONT);
+//		polyMode.setWinding(PolygonMode.WINDING_CW);
 
 		// create the appearance
 		appearance = new Appearance();
@@ -305,25 +307,7 @@ public class TestCanvas extends Canvas {
 		mesh = new Mesh(vertexBuffer, indexBuffer, appearance);
 		world.addChild(mesh);
 		
-		System.out.println("initScene() end");
+		//System.out.println("initScene() end");
 	}
 
-//	private class RenderListener extends RenderEventListener {
-//		public void paint() {
-//			g3d.setViewport(0, 0, TestCanvas.this.getWidth(), TestCanvas.this.getHeight());
-//			drawScene();
-//		}
-//
-//		public void initialize() {
-//			/**/
-//
-//			Object3D[] objects = Loader.load("/data/scene.m3g");
-//			for (int i = 0; i < objects.length; ++i)
-//				if (objects[i] instanceof World)
-//					world = (World) objects[i];
-//
-//			//initScene();
-//
-//		}
-//	}
 }

@@ -6,13 +6,13 @@ import java.util.TimerTask;
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 
-public class TestMidlet extends MIDlet {
-	private static TestMidlet instance;
-	TestCanvas displayable = new TestCanvas();
+public class M3GDemo extends MIDlet {
+	private static M3GDemo instance;
+	M3GCanvas displayable = new M3GCanvas();
 	Timer iTimer = new Timer();
 
 	/* Construct the midlet. */
-	public TestMidlet() {
+	public M3GDemo() {
 		this.instance = this;
 	}
 
@@ -20,7 +20,7 @@ public class TestMidlet extends MIDlet {
 	public void startApp() {
 		Display.getDisplay(this).setCurrent(displayable);
 		iTimer.schedule(new MyTimerTask(), 0, 20);
-		System.out.println("Midlet started");
+		//System.out.println("Midlet started");
 	}
 
 	/** * Handle pausing the MIDlet. */
@@ -39,7 +39,7 @@ public class TestMidlet extends MIDlet {
 		instance.destroyApp(true);
 		instance.notifyDestroyed();
 		instance = null;
-		System.out.println("Midlet exited");
+		//System.out.println("Midlet exited");
 	}
 
 	/** * Our timer task for providing animation. */
