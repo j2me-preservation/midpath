@@ -58,7 +58,7 @@ public class GZIPSupport {
 	 *         requested URI.
 	 */
 	public InputStream openHandleGZIP(String svgURI) throws IOException {
-		throw new UnsupportedOperationException("Must be implemented by concrete class");
+		throw new RuntimeException("Must be implemented by concrete class");
 	}
 
 	/**
