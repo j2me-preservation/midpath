@@ -41,7 +41,7 @@ public abstract class Node extends Transformable {
 	}
 
 	public final void align(Node reference) {
-		// todo
+		// TODO
 	}
 
 	public float getAlphaFactor() {
@@ -110,13 +110,13 @@ public abstract class Node extends Transformable {
 	}
 
 	public void setAlignment(Node zRef, int zTarget, Node yRef, int yTarget) {
-		if (zTarget < 0 || zTarget > 4 || yTarget < 0 || yTarget > 4)
+		if (((zTarget != Node.NONE) &&  (zTarget != Node.Z_AXIS)) || ((yTarget != Node.NONE) &&  (yTarget != Node.Y_AXIS)))
 			throw new IllegalArgumentException();
 		if ((zRef == yRef) && (zTarget != NONE || yTarget != NONE))
 			throw new IllegalArgumentException();
 		if (zRef == this || yRef == this)
 			throw new IllegalArgumentException("can not use this as refnode");
-		// todo
+		// TODO
 	}
 
 	public void setAlphaFactor(float alphaFactor) {
@@ -146,4 +146,16 @@ public abstract class Node extends Transformable {
 		}
 		return depth;
 	}
+	
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.ALPHA:
+		case AnimationTrack.VISIBILITY:
+		case AnimationTrack.PICKABILITY:
+		    return true;
+		default:
+		    return super.isCompatible(track);
+		}
+	}
+	
 }

@@ -19,34 +19,45 @@ package javax.microedition.m3g;
 
 import java.util.Vector;
 
+import org.thenesis.m3g.engine.util.Tools;
+
 public class Mesh extends Node {
 	private VertexBuffer vertices;
 	private Vector submeshes = new Vector();
 	private Vector appearances = new Vector();
-	
+
 	private Mesh() {
 	}
 
 	public Mesh(VertexBuffer vertices, IndexBuffer submesh, Appearance appearance) {
+		if ((vertices == null) || (submesh == null)) {
+			throw new NullPointerException();
+		}
 		this.vertices = vertices;
 		this.submeshes.addElement(submesh);
 		this.appearances.addElement(appearance);
 	}
 
 	public Mesh(VertexBuffer vertices, IndexBuffer[] submeshes, Appearance[] appearances) {
+		if ((vertices == null) || (submeshes == null) || hasArrayNullElement(submeshes)) {
+			throw new NullPointerException();
+		}
+		if ((submeshes.length == 0) || ((appearances != null) && (appearances.length < submeshes.length))) {
+			throw new IllegalArgumentException();
+		}
 		this.vertices = vertices;
 		for (int i = 0; i < submeshes.length; ++i)
 			this.submeshes.addElement(submeshes[i]);
 		for (int i = 0; i < appearances.length; ++i)
 			this.appearances.addElement(appearances[i]);
 	}
-	
+
 	Object3D duplicateImpl() {
 		Mesh copy = new Mesh();
-		duplicate((Node)copy);
+		duplicate((Node) copy);
 		copy.vertices = vertices;
 		copy.submeshes = submeshes;
-		copy.appearances = appearances;
+		copy.appearances = Tools.clone(appearances);
 		return copy;
 	}
 
@@ -92,5 +103,14 @@ public class Mesh extends Node {
 		}
 
 		return parentCount;
+	}
+
+	private boolean hasArrayNullElement(IndexBuffer[] buffer) {
+		for (int i = 0; i < buffer.length; i++) {
+			if (buffer[i] == null) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

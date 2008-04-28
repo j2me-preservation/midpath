@@ -39,7 +39,7 @@ public class Background extends Object3D {
 	private boolean colorClearEnabled = true; // Default
 	private boolean depthClearEnabled = true; // Default
 	private Texture2D backgroundTexture = null;
-	
+
 	private FloatBuffer vertexBuffer;
 	private FloatBuffer textureBuffer;
 	// top right, top left, bottom right, bottom left coordinates
@@ -55,7 +55,7 @@ public class Background extends Object3D {
 		textureBuffer = ByteBuffer.allocateDirect(4 * 2 * 4).asFloatBuffer();
 		textureArray = new float[4 * 2];
 	}
-	
+
 	Object3D duplicateImpl() {
 		Background copy = new Background();
 		copy.backgroundColor = backgroundColor;
@@ -146,7 +146,7 @@ public class Background extends Object3D {
 			throw new IllegalArgumentException("Image format must be RGB or RGBA");
 		}
 		this.backgroundImage = image;
-		
+
 		if (image != null) {
 			backgroundTexture = new Texture2D(backgroundImage);
 			backgroundTexture.setFiltering(Texture2D.FILTER_LINEAR, Texture2D.FILTER_LINEAR);
@@ -243,6 +243,17 @@ public class Background extends Object3D {
 			gl.glDisable(GL10.GL_TEXTURE_2D);
 			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		}
+	}
+
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.ALPHA:
+		case AnimationTrack.COLOR:
+		case AnimationTrack.CROP:
+			return true;
+		default:
+			return super.isCompatible(track);
 		}
 	}
 

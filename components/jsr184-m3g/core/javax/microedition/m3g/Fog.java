@@ -104,4 +104,16 @@ public class Fog extends Object3D {
 			return GL10.GL_LINEAR;
 		}
 	}
+	
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.COLOR:
+		case AnimationTrack.DENSITY:
+		case AnimationTrack.FAR_DISTANCE:
+		case AnimationTrack.NEAR_DISTANCE:
+			return true;
+		default:
+			return super.isCompatible(track);
+		}
+	}
 }

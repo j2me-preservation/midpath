@@ -33,10 +33,10 @@ public class Camera extends Node {
 
 	public Camera() {
 	}
-	
+
 	Object3D duplicateImpl() {
 		Camera copy = new Camera();
-		duplicate((Node)copy);
+		duplicate((Node) copy);
 		copy.projectionType = projectionType;
 		copy.fovy = fovy;
 		copy.aspectRatio = aspectRatio;
@@ -116,5 +116,16 @@ public class Camera extends Node {
 			params[3] = far;
 		}
 		return projectionType;
+	}
+
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.FAR_DISTANCE:
+		case AnimationTrack.FIELD_OF_VIEW:
+		case AnimationTrack.NEAR_DISTANCE:
+			return true;
+		default:
+			return super.isCompatible(track);
+		}
 	}
 }

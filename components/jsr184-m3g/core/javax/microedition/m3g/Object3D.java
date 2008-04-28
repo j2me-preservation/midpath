@@ -17,39 +17,28 @@
  */
 package javax.microedition.m3g;
 
-//import java.util.ArrayList; 
+import java.util.Vector;
 
-public abstract class Object3D { 
+public abstract class Object3D {
 
 	protected int userID = 0;
 	protected Object userObject = null;
 
-	//ArrayList animationTracks = new ArrayList();
+	Vector animationTracks = new Vector();
 
 	public final Object3D duplicate() {
-		
 		return duplicateImpl();
-		
-//		Object3D copy = null;
-//		try {
-//			copy = (Object3D) this.clone();
-//		} catch (Exception e) {
-//		}
-//		return copy;
 	}
-	
-	abstract Object3D duplicateImpl(); 
-//	{
-//		// TODO To implement
-//		throw new UnsupportedOperationException("not implemented yet");
-//	}
+
+	abstract Object3D duplicateImpl();
 
 	public Object3D find(int userID) {
-		// TODO: 
+		// TODO
 		return null;
 	}
 
 	public int getReferences(Object3D[] references) throws IllegalArgumentException {
+		// TODO
 		return 0;
 	}
 
@@ -69,10 +58,47 @@ public abstract class Object3D {
 		this.userObject = userObject;
 	}
 
-	/*
-	 public void addAnimationTrack(AnimationTrack animationTrack)
-	 {
-	 this.animationTracks.add(animationTrack);
-	 }
-	 */
+	public void addAnimationTrack(AnimationTrack animationTrack) {
+		
+		if (animationTrack == null) {
+			throw new NullPointerException();
+		}
+		if ((!isCompatible(animationTrack)) || animationTracks.contains(animationTrack)) {
+			throw new IllegalArgumentException("AnimationTrack is already existing or incompatible");
+		}
+			
+		// Check if AnimationTrack targeting the same property as a previously added AnimationTrack have the same keyframe size
+		int newTrackTarget = animationTrack.getTargetProperty();
+		int components = animationTrack.getKeyframeSequence().getComponentCount();
+		for (int i = 0; i < animationTracks.size(); i++) {
+			AnimationTrack track = (AnimationTrack) animationTracks.elementAt(i);
+			if (track.getTargetProperty() == newTrackTarget && (track.getKeyframeSequence().getComponentCount() != components)) {
+				throw new IllegalArgumentException();
+			}
+		}
+		
+		animationTracks.addElement(animationTrack);
+	}
+
+	public AnimationTrack getAnimationTrack(int index) {
+		return (AnimationTrack) animationTracks.elementAt(index);
+	}
+
+	public void removeAnimationTrack(AnimationTrack animationTrack) {
+		animationTracks.removeElement(animationTrack);
+	}
+
+	public int getAnimationTrackCount() {
+		return animationTracks.size();
+	}
+
+	public final int animate(int time) {
+		// TODO
+		return 0;
+	}
+	
+	boolean isCompatible(AnimationTrack animationtrack) {
+		return false;
+	}
+
 }

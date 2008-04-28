@@ -38,10 +38,10 @@ public class Light extends Node {
 
 	public Light() {
 	}
-	
+
 	Object3D duplicateImpl() {
 		Light copy = new Light();
-		duplicate((Node)copy);
+		duplicate((Node) copy);
 		copy.attenuationConstant = attenuationConstant;
 		copy.attenuationLinear = attenuationLinear;
 		copy.attenuationQuadratic = attenuationQuadratic;
@@ -161,6 +161,16 @@ public class Light extends Node {
 		}
 	}
 
-	
-	
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.COLOR:
+		case AnimationTrack.INTENSITY:
+		case AnimationTrack.SPOT_ANGLE:
+		case AnimationTrack.SPOT_EXPONENT:
+			return true;
+		default:
+			return super.isCompatible(track);
+		}
+	}
+
 }

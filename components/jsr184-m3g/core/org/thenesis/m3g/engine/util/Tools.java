@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class Tools {
 	
@@ -96,6 +98,19 @@ public class Tools {
 	 		int[] copy = new int[length];
 	 		System.arraycopy(src, 0, copy, 0, length);
 	 		return copy;
+	 	}
+	 	
+	 	public static Vector clone(Vector src) {
+	 		Vector dest = new Vector();
+	 		Enumeration e = src.elements();
+			while(e.hasMoreElements()) {
+				dest.addElement(e.nextElement());
+			}
+			return dest;
+	 	}
+	 	
+	 	public static boolean isPowerOfTwo(int x) {
+	 		return ((x & (x -1)) == 0); 
 	 	}
 
 }

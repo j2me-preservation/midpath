@@ -36,7 +36,7 @@ public class Material extends Object3D {
 
 	public Material() {
 	}
-	
+
 	Object3D duplicateImpl() {
 		Material copy = new Material();
 		copy.ambientColor = ambientColor;
@@ -90,13 +90,23 @@ public class Material extends Object3D {
 	void setupGL(GL10 gl, int lightTarget) {
 		gl.glEnable(GL10.GL_LIGHTING);
 		gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, Color.intToFloatArray(emissiveColor), 0);
-
 		gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, Color.intToFloatArray(ambientColor), 0);
-
 		gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, Color.intToFloatArray(diffuseColor), 0);
-
 		gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, Color.intToFloatArray(specularColor), 0);
-
 		gl.glMaterialf(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, shininess);
+	}
+
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.ALPHA:
+		case AnimationTrack.AMBIENT_COLOR:
+		case AnimationTrack.DIFFUSE_COLOR:
+		case AnimationTrack.EMISSIVE_COLOR:
+		case AnimationTrack.SHININESS:
+		case AnimationTrack.SPECULAR_COLOR:
+			return true;
+		default:
+			return super.isCompatible(track);
+		}
 	}
 }

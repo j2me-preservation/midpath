@@ -45,7 +45,7 @@ public class VertexBuffer extends Object3D {
 		texCoordsBias = new float[numTextureUnits][3];
 		texCoordsScale = new float[numTextureUnits];
 	}
-	
+
 	Object3D duplicateImpl() {
 		// Copy references
 		VertexBuffer copy = new VertexBuffer();
@@ -53,12 +53,12 @@ public class VertexBuffer extends Object3D {
 		copy.positions = positions;
 		copy.normals = normals;
 		copy.colors = colors;
-		
+
 		// Copy data
 		if (texCoords != null) {
 			for (int i = 0; i < texCoords.length; i++) {
 				if (texCoords[i] != null) {
-					copy.texCoords[i] = (VertexArray)texCoords[i].duplicateImpl();
+					copy.texCoords[i] = (VertexArray) texCoords[i].duplicateImpl();
 				}
 			}
 		}
@@ -66,7 +66,7 @@ public class VertexBuffer extends Object3D {
 		copy.positionScale = positionScale;
 		copy.texCoordsBias = Tools.clone(texCoordsBias);
 		copy.texCoordsScale = Tools.clone(texCoordsScale);
-		
+
 		copy.maxTextureUnitIndex = maxTextureUnitIndex;
 		copy.defaultColor = defaultColor;
 		return copy;
@@ -178,7 +178,7 @@ public class VertexBuffer extends Object3D {
 				colors.setARGBBuffer(argbBuffer);
 			} else {
 				// FIXME 
-				colors.setARGBBuffer((ByteBuffer)colors.getBuffer());
+				colors.setARGBBuffer((ByteBuffer) colors.getBuffer());
 			}
 
 		} else {
@@ -278,5 +278,15 @@ public class VertexBuffer extends Object3D {
 		}
 
 		return parentCount;
+	}
+
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.ALPHA:
+		case AnimationTrack.COLOR:
+			return true;
+		default:
+			return super.isCompatible(track);
+		}
 	}
 }

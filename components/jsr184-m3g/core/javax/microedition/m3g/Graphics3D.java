@@ -692,6 +692,10 @@ public final class Graphics3D {
 		return maxTextureUnits;
 	}
 
+	int getMaxTextureSize() {
+		return maxTextureSize;
+	}
+
 	void disableTextureUnits() {
 		for (int i = 0; i < maxTextureUnits; i++) {
 			gl.glActiveTexture(GL10.GL_TEXTURE0 + i);

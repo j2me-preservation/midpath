@@ -20,10 +20,10 @@ package javax.microedition.m3g;
 import javax.microedition.khronos.opengles.GL10;
 
 import org.thenesis.m3g.engine.util.Color;
-
+import org.thenesis.m3g.engine.util.Tools;
 
 public class Texture2D extends Transformable {
-	
+
 	public static final int FILTER_BASE_LEVEL = 208;
 	public static final int FILTER_LINEAR = 209;
 	public static final int FILTER_NEAREST = 210;
@@ -42,18 +42,17 @@ public class Texture2D extends Transformable {
 	private int wrappingT = WRAP_REPEAT;
 	private int levelFilter = FILTER_BASE_LEVEL;
 	private int imageFilter = FILTER_NEAREST;
-	
+
 	private boolean textureInitialized = false;
-	int[] id = { 0 };
-	
+	private int[] id = { 0 };
 
 	public Texture2D(Image2D image) {
 		setImage(image);
 	}
-	
+
 	Object3D duplicateImpl() {
 		Texture2D copy = new Texture2D(image);
-		duplicate((Transformable)copy);
+		duplicate((Transformable) copy);
 		copy.blendColor = blendColor;
 		copy.blending = blending;
 		copy.wrappingS = wrappingS;
@@ -72,6 +71,16 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setBlending(int blending) {
+		switch (blending) {
+		case FUNC_REPLACE:
+		case FUNC_MODULATE:
+		case FUNC_DECAL:
+		case FUNC_BLEND:
+		case FUNC_ADD:
+			break;
+		default:
+			throw new IllegalArgumentException("Bad blending function");
+		}
 		this.blending = blending;
 	}
 
@@ -80,6 +89,21 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setImage(Image2D image) {
+		if (image == null) {
+			throw new NullPointerException();
+		}
+
+		int w = image.getWidth();
+		int h = image.getHeight();
+		if ((!Tools.isPowerOfTwo(w)) || (!Tools.isPowerOfTwo(h))) {
+			throw new IllegalArgumentException("Width and height of image must be a positive power of two");
+		}
+
+		int maxSize = Graphics3D.getInstance().getMaxTextureSize();
+		if ((w > maxSize) || (h > maxSize)) {
+			throw new IllegalArgumentException("Width or height of image exceeds the implementation defined maximum");
+		}
+
 		this.image = image;
 	}
 
@@ -88,6 +112,12 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setFiltering(int levelFilter, int imageFilter) {
+		if ((levelFilter != FILTER_BASE_LEVEL) && (levelFilter != FILTER_NEAREST) && (levelFilter != FILTER_LINEAR)) {
+			throw new IllegalArgumentException("Bad levelFilter argument");
+		}
+		if ((imageFilter != FILTER_NEAREST) && (imageFilter != FILTER_LINEAR)) {
+			throw new IllegalArgumentException("Bad imageFilter argument");
+		}
 		this.levelFilter = levelFilter;
 		this.imageFilter = imageFilter;
 	}
@@ -101,6 +131,12 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setWrapping(int wrappingS, int wrappingT) {
+		if ((wrappingS != WRAP_CLAMP) && (wrappingS != WRAP_REPEAT)) {
+			throw new IllegalArgumentException("Bad wrapping mode");
+		}
+		if ((wrappingT != WRAP_CLAMP) && (wrappingT != WRAP_REPEAT)) {
+			throw new IllegalArgumentException("Bad wrapping mode");
+		}
 		this.wrappingS = wrappingS;
 		this.wrappingT = wrappingT;
 	}
@@ -114,21 +150,22 @@ public class Texture2D extends Transformable {
 	}
 
 	void setupGL(GL10 gl, float[] scaleBias) {
-		
+
 		gl.glEnable(GL10.GL_TEXTURE_2D);
-		
+
 		if (!textureInitialized) {
 			gl.glGenTextures(1, id, 0);
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
-			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, image.getGLFormat(), image.getWidth(), image.getHeight(), 0, image.getGLFormat(), GL10.GL_UNSIGNED_BYTE, image.getPixels());
+			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, image.getGLFormat(), image.getWidth(), image.getHeight(), 0, image
+					.getGLFormat(), GL10.GL_UNSIGNED_BYTE, image.getPixels());
 			textureInitialized = true;
 		} else {
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, id[0]);
 		}
 
-		// Set filtering
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, getGLFilter(this.imageFilter)); // Linear Filtering
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, getGLFilter(this.imageFilter)); // Linear Filtering
+		// Set filtering. TODO: Handle mipmapping if supported
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, getGLFilter()); // Linear Filtering
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, getGLFilter()); // Linear Filtering
 
 		// Set wrap mode
 		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, getGLWrap(this.wrappingS));
@@ -149,18 +186,15 @@ public class Texture2D extends Transformable {
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 	}
 
-	int getGLFilter(int filter) {
-		switch (filter) {
-		case FILTER_LINEAR:
-			return GL10.GL_LINEAR; //GL10.GL_LINEAR_MIPMAP_LINEAR;
-		case FILTER_NEAREST:
-			return GL10.GL_NEAREST; //GL10.GL_NEAREST_MIPMAP_LINEAR;
-		default:
+	private int getGLFilter() {
+		if (imageFilter == FILTER_NEAREST) {
 			return GL10.GL_NEAREST;
+		} else { // imageFilter == FILTER_LINEAR
+			return GL10.GL_LINEAR;
 		}
 	}
 
-	int getGLWrap(int wrap) {
+	private int getGLWrap(int wrap) {
 		switch (wrap) {
 		case Texture2D.WRAP_CLAMP:
 			return GL10.GL_CLAMP_TO_EDGE;
@@ -169,7 +203,7 @@ public class Texture2D extends Transformable {
 		}
 	}
 
-	int getGLBlend() {
+	private int getGLBlend() {
 		switch (blending) {
 		case FUNC_ADD:
 			return GL10.GL_ADD;
@@ -183,4 +217,39 @@ public class Texture2D extends Transformable {
 			return GL10.GL_DECAL;
 		}
 	}
+	
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.COLOR:
+			return true;
+		default:
+			return super.isCompatible(track);
+		}
+	}
+
+	//	private int getGLMinFilter() {
+	//	switch (levelFilter) {
+	//	case FILTER_BASE_LEVEL:
+	//		if (imageFilter == FILTER_NEAREST) {
+	//			return GL10.GL_NEAREST;
+	//		} else { // imageFilter == FILTER_LINEAR
+	//			return GL10.GL_LINEAR;
+	//		}
+	//	case FILTER_LINEAR:
+	//		if (imageFilter == FILTER_NEAREST) {
+	//			return GL10.GL_NEAREST_MIPMAP_LINEAR;
+	//		} else { // imageFilter == FILTER_LINEAR
+	//			return GL10.GL_LINEAR_MIPMAP_LINEAR;
+	//		}
+	//	case FILTER_NEAREST:
+	//		if (imageFilter == FILTER_NEAREST) {
+	//			return GL10.GL_NEAREST_MIPMAP_NEAREST;
+	//		} else { // imageFilter == FILTER_LINEAR
+	//			return GL10.GL_LINEAR_MIPMAP_NEAREST;
+	//		}
+	//	default:
+	//		// Should not occur !
+	//		return GL10.GL_NEAREST;
+	//	}
+	//}
 }

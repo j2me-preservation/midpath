@@ -148,4 +148,16 @@ public abstract class Transformable extends Object3D {
 		translation.y += ty;
 		translation.z += tz;
 	}
+	
+	boolean isCompatible(AnimationTrack track) {
+		switch (track.getTargetProperty()) {
+		case AnimationTrack.ORIENTATION:
+		case AnimationTrack.SCALE:
+		case AnimationTrack.TRANSLATION:
+		    return true;
+		default:
+		    return super.isCompatible(track);
+		}
+	}
+	
 }
