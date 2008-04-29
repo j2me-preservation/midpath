@@ -1,264 +1,601 @@
-#!/bin/sh
+#!/bin/bash
 # Usage: type ./build.sh --help
 
-# Adjust these two variables to your environment
+# Default commands and library locations
 JAVAC_CMD=javac
-JAVA_SE_LIBRARY_PATH=/usr/share/classpath/glibj.zip
+JAR_CMD=jar
+FASTJAR_ENABLED=no
+J2SE_JAR=/usr/share/classpath/glibj.zip
+
+JAR_DIST_HOME=`pwd`/dist
+
+# The file to use if you do not built it
+# yourself or the target name if it is
+# build
+CLDC_JAR=${JAR_DIST_HOME}/cldc1.1.jar
+
+CLDC_FLAGS="-source 1.3 -target 1.1"
+
+# Defaults
+CLDC_ENABLED=yes
+MIDPATH_ENABLED=yes
+
+# Default components/libraries
+SDLJAVA_CLDC_ENABLED=yes
+ESCHER_CLDC_ENABLED=yes
+JLAYERME_CLDC_ENABLED=yes
+JORBIS_CLDC_ENABLED=yes
+AVETANABT_CLDC_ENABLED=yes
+JGL_CLDC_ENABLED=yes
+
+# Optional components
+WEB_SERVICES_API_ENABLED=yes
+LOCATION_API_ENABLED=yes
+MESSAGING_API_ENABLED=yes
+SVG_API_ENABLED=yes
+SVG_API_AWT_ENABLED=no
+OPENGL_API_ENABLED=yes
+M3G_API_ENABLED=yes
+
+DEMOS_ENABLED=yes
+
+KXML2_DIST_ENABLED=yes
+
+# Overridable file names and default locations
+SDLJAVA_CLDC_JAR=${JAR_DIST_HOME}/sdljava-cldc.jar
+ESCHER_CLDC_JAR=${JAR_DIST_HOME}/escher-cldc.jar
+JLAYERME_CLDC_JAR=${JAR_DIST_HOME}/jlayerme-cldc.jar
+JORBIS_CLDC_JAR=${JAR_DIST_HOME}/jorbis-cldc.jar
+AVETANABT_CLDC_JAR=${JAR_DIST_HOME}/avetanabt-cldc.jar
+
+JAXP_JAR=$JAR_DIST_HOME/jsr172-jaxp.jar
+JAXRPC_JAR=$JAR_DIST_HOME/jsr172-jaxrpc.jar
+LOCATION_JAR=$JAR_DIST_HOME/jsr179-location.jar
+MESSAGING_JAR=$JAR_DIST_HOME/jsr205-messaging.jar
+
+SVG_CORE_JAR=$JAR_DIST_HOME/jsr226-svg-core.jar
+SVG_MIDP2_JAR=$JAR_DIST_HOME/jsr226-svg-midp2.jar
+SVG_AWT_JAR=$JAR_DIST_HOME/jsr226-svg-awt.jar
+
+JGL_CLDC_JAR=$JAR_DIST_HOME/jgl-cldc.jar
+OPENGLES_CORE_JAR=$JAR_DIST_HOME/jsr239-opengles-core.jar
+OPENGLES_JGL_JAR=$JAR_DIST_HOME/jsr239-opengles-jgl.jar
+OPENGLES_NIO_JAR=$JAR_DIST_HOME/jsr239-opengles-nio.jar
+
+MICROBACKEND_JAR=${JAR_DIST_HOME}/microbackend.jar
+
+# External library dependencies
+# (By default use the included ones.)
+KXML2_JAR=`pwd`/lib/kxml2-2.3.0.jar
+SWT_JAR=`pwd`/lib/swt.jar
+
+MIDPATH_JAR=${JAR_DIST_HOME}/midpath.jar
 
 #==========================================
 # You should not change anything below
 #==========================================
 
-while getopts "haesgq-:" option ; do
-	if [ "$option" = "-" ] ; then
-		case $OPTARG in
-			help ) option=h ;;
-			alsa ) option=a ;;
-			esd ) option=e ;;
-			gtk ) option=g ;;
-			qt3 ) option=q ;;
-			qt4 ) option=t ;;
-			sdl ) option=s ;;
-			fb ) option=f ;;
-			* ) echo "Option $OPTARG unknown" ;;
-		esac
-	fi
-	case $option in
-		h ) echo "Usage : $(basename $0) [options...] [target]"
-		    echo " Options :"
-		    echo "  -h	--help : Show this help"
-		    echo "  -a	--alsa : Compile ALSA native code"
-		    echo "  -e	--esd  : Compile ESD native code"
-		    echo "  -g	--gtk  : Compile GTK native code"
-		    echo "  -q	--qt3  : Compile Qt3 native code"
-		    echo "  -t	--qt4  : Compile Qt4 native code"
-		    echo "  -s	--sdl  : Compile SDL native code"
-		    echo "  -f	--fb   : Compile Linux framebuffer native code"
-		    echo " Targets :"
-		    echo "  generic (default)"
-		    echo "  maemo (compile libmidpathgtk with hildon libraries)"
+OPTIONS="\
+help,alsa,esd,gtk,qt3,qt4,fb,\
+\
+enable-hildon,\
+enable-fastjar,\
+\
+disable-cldc,\
+disable-midpath,\
+disable-sdljava-cldc,\
+disable-escher-cldc,\
+disable-jlayerme-cldc,\
+disable-jorbis-cldc,\
+disable-avetanabt-cldc,\
+disable-jgl-cldc,\
+\
+disable-web_services-api,\
+disable-location-api,\
+disable-messaging-api,\
+disable-svg-api,\
+enable-svg-api-awt,\
+disable-opengl-api,\
+disable-m3g-api,\
+disable-demos,\
+\
+with-j2se-jar:,\
+with-sdljava-cldc-jar:,\
+with-escher-cldc-jar:,\
+with-jlayerme-cldc-jar:,\
+with-jorbis-cldc-jar:,\
+with-avetanabt-cldc-jar:,\
+with-microbackend-jar:,\
+with-jaxp-jar:,\
+with-jaxrpc-jar:,\
+with-location-jar:,\
+with-messaging-jar:,\
+with-svg-core-jar:,\
+with-svg-midp2-jar:,\
+with-svg-awt-jar:,\
+with-jgl-jar:,\
+with-opengles-jgl-jar:,\
+with-opengles-nio-jar:,\
+with-opengles-core-jar:,\
+with-kxml2-jar:,\
+with-swt-jar:,\
+with-cldc-jar:,\
+\
+with-jar:,\
+with-javac:\
+"
+
+TEMP=`getopt -l $OPTIONS -o h -- "$@"`
+
+eval set -- "$TEMP"
+
+while true; do
+	case $1 in
+		--help ) echo "Usage : $(basename $0) [options...]"
+		    echo " Native libraries:"
+		    echo "  --help : Show this help"
+		    echo "  --alsa : Compile ALSA native code"
+		    echo "  --esd  : Compile ESD native code"
+		    echo "  --gtk  : Compile GTK native code"
+		    echo "  --qt3  : Compile Qt3 native code"
+		    echo "  --qt4  : Compile Qt4 native code"
+		    echo "  --fb   : Compile Linux framebuffer native code"
+        echo
+        echo "Misc. build options:"
+        echo "  --enable-hildon           : Compile gtk support library with hildon support (default: no)"
+        echo "  --enable-fastjar          : Enable use of the fastjar utility (default: no)"
+        echo
+        echo "Core features:"
+        echo "  --disable-cldc            : Do not compile CLDC1.1 classes (default: yes)"
+        echo "  --disable-midpath         : Do not compile MIDPath classes (includes microbackend) (default: yes)"
+        echo "  --disable-sdljava-cldc    : Do not compile SDLJava-CLDC backend (default: yes)"
+        echo "  --disable-escher-cldc     : Do not compile Escher CLDC backend (default: yes)"
+        echo "  --disable-jlayerme-cldc   : Do not compile JLayerME CLDC (MP3) library (default: yes)"
+        echo "  --disable-jorbis-cldc     : Do not compile JOrbis CLDC (Ogg Vorbis) library (default: yes)"
+        echo "  --disable-avetanabt-cldc  : Do not compile AvetanaBT CLDC (Bluetooth) library (default: yes)"
+        echo "  --disable-jgl-cldc        : Do not compile jGL CLDC library (default: yes)"
+        echo
+        echo "Optional features:"
+        echo "  --disable-web_services-api: Do not compile the J2ME Web Services API (JSR172) (default: yes)"
+	echo "  --disable-location-api    : Do not compile the Location API (JSR179) (default: yes)"
+        echo "  --disable-messaging-api   : Do not compile the Wireless Messaging API (JSR205) (default: yes)"
+        echo "  --disable-svg-api         : Do not compile the Scalable 2D Vector Graphics API (JSR226) (default: yes)"
+        echo "  --enable-svg-api-awt      : Do not compile the SVG API implementation for AWT (default: no)"
+        echo "  --disable-opengl-api      : Do not compile the OpenGL ES API (JSR239) (default: yes)"
+        echo "  --disable-m3g-api         : Do not compile the Mobile 3D Graphics API (JSR184) (default: yes)"
+        echo "  --disable-demos           : Do not compile the MIDPath demos (default: yes)"
+        echo
+        echo "Providable libraries:"
+        echo "  --with-cldc-jar           : Location of the CLDC class library"
+        echo "  --with-sdljava-cldc-jar   : Location of the SDLJava-CLDC library"
+        echo "  --with-escher-cldc-jar    : Location of the Escher-CLDC library"
+        echo "  --with-jlayerme-cldc-jar  : Location of the JLayerME-CLDC library"
+        echo "  --with-jorbis-cldc-jar    : Location of the JOrbis-CLDC library"
+        echo "  --with-avetanabt-cldc-jar : Location of the AvetanaBT-CLDC library"
+        echo "  --with-jaxp-jar           : Location of the J2ME Web Services API - JAXP library"
+	echo "  --with-jaxrpc-jar         : Location of the J2ME Web Services API - JAXRPC library"
+	echo "  --with-location-jar       : Location of the Location API library"
+        echo "  --with-messaging-jar      : Location of the Wireless Messaging API library"
+        echo "  --with-svg-core-jar       : Location of the SVG core API library"
+        echo "  --with-svg-midp2-jar      : Location of the SVG MIDP2 implementation library"
+        echo "  --with-svg-awt-jar        : Location of the SVG AWT implementation library"
+        echo "  --with-jgl-cldc-jar       : Location of the jGL-CLDC library"
+        echo "  --with-opengles-core-jar  : Location of the OpenGL ES core library"
+        echo "  --with-opengles-jgl-jar   : Location of the jGL-based OpenGL ES library"
+        echo "  --with-opengles-nio-jar   : Location of the OpenGL ES NIO library"
+        echo
+        echo "External libraries:"
+        echo "  --with-j2se-jar           : Location of the J2SE class library"
+        echo "  --with-kxml2-jar          : Location of the kxml2 library (when given disables distribution of the jar)"
+        echo "  --with-swt-jar            : Location of the SWT library (default: /usr/share/java/swt.jar)"
+        echo
+        echo "External programs:"
+        echo "  --with-jar                : Location and name of the jar tool (default: $JAR_CMD)"
+        echo "  --with-javac              : Location and name of the javac tool (default: $JAVAC_CMD)"
 		    exit 0
 		    ;;
-		a ) ALSA_ENABLED=yes
-			echo "ALSA enabled" ;;
-		e ) ESD_ENABLED=yes
-			echo "ESD enabled" ;;
-		g ) GTK_ENABLED=yes
-			echo "GTK enabled" ;;
-		q ) QT3_ENABLED=yes
-			echo "QT3 enabled" ;;
-		t ) QT4_ENABLED=yes
-			echo "QT4 enabled" ;;
-		s ) SDL_ENABLED=yes
-			echo "SDL enabled" ;;
-		f ) FB_ENABLED=yes
-			echo "FB enabled" ;;
-		? ) echo "Unknown" ;;
+		--alsa ) ALSA_ENABLED=yes
+			echo "ALSA enabled"
+      shift ;;
+		--esd ) ESD_ENABLED=yes
+			echo "ESD enabled"
+      shift ;;
+		--gtk ) GTK_ENABLED=yes
+			echo "GTK enabled"
+      shift ;;
+		--qt3 ) QT3_ENABLED=yes
+			echo "QT3 enabled"
+      shift ;;
+		--qt4 ) QT4_ENABLED=yes
+			echo "QT4 enabled"
+      shift ;;
+		--sdl ) SDL_ENABLED=yes
+			echo "SDL enabled"
+      shift ;;
+		--fb ) FB_ENABLED=yes
+			echo "FB enabled"
+      shift ;;
+		--enable-hildon ) HILDON_ENABLED=yes
+			echo "hildon support enabled"
+      shift ;;
+    --disable-cldc ) CLDC_ENABLED=no
+			echo "compiling CLDC1.1 disabled"
+      shift ;;
+    --disable-midpath ) MIDPATH_ENABLED=no
+			echo "compiling MIDPath (J2ME class library) disabled"
+      shift ;;
+    --disable-sdljava-cldc ) SDLJAVA_CLDC_ENABLED=no
+			echo "compiling SDLJava-CLDC backend disabled"
+      shift ;;
+    --disable-escher-cldc ) ESCHER_CLDC_ENABLED=no
+			echo "compiling Escher CLDC backend disabled"
+      shift ;;
+    --disable-jlayerme-cldc ) JLAYERME_CLDC_ENABLED=no
+			echo "compiling JLayerME CLDC library disabled"
+      shift ;;
+    --disable-jorbis-cldc ) JORBIS_CLDC_ENABLED=no
+			echo "compiling JOrbis CLDC library disabled"
+      shift ;;
+    --disable-avetanabt-cldc ) AVETANABT_CLDC_ENABLED=no
+			echo "compiling AvetanaBT CLDC library disabled"
+      shift ;;
+    --disable-jgl-cldc ) JGL_CLDC_ENABLED=no
+			echo "compiling jGL CLDC library disabled"
+      shift ;;
+    --disable-web_services-api ) WEB_SERVICES_API_ENABLED=no
+                        echo "compiling J2ME Web Services API (JSR172) disabled"
+      shift ;;
+    --disable-location-api ) LOCATION_API_ENABLED=no
+			echo "compiling Location API (JSR179) disabled"
+      shift ;;
+    --disable-messaging-api ) MESSAGING_API_ENABLED=no
+			echo "compiling Wireless Messaging API (JSR205) disabled"
+      shift ;;
+    --disable-svg-api ) SVG_API_ENABLED=no
+			echo "compiling Scalable 2D Vector Graphics API (JSR226) disabled"
+      shift ;;
+    --enable-svg-api-awt ) SVG_API_AWT_ENABLED=yes
+			echo "compiling SVG API implementation for AWT (JSR226) enabled"
+      shift ;;
+    --disable-opengl-api ) OPENGL_API_ENABLED=no
+			echo "compiling OpenGL API (JSR239) disabled"
+      shift ;;
+    --disable-m3g-api ) M3G_API_ENABLED=no
+			echo "compiling Mobile 3D Graphics API (JSR184) disabled"
+      shift ;;
+    --disable-demos ) DEMOS_ENABLED=no
+			echo "compiling MIDPath demos disabled"
+      shift ;;
+    --with-j2se-jar )
+      J2SE_JAR=$2
+			echo "using J2SE class library at: $J2SE_JAR"
+      shift 2 ;;
+    --with-cldc-jar )
+      CLDC_JAR=$2
+			echo "using CLDC class library at: $CLDC_JAR"
+      shift 2 ;;
+    --with-sdljava-cldc-jar )
+      SDLJAVA_CLDC_JAR=$2
+			echo "using SDLJava-CLDC library at: $SDLJAVA_CLDC_JAR"
+      shift 2 ;;
+    --with-escher-cldc-jar )
+      ESCHER_CLDC_JAR=$2
+			echo "using Escher-CLDC library at: $ESCHER_CLDC_JAR"
+      shift 2 ;;
+    --with-jlayerme-cldc-jar )
+      JLAYERME_CLDC_JAR=$2
+			echo "using JLayerME-CLDC library at: $JLAYERME_CLDC_JAR"
+      shift 2 ;;
+    --with-jorbis-cldc-jar )
+      JORBIS_CLDC_JAR=$2
+			echo "using JOrbis-CLDC library at: $JORBIS_CLDC_JAR"
+      shift 2 ;;
+    --with-avetanabt-cldc-jar )
+      AVETANABT_CLDC_JAR=$2
+			echo "using AvetanaBT-CLDC library at: $AVETANABT_CLDC_JAR"
+      shift 2 ;;
+    --with-jaxp-jar )
+      JAXP_JAR=$2
+	                echo "using J2ME Web Services - JAXP library at: $JAXP_JAR"
+      shift 2 ;;
+    --with-jaxrpc-jar )
+      JAXRPC_JAR=$2
+	                echo "using J2ME Web Services - JAXRPC library at: $JAXRPC_JAR"
+      shift 2 ;;
+    --with-location-jar )
+      LOCATION_JAR=$2
+			echo "using Location API library at: $LOCATION_JAR"
+      shift 2 ;;
+    --with-messaging-jar )
+      MESSAGING_JAR=$2
+			echo "using Wireless Messaging library at: $MESSAGING_JAR"
+      shift 2 ;;
+    --with-svg-core-jar )
+      SVG_CORE_JAR=$2
+			echo "using SVG API core library at: $SVG_CORE_JAR"
+      shift 2 ;;
+    --with-svg-midp2-jar )
+      SVG_MIDP2_JAR=$2
+			echo "using SVG MIDP2 implementation library at: $SVG_MIDP2_JAR"
+      shift 2 ;;
+    --with-svg-awt-jar )
+      SVG_AWT_JAR=$2
+			echo "using SVG AWT implementation library at: $SVG_AWT_JAR"
+      shift 2 ;;
+    --with-jgl-cldc-jar )
+      JGL_CLDC_JAR=$2
+			echo "using jGL-CLDC library at: $JGL_CLDC_JAR"
+      shift 2 ;;
+    --with-opengles-jgl-jar )
+      OPENGLES_JGL_JAR=$2
+			echo "using jGL-based OpenGL ES library at: $OPENGLES_JGL_JAR"
+      shift 2 ;;
+    --with-opengles-core-jar )
+      OPENGLES_CORE_JAR=$2
+			echo "using OpenGL ES core library at: $OPENGLES_CORE_JAR"
+      shift 2 ;;
+    --with-opengles-nio-jar )
+      OPENGLES_NIO_JAR=$2
+			echo "using OpenGL ES NIO library at: $OPENGLES_NIO_JAR"
+      shift 2 ;;
+    --with-kxml2-jar )
+      # If kxml2 is provided from somewhere else we do not need to
+      # copy it for distribution.
+      KXML2_DIST_ENABLED=no
+      KXML2_JAR=$2
+			echo "using kxml2 library at: $KXML2_JAR"
+      shift 2 ;;
+    --with-swt-jar )
+      SWT_JAR=$2
+			echo "using SWT library at: $SWT_JAR"
+      shift 2 ;;
+    --enable-fastjar )
+      FASTJAR_ENABLED=yes
+			echo "using fastjar utility"
+      shift ;;
+    --with-jar )
+      JAR_CMD=$2
+      echo "using jar command: $JAR_CMD"
+      shift 2 ;;
+    --with-javac )
+      JAVAC_CMD=$2
+      echo "using javac command: $JAVAC_CMD"
+      shift 2 ;;
+    -- ) shift; break;;
+		* ) echo "Unknown argument: $1"; break ;;
 	esac
 done
 
-shift $((OPTIND - 1))
-while [ $# -ne 0 ] ; do
-	if [ "$1" = "maemo" ]
-	then
-		echo "Target: MAEMO"
-		MAEMO_ENABLED=yes
-	fi
-	shift
-done
-
-
-DIST_HOME=`pwd`
-mkdir -p $DIST_HOME/dist
-
+# Create the dist directory
+if [ ! -d $JAR_DIST_HOME ]; then
+  mkdir $JAR_DIST_HOME
+fi
 
 #---------------------
 # Build CLDC1.1
 #---------------------
+if [ $CLDC_ENABLED = "yes" ]
+then
+  CLDC_CLASSES=`readlink -f external/cldc1.1/classes`
 
-# Build base classes
-cd $DIST_HOME/external/cldc1.1/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath . -source 1.3 -target 1.1" || exit 1
-make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath . -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/external/cldc1.1/classes || exit 1
-# Build CLDC extra classes for MIDP2
-cd $DIST_HOME/components/cldc-glue
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/external/cldc1.1/classes -sourcepath $DIST_HOME/components/cldc-glue -source 1.3 -target 1.1"
-make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/external/cldc1.1/classes -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/external/cldc1.1/classes
-# Make a jar
-jar cvf  $DIST_HOME/dist/cldc1.1.jar -C $DIST_HOME/external/cldc1.1/classes .
+  # Make and install CLDC classes
+  make -C external/cldc1.1/src \
+    JAVAC=$JAVAC_CMD \
+    JAVAC_FLAGS="-bootclasspath . -sourcepath . $CLDC_FLAGS" || exit 1
 
-CLDC_PATH=$DIST_HOME/dist/cldc1.1.jar
+  make install -C external/cldc1.1/src \
+    CLASS_DIR=$CLDC_CLASSES || exit 1
+
+  # Build CLDC extra classes for MIDP2
+  make install -C components/cldc-glue \
+    JAVAC=$JAVAC_CMD \
+    JAVAC_FLAGS="-bootclasspath $CLDC_CLASSES -sourcepath . $CLDC_FLAGS" || exit 1
+
+  # Install CLDC extra classes for MIDP2
+  make install -C components/cldc-glue \
+    CLASS_DIR=$CLDC_CLASSES || exit 1
+
+  # Make a jar
+  $JAR_CMD cvf $CLDC_JAR -C $CLDC_CLASSES . || exit 1
+
+else
+  echo "skipped CLDC1.1 build and using pre-built one"
+fi
+
+# Builds mmake-managed Java sources and creates a Jar.
+#
+# $1 - yes/no = whether the build should be done or not
+# $2 - source directory
+# $3 - target jar file name and location (must be absolute!)
+# $4 - auxiliary bootclasspath entries (optional)
+#      containing a leading colon (:) character
+build_java ()
+{
+  if [ $1 = yes ]
+  then
+    local srcdir=$2
+    local jarname=$3
+    local auxbcp=$4
+
+    make -C $srcdir \
+      JAVAC=$JAVAC_CMD \
+      JAVAC_FLAGS="-bootclasspath ${CLDC_JAR}$auxbcp -sourcepath . $CLDC_FLAGS" || exit 1
+
+    make jar -C $srcdir \
+      JAVAC=$JAVAC_CMD \
+      JAVAC_FLAGS="-bootclasspath ${CLDC_JAR}$auxbcp -sourcepath . $CLDC_FLAGS" \
+      JAR=$JAR_CMD \
+      JAR_FLAGS="cvf" \
+      JAR_FILE="$jarname" || exit 1
+  else
+    echo "skipping: $2"
+  fi
+}
+
+# Builds mmake-managed Java sources, creates a Jar and adds resources.
+#
+# $1 - yes/no = whether the build should be done or not
+# $2 - source directory
+# $3 - resource directory
+# $4 - target jar file name and location (must be absolute!)
+# $5 - auxilliary bootclasspath entries (optional)
+#      containing a leading colon (:) character
+build_java_res()
+{
+  build_java $1 $2 $4 $5 || exit 1
+
+  if [ $1 = yes ]; then
+    local resdir=$3
+    local jarname=$4
+    
+    if [ $FASTJAR_ENABLED = yes ]; then
+      # fastjar needs to get the file list via stdin
+      ( cd $resdir && find -type f | grep -v "/.svn" | $JAR_CMD uvf $MIDPATH_JAR -@ )
+    else
+      # Sun's jar has trouble with the first entry when using @ and -C
+      echo "ignore_the_error" > resources.list
+      # all other jar commands handle the resources via a file
+      find $resdir -type f | grep -v "/.svn" >> resources.list
+      $JAR_CMD uvf $jarname -C $resdir @resources.list
+    fi
+  fi
+}
 
 #--------------------------
 # Build external libraries
 #--------------------------
+# Build SDLJava library
+build_java $SDLJAVA_CLDC_ENABLED external/sdljava-cldc/java $SDLJAVA_CLDC_JAR
 
-# Build SDLJava for CLDC
-cd $DIST_HOME/external/sdljava-cldc/java
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/sdljava-cldc/java -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="sdljava-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/sdljava-cldc/java/sdljava-cldc.jar $DIST_HOME/dist
+# Build Escher library
+build_java $ESCHER_CLDC_ENABLED external/escher-cldc/core $ESCHER_CLDC_JAR
 
-# Build Escher X11 library
-cd $DIST_HOME/external/escher-cldc/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/escher-cldc/core -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="escher-x11-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/escher-cldc/core/escher-x11-cldc.jar $DIST_HOME/dist
+# Build JLayerME MP3 library
+build_java $JLAYERME_CLDC_ENABLED external/jlayerme-cldc/src $JLAYERME_CLDC_JAR
 
-# Build MP3 library
-cd $DIST_HOME/external/jlayerme-cldc/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/jlayerme-cldc/src -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="jlayerme-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/jlayerme-cldc/src/jlayerme-cldc.jar $DIST_HOME/dist
+# Build JOrbis Ogg Vorbis library
+build_java $JORBIS_CLDC_ENABLED external/jorbis-cldc/src $JORBIS_CLDC_JAR
 
-# Build OGG library
-cd $DIST_HOME/external/jorbis-cldc/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/jorbis-cldc/src -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="jorbis-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/jorbis-cldc/src/jorbis-cldc.jar $DIST_HOME/dist
-
-# Build Bluetooth library
-cd $DIST_HOME/external/avetanabt-cldc/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -sourcepath $DIST_HOME/external/avetanabt-cldc/src -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="avetanabt-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/avetanabt-cldc/src/avetanabt-cldc.jar $DIST_HOME/dist
+# Build AvetanaBT Bluetooth library
+build_java $AVETANABT_CLDC_ENABLED external/avetanabt-cldc/src $AVETANABT_CLDC_JAR
 
 # Build jGL library
-cd $DIST_HOME/external/jgl-cldc/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="jgl-cldc.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/external/jgl-cldc/src/jgl-cldc.jar $DIST_HOME/dist
+build_java $JGL_CLDC_ENABLED external/jgl-cldc/src $JGL_CLDC_JAR
 
-# Build MicroBackend library
-cd $DIST_HOME/components/microbackend
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -sourcepath $DIST_HOME/components/microbackend -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/escher-x11-cldc.jar:$DIST_HOME/lib/swt.jar -source 1.3 -target 1.1" JAR_FILE="microbackend.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/microbackend/microbackend.jar $DIST_HOME/dist
+# Build MicroBackend library (requires sdljava-cldc, escher-cldc and swt library)
+build_java \
+  $MIDPATH_ENABLED components/microbackend $MICROBACKEND_JAR \
+  :$J2SE_JAR:$SDLJAVA_CLDC_JAR:$ESCHER_CLDC_JAR:$SWT_JAR
 
-#--------------------
-# Build MIDPath core
-#--------------------
+# Build the MIDPath core
+build_java_res $MIDPATH_ENABLED components/core/src components/core/resources ${MIDPATH_JAR} \
+  :$J2SE_JAR:$SDLJAVA_CLDC_JAR:$JLAYERME_CLDC_JAR:$JORBIS_CLDC_JAR:$AVETANABT_CLDC_JAR:$MICROBACKEND_JAR:$KXML2_JAR
 
-# Build core
-cd $DIST_HOME/components/core/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -sourcepath $DIST_HOME/components/core/src -source 1.3 -target 1.1" || exit 1
-make install JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/microbackend.jar:$DIST_HOME/dist/sdljava-cldc.jar:$DIST_HOME/dist/jlayerme-cldc.jar:$DIST_HOME/dist/jorbis-cldc.jar:$DIST_HOME/dist/avetanabt-cldc.jar:$DIST_HOME/lib/kxml2-2.3.0.jar -source 1.3 -target 1.1" CLASS_DIR=$DIST_HOME/components/core/src/classes || exit 1
-jar cvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/components/core/src/classes .
+if [ $MIDPATH_ENABLED = yes ]; then
+  # Compile JVM.java separately as it can't be compiled against cldc.jar
+  mkdir -p components/j2se-glue/classes
+  ${JAVAC_CMD} \
+    -bootclasspath ${J2SE_JAR} \
+    -sourcepath components/j2se-glue \
+    ${CLDC_FLAGS} \
+    -d components/j2se-glue/classes \
+    components/j2se-glue/com/sun/cldchi/jvm/JVM.java
 
-# Add resources to the midpath.jar
-(cd $DIST_HOME/components/core/resources && find -type f | grep -v "/.svn") > $DIST_HOME/components/core/resources.list
-cd $DIST_HOME/components/core/resources
-jar uvf $DIST_HOME/dist/midpath.jar @$DIST_HOME/components/core/resources.list
+  # Add JVM.class to midpath and microbackend jar (which could be used in J2SE env)
+  ${JAR_CMD} uvf $MIDPATH_JAR -C components/j2se-glue/classes .
+  ${JAR_CMD} uvf $MICROBACKEND_JAR -C components/j2se-glue/classes .
+fi
 
-# Include com.sun.cldchi.jvm.JVM class (J2SE glue) in jars which could be used in a J2SE environment  
-mkdir -p $DIST_HOME/components/j2se-glue/classes
-cd $DIST_HOME/components/j2se-glue
-ecj -bootclasspath $JAVA_SE_LIBRARY_PATH -source 1.3 -target 1.1 -d $DIST_HOME/components/j2se-glue/classes com/sun/cldchi/jvm/JVM.java
-jar uvf $DIST_HOME/dist/midpath.jar -C $DIST_HOME/components/j2se-glue/classes .
-jar uvf $DIST_HOME/dist/microbackend.jar -C $DIST_HOME/components/j2se-glue/classes .
+if [ $KXML2_DIST_ENABLED = yes ]; then
+  # Add other required libraries to the dist directory
+  cp $KXML2_JAR dist
+fi
 
-cd $DIST_HOME/tests
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/dist/midpath.jar:$CLDC_PATH -sourcepath $DIST_HOME/tests -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $DIST_HOME/dist/midpath.jar:$CLDC_PATH -source 1.3 -target 1.1" JAR_FILE="midpath-tests.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/tests/midpath-tests.jar $DIST_HOME/dist
+# Optional components
 
-# Add other required libraries to the dist directory
-cp $DIST_HOME/lib/kxml2-2.3.0.jar $DIST_HOME/dist
+# Build J2ME Web Services API (JSR172) - JAXP
+build_java $WEB_SERVICES_API_ENABLED \
+  components/jsr172-web_services/jaxp \
+  $JAXP_JAR \
+  :$MIDPATH_JAR
 
-MIDPATH_CORE_PATH=$DIST_HOME/dist/midpath.jar
-
-#---------------------
-# Build optional JSRs
-#---------------------
+# Build J2ME Web Services API (JSR172) - JAXRPC
+build_java $WEB_SERVICES_API_ENABLED \
+  components/jsr172-web_services/jaxrpc \
+  $JAXRPC_JAR \
+  :$MIDPATH_JAR:$JAXP_JAR
 
 # Build Location API (JSR179)
-cd $DIST_HOME/components/jsr179-location/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/dist/avetanabt-cldc.jar -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$DIST_HOME/lib/kxml2-2.3.0.jar:$DIST_HOME/dist/avetanabt-cldc.jar -source 1.3 -target 1.1" JAR_FILE="jsr179-location.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr179-location/core/jsr179-location.jar $DIST_HOME/dist
-# Add resources to jsr179-location.jar
-(cd $DIST_HOME/components/jsr179-location/resources && find -type f | grep -v "/.svn") > $DIST_HOME/components/jsr179-location/resources.list
-cd $DIST_HOME/components/jsr179-location/resources
-jar uvf $DIST_HOME/dist/jsr179-location.jar @$DIST_HOME/components/jsr179-location/resources.list
+build_java_res $LOCATION_API_ENABLED \
+  components/jsr179-location/core \
+  components/jsr179-location/resources \
+  $LOCATION_JAR \
+  :$MIDPATH_JAR:$KXML2_JAR:$AVETANABT_CLDC_JAR
 
 # Build Wireless Messaging API (JSR205)
-cd $DIST_HOME/components/jsr205-messaging/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH -source 1.3 -target 1.1" JAR_FILE="jsr205-messaging.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr205-messaging/core/jsr205-messaging.jar $DIST_HOME/dist
+build_java $MESSAGING_API_ENABLED \
+  components/jsr205-messaging/core \
+  $MESSAGING_JAR \
+  :$MIDPATH_JAR
 
-# Build M2G/SVG (JSR226) core
-cd $DIST_HOME/components/jsr226-svg/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$JAVA_SE_LIBRARY_PATH -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$JAVA_SE_LIBRARY_PATH -source 1.3 -target 1.1" JAR_FILE="jsr226-svg-core.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr226-svg/core/jsr226-svg-core.jar $DIST_HOME/dist
-# Add resources to jsr226-svg-core.jar
-(cd $DIST_HOME/components/jsr226-svg/resources && find -type f | grep -v "/.svn") > $DIST_HOME/components/jsr226-svg/resources.list
-cd $DIST_HOME/components/jsr226-svg/resources
-jar uvf $DIST_HOME/dist/jsr226-svg-core.jar @$DIST_HOME/components/jsr226-svg/resources.list
+# Build M2G/SVG (JSR226) core library
+build_java_res $SVG_API_ENABLED \
+  components/jsr226-svg/core \
+  components/jsr226-svg/resources \
+  $SVG_CORE_JAR \
+  :$MIDPATH_JAR:$JAXP_JAR
 
 # Build M2G/SVG (JSR226) MIDP2 implementation
-cd $DIST_HOME/components/jsr226-svg/midp2
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$DIST_HOME/dist/jsr226-svg-core.jar -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$DIST_HOME/dist/jsr226-svg-core.jar -source 1.3 -target 1.1" JAR_FILE="jsr226-svg-midp2.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr226-svg/midp2/jsr226-svg-midp2.jar $DIST_HOME/dist
+build_java $SVG_API_ENABLED \
+  components/jsr226-svg/midp2 \
+  $SVG_MIDP2_JAR \
+  :$MIDPATH_JAR:$SVG_CORE_JAR \
 
+# Not fully tested yet.
 # Build M2G/SVG (JSR226) AWT implementation
-#cd $DIST_HOME/components/jsr226-svg/awt
-#make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/jsr226-svg-core.jar -source 1.3 -target 1.1" || exit 1
-#make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/jsr226-svg-core.jar -source 1.3 -target 1.1" JAR_FILE="jsr226-svg-awt.jar" JAR_FLAGS="cvf" || exit 1
-#cp $DIST_HOME/components/jsr226-svg/awt/jsr226-svg-awt.jar $DIST_HOME/dist
+if [ $SVG_API_ENABLED = yes ]; then
+  build_java $SVG_API_AWT_ENABLED \
+    components/jsr226-svg/awt \
+    $SVG_AWT_JAR
+    :$J2SE_JAR:$SVG_CORE_JAR
+fi
 
 # Build OpenGL ES (JSR239) core
-cd $DIST_HOME/components/jsr239-opengl/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$JAVA_SE_LIBRARY_PATH -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$JAVA_SE_LIBRARY_PATH -source 1.3 -target 1.1" JAR_FILE="jsr239-opengles-core.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr239-opengl/core/jsr239-opengles-core.jar $DIST_HOME/dist
+build_java $OPENGL_API_ENABLED components/jsr239-opengl/core $OPENGLES_CORE_JAR \
+  :$MIDPATH_JAR:$J2SE_JAR
 
 # Build OpenGL ES (JSR239) pure Java implementation based on jGL
-cd $DIST_HOME/components/jsr239-opengl/implementations/jgl
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/jsr239-opengles-core.jar:$DIST_HOME/dist/jgl-cldc.jar -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$JAVA_SE_LIBRARY_PATH:$DIST_HOME/dist/jsr239-opengles-core.jar:$DIST_HOME/dist/jgl-cldc.jar -source 1.3 -target 1.1" JAR_FILE="jsr239-opengles-jgl.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr239-opengl/implementations/jgl/jsr239-opengles-jgl.jar $DIST_HOME/dist
+build_java $OPENGL_API_ENABLED components/jsr239-opengl/implementations/jgl $OPENGLES_JGL_JAR \
+  :$MIDPATH_JAR:$J2SE_JAR:$JGL_CLDC_JAR:$OPENGLES_CORE_JAR
 
 # Build OpenGL ES (JSR239) NIO classes (only used with CLDC JVMs)
-cd $DIST_HOME/components/jsr239-opengl/nio-cldc
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$DIST_HOME/dist/jsr239-opengles-core.jar -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$DIST_HOME/dist/jsr239-opengles-core.jar -source 1.3 -target 1.1" JAR_FILE="jsr239-nio.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr239-opengl/nio-cldc/jsr239-nio.jar $DIST_HOME/dist
+build_java $OPENGL_API_ENABLED components/jsr239-opengl/nio-cldc $OPENGLES_NIO_JAR \
+  :$OPENGLES_CORE_JAR
 
 # Build M3G (JSR184)
-cd $DIST_HOME/components/jsr184-m3g/core
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$DIST_HOME/dist/jsr239-opengles-core.jar:$DIST_HOME/dist/jsr239-nio.jar -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$DIST_HOME/dist/jsr239-opengles-core.jar:$DIST_HOME/dist/jsr239-nio.jar -source 1.3 -target 1.1" JAR_FILE="jsr184-m3g.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/components/jsr184-m3g/core/jsr184-m3g.jar $DIST_HOME/dist
+build_java $M3G_API_ENABLED components/jsr184-m3g/core ${JAR_DIST_HOME}/jsr184-m3g.jar \
+  :$MIDPATH_JAR:$OPENGLES_CORE_JAR:$OPENGLES_NIO_JAR
 
 #-------------------
 # Build demos
 #-------------------
 
-JSR_PATH=$DIST_HOME/dist/jsr179-location.jar:$DIST_HOME/dist/jsr205-messaging.jar:$DIST_HOME/dist/jsr226-svg-core.jar:$DIST_HOME/dist/jsr239-opengles-core.jar:$DIST_HOME/dist/jsr239-nio.jar:$DIST_HOME/dist/jsr184-m3g.jar
-
-cd $DIST_HOME/demos/src
-make JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$JSR_PATH -source 1.3 -target 1.1" || exit 1
-make jar JAVAC=$JAVAC_CMD JAVAC_FLAGS="-bootclasspath $CLDC_PATH:$MIDPATH_CORE_PATH:$JSR_PATH -source 1.3 -target 1.1" JAR_FILE="midpath-demos.jar" JAR_FLAGS="cvf" || exit 1
-cp $DIST_HOME/demos/src/midpath-demos.jar $DIST_HOME/dist
-# Add resources to midpath-demos.jar
-(cd $DIST_HOME/demos/resources && find -type f | grep -v "/.svn") > $DIST_HOME/demos/resources.list
-cd $DIST_HOME/demos/resources
-jar uvf $DIST_HOME/dist/midpath-demos.jar @$DIST_HOME/demos/resources.list
+build_java_res $DEMOS_ENABLED demos/src demos/resources \
+  $JAR_DIST_HOME/midpath-demos.jar \
+  :$MIDPATH_JAR:$LOCATION_JAR:$MESSAGING_JAR:$SVG_CORE_JAR:$OPENGLES_CORE_JAR:$OPENGLES_NIO_JAR:$JAR_DIST_HOME/jsr184-m3g.jar
+$JAR_CMD uvmf demos/resources/META-INF/MANIFEST.MF $JAR_DIST_HOME/midpath-demos.jar
 
 #------------------- 
 # Build native code
 #-------------------
 
 if [ "$GTK_ENABLED" = "yes" ]; then
-if [ "$MAEMO_ENABLED" = "yes" ]; then
+if [ "$HILDON_ENABLED" = "yes" ]; then
 	cd $DIST_HOME/native/microbackend/gtk
 	make -f Makefile.maemo || exit 1
 	cp *.so $DIST_HOME/dist
 else
-	cd $DIST_HOME/native//microbackend/gtk
+	cd $DIST_HOME/native/microbackend/gtk
 	make -f Makefile || exit 1
 	cp *.so $DIST_HOME/dist
 fi
