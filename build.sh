@@ -7,7 +7,8 @@ JAR_CMD=jar
 FASTJAR_ENABLED=no
 J2SE_JAR=/usr/share/classpath/glibj.zip
 
-JAR_DIST_HOME=`pwd`/dist
+DIST_HOME=`pwd`
+JAR_DIST_HOME=$DIST_HOME/dist
 
 # The file to use if you do not built it
 # yourself or the target name if it is
