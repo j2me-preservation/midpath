@@ -2,7 +2,7 @@
 # Usage: type ./build.sh --help
 
 # Default commands and library locations
-JAVAC_CMD=javac
+JAVAC_CMD=ecj
 JAR_CMD=jar
 FASTJAR_ENABLED=no
 J2SE_JAR=/usr/share/classpath/glibj.zip
@@ -77,7 +77,7 @@ MIDPATH_JAR=${JAR_DIST_HOME}/midpath.jar
 #==========================================
 
 OPTIONS="\
-help,alsa,esd,gtk,qt3,qt4,fb,\
+help,alsa,esd,gtk,qt3,qt4,qtopia4,fb,\
 \
 enable-hildon,\
 enable-fastjar,\
@@ -101,6 +101,7 @@ disable-m3g-api,\
 disable-demos,\
 \
 with-j2se-jar:,\
+with-cldc-jar:,\
 with-sdljava-cldc-jar:,\
 with-escher-cldc-jar:,\
 with-jlayerme-cldc-jar:,\
@@ -120,7 +121,7 @@ with-opengles-nio-jar:,\
 with-opengles-core-jar:,\
 with-kxml2-jar:,\
 with-swt-jar:,\
-with-cldc-jar:,\
+with-greenphone-sdk:,\
 \
 with-jar:,\
 with-javac:\
@@ -134,236 +135,245 @@ while true; do
 	case $1 in
 		--help ) echo "Usage : $(basename $0) [options...]"
 		    echo " Native libraries:"
-		    echo "  --help : Show this help"
-		    echo "  --alsa : Compile ALSA native code"
-		    echo "  --esd  : Compile ESD native code"
-		    echo "  --gtk  : Compile GTK native code"
-		    echo "  --qt3  : Compile Qt3 native code"
-		    echo "  --qt4  : Compile Qt4 native code"
-		    echo "  --fb   : Compile Linux framebuffer native code"
-        echo
-        echo "Misc. build options:"
-        echo "  --enable-hildon           : Compile gtk support library with hildon support (default: no)"
-        echo "  --enable-fastjar          : Enable use of the fastjar utility (default: no)"
-        echo
-        echo "Core features:"
-        echo "  --disable-cldc            : Do not compile CLDC1.1 classes (default: yes)"
-        echo "  --disable-midpath         : Do not compile MIDPath classes (includes microbackend) (default: yes)"
-        echo "  --disable-sdljava-cldc    : Do not compile SDLJava-CLDC backend (default: yes)"
-        echo "  --disable-escher-cldc     : Do not compile Escher CLDC backend (default: yes)"
-        echo "  --disable-jlayerme-cldc   : Do not compile JLayerME CLDC (MP3) library (default: yes)"
-        echo "  --disable-jorbis-cldc     : Do not compile JOrbis CLDC (Ogg Vorbis) library (default: yes)"
-        echo "  --disable-avetanabt-cldc  : Do not compile AvetanaBT CLDC (Bluetooth) library (default: yes)"
-        echo "  --disable-jgl-cldc        : Do not compile jGL CLDC library (default: yes)"
-        echo
-        echo "Optional features:"
-        echo "  --disable-web_services-api: Do not compile the J2ME Web Services API (JSR172) (default: yes)"
-	echo "  --disable-location-api    : Do not compile the Location API (JSR179) (default: yes)"
-        echo "  --disable-messaging-api   : Do not compile the Wireless Messaging API (JSR205) (default: yes)"
-        echo "  --disable-svg-api         : Do not compile the Scalable 2D Vector Graphics API (JSR226) (default: yes)"
-        echo "  --enable-svg-api-awt      : Do not compile the SVG API implementation for AWT (default: no)"
-        echo "  --disable-opengl-api      : Do not compile the OpenGL ES API (JSR239) (default: yes)"
-        echo "  --disable-m3g-api         : Do not compile the Mobile 3D Graphics API (JSR184) (default: yes)"
-        echo "  --disable-demos           : Do not compile the MIDPath demos (default: yes)"
-        echo
-        echo "Providable libraries:"
-        echo "  --with-cldc-jar           : Location of the CLDC class library"
-        echo "  --with-sdljava-cldc-jar   : Location of the SDLJava-CLDC library"
-        echo "  --with-escher-cldc-jar    : Location of the Escher-CLDC library"
-        echo "  --with-jlayerme-cldc-jar  : Location of the JLayerME-CLDC library"
-        echo "  --with-jorbis-cldc-jar    : Location of the JOrbis-CLDC library"
-        echo "  --with-avetanabt-cldc-jar : Location of the AvetanaBT-CLDC library"
-        echo "  --with-jaxp-jar           : Location of the J2ME Web Services API - JAXP library"
-	echo "  --with-jaxrpc-jar         : Location of the J2ME Web Services API - JAXRPC library"
-	echo "  --with-location-jar       : Location of the Location API library"
-        echo "  --with-messaging-jar      : Location of the Wireless Messaging API library"
-        echo "  --with-svg-core-jar       : Location of the SVG core API library"
-        echo "  --with-svg-midp2-jar      : Location of the SVG MIDP2 implementation library"
-        echo "  --with-svg-awt-jar        : Location of the SVG AWT implementation library"
-        echo "  --with-jgl-cldc-jar       : Location of the jGL-CLDC library"
-        echo "  --with-opengles-core-jar  : Location of the OpenGL ES core library"
-        echo "  --with-opengles-jgl-jar   : Location of the jGL-based OpenGL ES library"
-        echo "  --with-opengles-nio-jar   : Location of the OpenGL ES NIO library"
-        echo
-        echo "External libraries:"
-        echo "  --with-j2se-jar           : Location of the J2SE class library"
-        echo "  --with-kxml2-jar          : Location of the kxml2 library (when given disables distribution of the jar)"
-        echo "  --with-swt-jar            : Location of the SWT library (default: /usr/share/java/swt.jar)"
-        echo
-        echo "External programs:"
-        echo "  --with-jar                : Location and name of the jar tool (default: $JAR_CMD)"
-        echo "  --with-javac              : Location and name of the javac tool (default: $JAVAC_CMD)"
+		    echo "  --help   : Show this help"
+		    echo "  --alsa   : Compile ALSA native code"
+		    echo "  --esd    : Compile ESD native code"
+		    echo "  --gtk    : Compile GTK native code"
+		    echo "  --qt3    : Compile Qt3 native code"
+		    echo "  --qt4    : Compile Qt4 native code"
+		    echo "  --qtopia4: Compile Qtopia4 native code"
+		    echo "  --fb     : Compile Linux framebuffer native code"
+	    	echo
+	    	echo "Misc. build options:"
+	    	echo "  --enable-hildon           : Compile gtk support library with hildon support (default: no)"
+	    	echo "  --enable-fastjar          : Enable use of the fastjar utility (default: no)"
+	    	echo
+	    	echo "Core features:"
+	    	echo "  --disable-cldc            : Do not compile CLDC1.1 classes (default: yes)"
+	    	echo "  --disable-midpath         : Do not compile MIDPath classes (includes microbackend) (default: yes)"
+	    	echo "  --disable-sdljava-cldc    : Do not compile SDLJava-CLDC backend (default: yes)"
+	        echo "  --disable-escher-cldc     : Do not compile Escher CLDC backend (default: yes)"
+	        echo "  --disable-jlayerme-cldc   : Do not compile JLayerME CLDC (MP3) library (default: yes)"
+	        echo "  --disable-jorbis-cldc     : Do not compile JOrbis CLDC (Ogg Vorbis) library (default: yes)"
+	        echo "  --disable-avetanabt-cldc  : Do not compile AvetanaBT CLDC (Bluetooth) library (default: yes)"
+	        echo "  --disable-jgl-cldc        : Do not compile jGL CLDC library (default: yes)"
+	        echo
+	        echo "Optional features:"
+	        echo "  --disable-web_services-api: Do not compile the J2ME Web Services API (JSR172) (default: yes)"
+			echo "  --disable-location-api    : Do not compile the Location API (JSR179) (default: yes)"
+	        echo "  --disable-messaging-api   : Do not compile the Wireless Messaging API (JSR205) (default: yes)"
+	        echo "  --disable-svg-api         : Do not compile the Scalable 2D Vector Graphics API (JSR226) (default: yes)"
+	        echo "  --enable-svg-api-awt      : Do not compile the SVG API implementation for AWT (default: no)"
+	        echo "  --disable-opengl-api      : Do not compile the OpenGL ES API (JSR239) (default: yes)"
+	        echo "  --disable-m3g-api         : Do not compile the Mobile 3D Graphics API (JSR184) (default: yes)"
+	        echo "  --disable-demos           : Do not compile the MIDPath demos (default: yes)"
+	        echo
+	        echo "Providable libraries:"
+	        echo "  --with-cldc-jar           : Location of the CLDC class library"
+	        echo "  --with-sdljava-cldc-jar   : Location of the SDLJava-CLDC library"
+	        echo "  --with-escher-cldc-jar    : Location of the Escher-CLDC library"
+	        echo "  --with-jlayerme-cldc-jar  : Location of the JLayerME-CLDC library"
+	        echo "  --with-jorbis-cldc-jar    : Location of the JOrbis-CLDC library"
+	        echo "  --with-avetanabt-cldc-jar : Location of the AvetanaBT-CLDC library"
+	        echo "  --with-jaxp-jar           : Location of the J2ME Web Services API - JAXP library"
+			echo "  --with-jaxrpc-jar         : Location of the J2ME Web Services API - JAXRPC library"
+			echo "  --with-location-jar       : Location of the Location API library"
+	        echo "  --with-messaging-jar      : Location of the Wireless Messaging API library"
+	        echo "  --with-svg-core-jar       : Location of the SVG core API library"
+	        echo "  --with-svg-midp2-jar      : Location of the SVG MIDP2 implementation library"
+	        echo "  --with-svg-awt-jar        : Location of the SVG AWT implementation library"
+	        echo "  --with-jgl-cldc-jar       : Location of the jGL-CLDC library"
+	        echo "  --with-opengles-core-jar  : Location of the OpenGL ES core library"
+	        echo "  --with-opengles-jgl-jar   : Location of the jGL-based OpenGL ES library"
+	        echo "  --with-opengles-nio-jar   : Location of the OpenGL ES NIO library"
+	        echo
+	        echo "External libraries:"
+	        echo "  --with-j2se-jar           : Location of the J2SE class library"
+	        echo "  --with-kxml2-jar          : Location of the kxml2 library (when given disables distribution of the jar)"
+	        echo "  --with-swt-jar            : Location of the SWT library (default: lib/swt.jar)"
+	        echo "  --with-greenphone-sdk     : Location of the Greenphone SDK (used to compile the qtopia backend)"
+	        echo
+	        echo "External programs:"
+	        echo "  --with-jar                : Location and name of the jar tool (default: $JAR_CMD)"
+	        echo "  --with-javac              : Location and name of the javac tool (default: $JAVAC_CMD)"
 		    exit 0
 		    ;;
 		--alsa ) ALSA_ENABLED=yes
-			echo "ALSA enabled"
-      shift ;;
+				echo "ALSA enabled"
+	      shift ;;
 		--esd ) ESD_ENABLED=yes
-			echo "ESD enabled"
-      shift ;;
+				echo "ESD enabled"
+	      shift ;;
 		--gtk ) GTK_ENABLED=yes
-			echo "GTK enabled"
-      shift ;;
+				echo "GTK enabled"
+	      shift ;;
 		--qt3 ) QT3_ENABLED=yes
-			echo "QT3 enabled"
-      shift ;;
+				echo "QT3 enabled"
+	      shift ;;
 		--qt4 ) QT4_ENABLED=yes
-			echo "QT4 enabled"
-      shift ;;
+				echo "QT4 enabled"
+	      shift ;;
+	    --qtopia4 ) QTOPIA4_ENABLED=yes
+				echo "Qtopia4 enabled"
+	      shift ;;
 		--sdl ) SDL_ENABLED=yes
-			echo "SDL enabled"
-      shift ;;
+				echo "SDL enabled"
+	      shift ;;
 		--fb ) FB_ENABLED=yes
-			echo "FB enabled"
-      shift ;;
+				echo "FB enabled"
+	      shift ;;
 		--enable-hildon ) HILDON_ENABLED=yes
-			echo "hildon support enabled"
-      shift ;;
-    --disable-cldc ) CLDC_ENABLED=no
-			echo "compiling CLDC1.1 disabled"
-      shift ;;
-    --disable-midpath ) MIDPATH_ENABLED=no
-			echo "compiling MIDPath (J2ME class library) disabled"
-      shift ;;
-    --disable-sdljava-cldc ) SDLJAVA_CLDC_ENABLED=no
-			echo "compiling SDLJava-CLDC backend disabled"
-      shift ;;
-    --disable-escher-cldc ) ESCHER_CLDC_ENABLED=no
-			echo "compiling Escher CLDC backend disabled"
-      shift ;;
-    --disable-jlayerme-cldc ) JLAYERME_CLDC_ENABLED=no
-			echo "compiling JLayerME CLDC library disabled"
-      shift ;;
-    --disable-jorbis-cldc ) JORBIS_CLDC_ENABLED=no
-			echo "compiling JOrbis CLDC library disabled"
-      shift ;;
-    --disable-avetanabt-cldc ) AVETANABT_CLDC_ENABLED=no
-			echo "compiling AvetanaBT CLDC library disabled"
-      shift ;;
-    --disable-jgl-cldc ) JGL_CLDC_ENABLED=no
-			echo "compiling jGL CLDC library disabled"
-      shift ;;
-    --disable-web_services-api ) WEB_SERVICES_API_ENABLED=no
-                        echo "compiling J2ME Web Services API (JSR172) disabled"
-      shift ;;
-    --disable-location-api ) LOCATION_API_ENABLED=no
-			echo "compiling Location API (JSR179) disabled"
-      shift ;;
-    --disable-messaging-api ) MESSAGING_API_ENABLED=no
-			echo "compiling Wireless Messaging API (JSR205) disabled"
-      shift ;;
-    --disable-svg-api ) SVG_API_ENABLED=no
-			echo "compiling Scalable 2D Vector Graphics API (JSR226) disabled"
-      shift ;;
-    --enable-svg-api-awt ) SVG_API_AWT_ENABLED=yes
-			echo "compiling SVG API implementation for AWT (JSR226) enabled"
-      shift ;;
-    --disable-opengl-api ) OPENGL_API_ENABLED=no
-			echo "compiling OpenGL API (JSR239) disabled"
-      shift ;;
-    --disable-m3g-api ) M3G_API_ENABLED=no
-			echo "compiling Mobile 3D Graphics API (JSR184) disabled"
-      shift ;;
-    --disable-demos ) DEMOS_ENABLED=no
-			echo "compiling MIDPath demos disabled"
-      shift ;;
-    --with-j2se-jar )
-      J2SE_JAR=$2
-			echo "using J2SE class library at: $J2SE_JAR"
-      shift 2 ;;
-    --with-cldc-jar )
-      CLDC_JAR=$2
-			echo "using CLDC class library at: $CLDC_JAR"
-      shift 2 ;;
-    --with-sdljava-cldc-jar )
-      SDLJAVA_CLDC_JAR=$2
-			echo "using SDLJava-CLDC library at: $SDLJAVA_CLDC_JAR"
-      shift 2 ;;
-    --with-escher-cldc-jar )
-      ESCHER_CLDC_JAR=$2
-			echo "using Escher-CLDC library at: $ESCHER_CLDC_JAR"
-      shift 2 ;;
-    --with-jlayerme-cldc-jar )
-      JLAYERME_CLDC_JAR=$2
-			echo "using JLayerME-CLDC library at: $JLAYERME_CLDC_JAR"
-      shift 2 ;;
-    --with-jorbis-cldc-jar )
-      JORBIS_CLDC_JAR=$2
-			echo "using JOrbis-CLDC library at: $JORBIS_CLDC_JAR"
-      shift 2 ;;
-    --with-avetanabt-cldc-jar )
-      AVETANABT_CLDC_JAR=$2
-			echo "using AvetanaBT-CLDC library at: $AVETANABT_CLDC_JAR"
-      shift 2 ;;
-    --with-jaxp-jar )
-      JAXP_JAR=$2
-	                echo "using J2ME Web Services - JAXP library at: $JAXP_JAR"
-      shift 2 ;;
-    --with-jaxrpc-jar )
-      JAXRPC_JAR=$2
-	                echo "using J2ME Web Services - JAXRPC library at: $JAXRPC_JAR"
-      shift 2 ;;
-    --with-location-jar )
-      LOCATION_JAR=$2
-			echo "using Location API library at: $LOCATION_JAR"
-      shift 2 ;;
-    --with-messaging-jar )
-      MESSAGING_JAR=$2
-			echo "using Wireless Messaging library at: $MESSAGING_JAR"
-      shift 2 ;;
-    --with-svg-core-jar )
-      SVG_CORE_JAR=$2
-			echo "using SVG API core library at: $SVG_CORE_JAR"
-      shift 2 ;;
-    --with-svg-midp2-jar )
-      SVG_MIDP2_JAR=$2
-			echo "using SVG MIDP2 implementation library at: $SVG_MIDP2_JAR"
-      shift 2 ;;
-    --with-svg-awt-jar )
-      SVG_AWT_JAR=$2
-			echo "using SVG AWT implementation library at: $SVG_AWT_JAR"
-      shift 2 ;;
-    --with-jgl-cldc-jar )
-      JGL_CLDC_JAR=$2
-			echo "using jGL-CLDC library at: $JGL_CLDC_JAR"
-      shift 2 ;;
-    --with-opengles-jgl-jar )
-      OPENGLES_JGL_JAR=$2
-			echo "using jGL-based OpenGL ES library at: $OPENGLES_JGL_JAR"
-      shift 2 ;;
-    --with-opengles-core-jar )
-      OPENGLES_CORE_JAR=$2
-			echo "using OpenGL ES core library at: $OPENGLES_CORE_JAR"
-      shift 2 ;;
-    --with-opengles-nio-jar )
-      OPENGLES_NIO_JAR=$2
-			echo "using OpenGL ES NIO library at: $OPENGLES_NIO_JAR"
-      shift 2 ;;
-    --with-kxml2-jar )
-      # If kxml2 is provided from somewhere else we do not need to
-      # copy it for distribution.
-      KXML2_DIST_ENABLED=no
-      KXML2_JAR=$2
-			echo "using kxml2 library at: $KXML2_JAR"
-      shift 2 ;;
-    --with-swt-jar )
-      SWT_JAR=$2
-			echo "using SWT library at: $SWT_JAR"
-      shift 2 ;;
-    --enable-fastjar )
-      FASTJAR_ENABLED=yes
-			echo "using fastjar utility"
-      shift ;;
-    --with-jar )
-      JAR_CMD=$2
-      echo "using jar command: $JAR_CMD"
-      shift 2 ;;
-    --with-javac )
-      JAVAC_CMD=$2
-      echo "using javac command: $JAVAC_CMD"
-      shift 2 ;;
-    -- ) shift; break;;
-		* ) echo "Unknown argument: $1"; break ;;
+				echo "hildon support enabled"
+	      shift ;;
+	    --disable-cldc ) CLDC_ENABLED=no
+				echo "compiling CLDC1.1 disabled"
+	      shift ;;
+	    --disable-midpath ) MIDPATH_ENABLED=no
+				echo "compiling MIDPath (J2ME class library) disabled"
+	      shift ;;
+	    --disable-sdljava-cldc ) SDLJAVA_CLDC_ENABLED=no
+				echo "compiling SDLJava-CLDC backend disabled"
+	      shift ;;
+	    --disable-escher-cldc ) ESCHER_CLDC_ENABLED=no
+				echo "compiling Escher CLDC backend disabled"
+	      shift ;;
+	    --disable-jlayerme-cldc ) JLAYERME_CLDC_ENABLED=no
+				echo "compiling JLayerME CLDC library disabled"
+	      shift ;;
+	    --disable-jorbis-cldc ) JORBIS_CLDC_ENABLED=no
+				echo "compiling JOrbis CLDC library disabled"
+	      shift ;;
+	    --disable-avetanabt-cldc ) AVETANABT_CLDC_ENABLED=no
+				echo "compiling AvetanaBT CLDC library disabled"
+	      shift ;;
+	    --disable-jgl-cldc ) JGL_CLDC_ENABLED=no
+				echo "compiling jGL CLDC library disabled"
+	      shift ;;
+	    --disable-web_services-api ) WEB_SERVICES_API_ENABLED=no
+	                        echo "compiling J2ME Web Services API (JSR172) disabled"
+	      shift ;;
+	    --disable-location-api ) LOCATION_API_ENABLED=no
+				echo "compiling Location API (JSR179) disabled"
+	      shift ;;
+	    --disable-messaging-api ) MESSAGING_API_ENABLED=no
+				echo "compiling Wireless Messaging API (JSR205) disabled"
+	      shift ;;
+	    --disable-svg-api ) SVG_API_ENABLED=no
+				echo "compiling Scalable 2D Vector Graphics API (JSR226) disabled"
+	      shift ;;
+	    --enable-svg-api-awt ) SVG_API_AWT_ENABLED=yes
+				echo "compiling SVG API implementation for AWT (JSR226) enabled"
+	      shift ;;
+	    --disable-opengl-api ) OPENGL_API_ENABLED=no
+				echo "compiling OpenGL API (JSR239) disabled"
+	      shift ;;
+	    --disable-m3g-api ) M3G_API_ENABLED=no
+				echo "compiling Mobile 3D Graphics API (JSR184) disabled"
+	      shift ;;
+	    --disable-demos ) DEMOS_ENABLED=no
+				echo "compiling MIDPath demos disabled"
+	      shift ;;
+	    --with-j2se-jar )
+	      J2SE_JAR=$2
+				echo "using J2SE class library at: $J2SE_JAR"
+	      shift 2 ;;
+	    --with-cldc-jar )
+	      CLDC_JAR=$2
+				echo "using CLDC class library at: $CLDC_JAR"
+	      shift 2 ;;
+	    --with-sdljava-cldc-jar )
+	      SDLJAVA_CLDC_JAR=$2
+				echo "using SDLJava-CLDC library at: $SDLJAVA_CLDC_JAR"
+	      shift 2 ;;
+	    --with-escher-cldc-jar )
+	      ESCHER_CLDC_JAR=$2
+				echo "using Escher-CLDC library at: $ESCHER_CLDC_JAR"
+	      shift 2 ;;
+	    --with-jlayerme-cldc-jar )
+	      JLAYERME_CLDC_JAR=$2
+				echo "using JLayerME-CLDC library at: $JLAYERME_CLDC_JAR"
+	      shift 2 ;;
+	    --with-jorbis-cldc-jar )
+	      JORBIS_CLDC_JAR=$2
+				echo "using JOrbis-CLDC library at: $JORBIS_CLDC_JAR"
+	      shift 2 ;;
+	    --with-avetanabt-cldc-jar )
+	      AVETANABT_CLDC_JAR=$2
+				echo "using AvetanaBT-CLDC library at: $AVETANABT_CLDC_JAR"
+	      shift 2 ;;
+	    --with-jaxp-jar )
+	      JAXP_JAR=$2
+		                echo "using J2ME Web Services - JAXP library at: $JAXP_JAR"
+	      shift 2 ;;
+	    --with-jaxrpc-jar )
+	      JAXRPC_JAR=$2
+		                echo "using J2ME Web Services - JAXRPC library at: $JAXRPC_JAR"
+	      shift 2 ;;
+	    --with-location-jar )
+	      LOCATION_JAR=$2
+				echo "using Location API library at: $LOCATION_JAR"
+	      shift 2 ;;
+	    --with-messaging-jar )
+	      MESSAGING_JAR=$2
+				echo "using Wireless Messaging library at: $MESSAGING_JAR"
+	      shift 2 ;;
+	    --with-svg-core-jar )
+	      SVG_CORE_JAR=$2
+				echo "using SVG API core library at: $SVG_CORE_JAR"
+	      shift 2 ;;
+	    --with-svg-midp2-jar )
+	      SVG_MIDP2_JAR=$2
+				echo "using SVG MIDP2 implementation library at: $SVG_MIDP2_JAR"
+	      shift 2 ;;
+	    --with-svg-awt-jar )
+	      SVG_AWT_JAR=$2
+				echo "using SVG AWT implementation library at: $SVG_AWT_JAR"
+	      shift 2 ;;
+	    --with-jgl-cldc-jar )
+	      JGL_CLDC_JAR=$2
+				echo "using jGL-CLDC library at: $JGL_CLDC_JAR"
+	      shift 2 ;;
+	    --with-opengles-jgl-jar )
+	      OPENGLES_JGL_JAR=$2
+				echo "using jGL-based OpenGL ES library at: $OPENGLES_JGL_JAR"
+	      shift 2 ;;
+	    --with-opengles-core-jar )
+	      OPENGLES_CORE_JAR=$2
+				echo "using OpenGL ES core library at: $OPENGLES_CORE_JAR"
+	      shift 2 ;;
+	    --with-opengles-nio-jar )
+	      OPENGLES_NIO_JAR=$2
+				echo "using OpenGL ES NIO library at: $OPENGLES_NIO_JAR"
+	      shift 2 ;;
+	    --with-kxml2-jar )
+	      # If kxml2 is provided from somewhere else we do not need to
+	      # copy it for distribution.
+	      KXML2_DIST_ENABLED=no
+	      KXML2_JAR=$2
+				echo "using kxml2 library at: $KXML2_JAR"
+	      shift 2 ;;
+	    --with-swt-jar )
+	      SWT_JAR=$2
+				echo "using SWT library at: $SWT_JAR"
+	      shift 2 ;;
+	    --with-greenphone-sdk )
+	      GREENPHONE_SDK_PATH=$2
+	      echo "using Greenphone SDK: $GREENPHONE_SDK_PATH"
+	      shift 2 ;;
+	    --enable-fastjar )
+	      FASTJAR_ENABLED=yes
+				echo "using fastjar utility"
+	      shift ;;
+	    --with-jar )
+	      JAR_CMD=$2
+	      echo "using jar command: $JAR_CMD"
+	      shift 2 ;;
+	    --with-javac )
+	      JAVAC_CMD=$2
+	      echo "using javac command: $JAVAC_CMD"
+	      shift 2 ;;
+	    -- ) shift; break;;
+			* ) echo "Unknown argument: $1"; break ;;
 	esac
 done
 
@@ -590,56 +600,61 @@ $JAR_CMD uvmf demos/resources/META-INF/MANIFEST.MF $JAR_DIST_HOME/midpath-demos.
 # Build native code
 #-------------------
 
+# Build the GTK native part
 if [ "$GTK_ENABLED" = "yes" ]; then
-if [ "$HILDON_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/microbackend/gtk
-	make -f Makefile.maemo || exit 1
-	cp *.so $DIST_HOME/dist
-else
-	cd $DIST_HOME/native/microbackend/gtk
-	make -f Makefile || exit 1
-	cp *.so $DIST_HOME/dist
-fi
+	if [ "$HILDON_ENABLED" = "yes" ]; then
+		cd $DIST_HOME/native/microbackend/gtk
+		make -f Makefile.maemo || exit 1
+		cp *.so $DIST_HOME/dist
+	else
+		cd $DIST_HOME/native/microbackend/gtk
+		make -f Makefile || exit 1
+		cp *.so $DIST_HOME/dist
+	fi
 fi
 
-if [ "$ALSA_ENABLED" = "yes" ]; then
 # Build the ALSA native part
-cd $DIST_HOME/native/alsa
-make || exit 1
-cp *.so $DIST_HOME/dist
+if [ "$ALSA_ENABLED" = "yes" ]; then
+	cd $DIST_HOME/native/alsa
+	make || exit 1
+	cp *.so $DIST_HOME/dist
 fi
 
-if [ "$ESD_ENABLED" = "yes" ]; then
 # Build the ESounD native part
-cd $DIST_HOME/native/esd
-make || exit 1
-cp *.so $DIST_HOME/dist
+if [ "$ESD_ENABLED" = "yes" ]; then
+	cd $DIST_HOME/native/esd
+	make || exit 1
+	cp *.so $DIST_HOME/dist
 fi
 
+# Build the Qt3 native part
 if [ "$QT3_ENABLED" = "yes" ]; then
-# Build the Qt native part
-cd $DIST_HOME/native/microbackend/qt
-make || exit 1
-cp *.so $DIST_HOME/dist
+	cd $DIST_HOME/native/microbackend/qt
+	make QT3=yes || exit 1
+	cp *.so $DIST_HOME/dist
 fi
 
+# Build the Qt4 native part
 if [ "$QT4_ENABLED" = "yes" ]; then
-# Build the Qt native part
-cd $DIST_HOME/native/microbackend/qt
-make QT4_BACKEND=yes || exit 1
-cp *.so $DIST_HOME/dist
+	cd $DIST_HOME/native/microbackend/qt
+	if [ "$QTOPIA4_ENABLED" = "yes" ]; then
+		make QTOPIA4=yes GREENPHONE_SDK_PATH=$GREENPHONE_SDK_PATH || exit 1
+	else
+		make || exit 1
+	fi
+	cp *.so $DIST_HOME/dist
 fi
 
-if [ "$SDL_ENABLED" = "yes" ]; then
 # Build the SDLJava native part
-cd $DIST_HOME/external/sdljava-cldc/native
-make || exit 1
-cp *.so $DIST_HOME/dist
+if [ "$SDL_ENABLED" = "yes" ]; then
+	cd $DIST_HOME/external/sdljava-cldc/native
+	make || exit 1
+	cp *.so $DIST_HOME/dist
 fi
 
-if [ "$FB_ENABLED" = "yes" ]; then
 # Build the Linux framebuffer native part
-cd $DIST_HOME/native/microbackend/fb
-make || exit 1
-cp *.so $DIST_HOME/dist
+if [ "$FB_ENABLED" = "yes" ]; then
+	cd $DIST_HOME/native/microbackend/fb
+	make || exit 1
+	cp *.so $DIST_HOME/dist
 fi
