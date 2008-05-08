@@ -120,7 +120,7 @@ public class ImageLoaderUtilImpl extends ImageLoaderUtil {
 			img = ImageIO.read(new ByteArrayInputStream(imageData));
 			return (new RasterImageImpl(img));
 		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
+			throw new IllegalArgumentException(e.getMessage());
 		}
 	}
 

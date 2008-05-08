@@ -560,14 +560,14 @@ build_java_res $SVG_API_ENABLED \
 build_java $SVG_API_ENABLED \
   components/jsr226-svg/midp2 \
   $SVG_MIDP2_JAR \
-  :$MIDPATH_JAR:$SVG_CORE_JAR \
+  :$MIDPATH_JAR:$SVG_CORE_JAR 
 
 # Not fully tested yet.
 # Build M2G/SVG (JSR226) AWT implementation
 if [ $SVG_API_ENABLED = yes ]; then
   build_java $SVG_API_AWT_ENABLED \
     components/jsr226-svg/awt \
-    $SVG_AWT_JAR
+    $SVG_AWT_JAR \
     :$J2SE_JAR:$SVG_CORE_JAR
 fi
 
