@@ -1,5 +1,6 @@
+JNI_INCLUDE = -I/usr/include/classpath
 
-CFLAGS = -I/usr/include/classpath
+CFLAGS = $(JNI_INCLUDE)
 LDFLAGS =
 
 SOURCES = jcl.c javaio.c org_thenesis_midpath_io_backend_cldc_File.c \

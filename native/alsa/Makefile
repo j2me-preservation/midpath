@@ -1,5 +1,6 @@
+JNI_INCLUDE = -I/usr/include/classpath
 
-CFLAGS = `pkg-config --cflags alsa` -I/usr/include/classpath
+CFLAGS = `pkg-config --cflags alsa` $(JNI_INCLUDE)
 LDFLAGS = `pkg-config --libs alsa` 
 
 SOURCES = org_thenesis_midpath_sound_backend_alsa_AlsaSink.c

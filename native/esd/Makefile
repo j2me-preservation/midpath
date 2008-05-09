@@ -1,5 +1,6 @@
+JNI_INCLUDE = -I/usr/include/classpath
 
-CFLAGS = `pkg-config --cflags esound` -I/usr/include/classpath
+CFLAGS = `pkg-config --cflags esound` $(JNI_INCLUDE)
 LDFLAGS = `pkg-config --libs esound` 
 
 SOURCES = org_thenesis_midpath_sound_backend_esd_EsdSink.c

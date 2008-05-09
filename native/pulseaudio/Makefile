@@ -1,5 +1,6 @@
+JNI_INCLUDE = -I/usr/include/classpath
 
-CFLAGS = `pkg-config --cflags libpulse-simple` -I/usr/include/classpath
+CFLAGS = `pkg-config --cflags libpulse-simple` $(JNI_INCLUDE)
 LDFLAGS = `pkg-config --libs libpulse-simple` 
 
 SOURCES = org_thenesis_midpath_sound_backend_pulseaudio_PulseSink.c

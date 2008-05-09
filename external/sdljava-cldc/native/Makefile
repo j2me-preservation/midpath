@@ -1,7 +1,11 @@
 
 CFLAGS=-O -fPIC -g
 
-INCLUDE=-I. -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I/usr/include -I/usr/include/SDL -I/usr/local/include -I/usr/local/include/SDL
+JNI_INCLUDE=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+
+SDL_INCLUDE=-I/usr/include/SDL -I/usr/local/include -I/usr/local/include/SDL
+
+INCLUDE=-I. $(JNI_INCLUDE) $(SDL_INCLUDE)
 
 SDLJAVA_OBJ=SDLAudio_wrap.o\
             SDLEvent_wrap.o\

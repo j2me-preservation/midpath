@@ -1,5 +1,7 @@
+JNI_INCLUDE = -I/usr/include/classpath
+
 ifdef QT3
-CFLAGS = `pkg-config --cflags qt-mt` -I/usr/include/classpath
+CFLAGS = `pkg-config --cflags qt-mt` $(JNI_INCLUDE)
 LDFLAGS = `pkg-config --libs qt-mt`
 DFLAGS = -DQT3_BACKEND
 # QT4
@@ -14,7 +16,8 @@ CFLAGS = -I$(GREENPHONE_SDK_PATH)/include/qtopia -I$(GREENPHONE_SDK_PATH)/includ
 -I$(GREENPHONE_SDK_PATH)/include -I$(GREENPHONE_SDK_PATH)/qtopiacore/target/include/QtCore \
 -I$(GREENPHONE_SDK_PATH)/qtopiacore/target/include -I$(GREENPHONE_SDK_PATH)/target/include \
 -I$(GREENPHONE_SDK_PATH)/qtopiacore/target/include/QtGui \
--I/usr/include/classpath
+$(JNI_INCLUDE)
+
 LDFLAGS = -L$(GREENPHONE_SDK_PATH)/qtopiacore/target/lib -L$(GREENPHONE_SDK_PATH)/image/lib -lqtopia -lQtGui
 endif
 DFLAGS = -DQTOPIA4_BACKEND

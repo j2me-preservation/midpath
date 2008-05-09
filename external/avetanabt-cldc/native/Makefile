@@ -1,5 +1,6 @@
+JNI_INCLUDE = -I/usr/include/classpath
 
-CFLAGS = -I/usr/include/classpath
+CFLAGS = $(JNI_INCLUDE)
 LDFLAGS = -lbluetooth 
 
 SOURCES = de_avetana_bluetooth_stack_BlueZ.cpp

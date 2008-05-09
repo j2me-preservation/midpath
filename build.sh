@@ -72,12 +72,27 @@ SWT_JAR=`pwd`/lib/swt.jar
 
 MIDPATH_JAR=${JAR_DIST_HOME}/midpath.jar
 
+# Default include headers location (CC syntax)
+JNI_INCLUDE=-I/usr/include/classpath
+SDL_INCLUDE=-I/usr/include/SDL
+
+# JNI library defaults (those variables must exist and have a non-empty value)
+GTK_ENABLED=no
+ALSA_ENABLED=no
+ESD_ENABLED=no
+PULSEAUDIO_ENABLED=no
+QT3_ENABLED=no
+QT4_ENABLED=no
+SDL_ENABLED=no
+FB_ENABLED=no
+
 #==========================================
 # You should not change anything below
 #==========================================
 
 OPTIONS="\
-help,alsa,esd,gtk,qt3,qt4,qtopia4,fb,\
+help,\
+sdl,alsa,esd,pulseaudio,gtk,qt3,qt4,qtopia4,fb,\
 \
 enable-hildon,\
 enable-fastjar,\
@@ -122,9 +137,13 @@ with-opengles-core-jar:,\
 with-kxml2-jar:,\
 with-swt-jar:,\
 with-greenphone-sdk:,\
+with-jdk-home:,\
 \
 with-jar:,\
-with-javac:\
+with-javac:,\
+\
+with-jni-include:,\
+with-sdl-include:\
 "
 
 TEMP=`getopt -l $OPTIONS -o h -- "$@"`
@@ -135,18 +154,20 @@ while true; do
 	case $1 in
 		--help ) echo "Usage : $(basename $0) [options...]"
 		    echo " Native libraries:"
-		    echo "  --help   : Show this help"
-		    echo "  --alsa   : Compile ALSA native code"
-		    echo "  --esd    : Compile ESD native code"
-		    echo "  --gtk    : Compile GTK native code"
-		    echo "  --qt3    : Compile Qt3 native code"
-		    echo "  --qt4    : Compile Qt4 native code"
-		    echo "  --qtopia4: Compile Qtopia4 native code"
-		    echo "  --fb     : Compile Linux framebuffer native code"
+		    echo "  --sdl       : Compile SDL native code (default: no)"
+		    echo "  --alsa      : Compile ALSA native code (default: no)"
+		    echo "  --esd       : Compile ESD native code (default: no)"
+		    echo "  --pulseaudio: Compile PulseAudio native code (default: no)"
+		    echo "  --gtk       : Compile GTK native code (default: no)"
+		    echo "  --qt3       : Compile Qt3 native code (default: no)"
+		    echo "  --qt4       : Compile Qt4 native code (default: no)"
+		    echo "  --qtopia4   : Compile Qtopia4 native code (default: no)"
+		    echo "  --fb        : Compile Linux framebuffer native code (default: no)"
 	    	echo
 	    	echo "Misc. build options:"
 	    	echo "  --enable-hildon           : Compile gtk support library with hildon support (default: no)"
 	    	echo "  --enable-fastjar          : Enable use of the fastjar utility (default: no)"
+		    echo "  --help                    : Show this help"
 	    	echo
 	    	echo "Core features:"
 	    	echo "  --disable-cldc            : Do not compile CLDC1.1 classes (default: yes)"
@@ -192,17 +213,29 @@ while true; do
 	        echo "  --with-kxml2-jar          : Location of the kxml2 library (when given disables distribution of the jar)"
 	        echo "  --with-swt-jar            : Location of the SWT library (default: lib/swt.jar)"
 	        echo "  --with-greenphone-sdk     : Location of the Greenphone SDK (used to compile the qtopia backend)"
+	        echo "  --with-jdk-home           : Location of a Sun JDK (used to derive the location of the JNI headers)"
 	        echo
 	        echo "External programs:"
 	        echo "  --with-jar                : Location and name of the jar tool (default: $JAR_CMD)"
 	        echo "  --with-javac              : Location and name of the javac tool (default: $JAVAC_CMD)"
+	        echo
+	        echo "Header file locations:"
+	        echo "Note: Quoting is neccessary for multiple path elements."
+	        echo "  --with-jni-include        : Location of the JNI headers (CC syntax) (default: $JNI_INCLUDE)"
+	        echo "  --with-sdl-include        : Location of the SDL headers (CC syntax) (default: $SDL_INCLUDE)"
 		    exit 0
 		    ;;
 		--alsa ) ALSA_ENABLED=yes
 				echo "ALSA enabled"
 	      shift ;;
+		--sdl ) SDL_ENABLED=yes
+				echo "SDL enabled"
+	      shift ;;
 		--esd ) ESD_ENABLED=yes
 				echo "ESD enabled"
+	      shift ;;
+		--pulseaudio ) PULSEAUDIO_ENABLED=yes
+				echo "PulseAudio enabled"
 	      shift ;;
 		--gtk ) GTK_ENABLED=yes
 				echo "GTK enabled"
@@ -303,11 +336,11 @@ while true; do
 	      shift 2 ;;
 	    --with-jaxp-jar )
 	      JAXP_JAR=$2
-		                echo "using J2ME Web Services - JAXP library at: $JAXP_JAR"
+        echo "using J2ME Web Services - JAXP library at: $JAXP_JAR"
 	      shift 2 ;;
 	    --with-jaxrpc-jar )
 	      JAXRPC_JAR=$2
-		                echo "using J2ME Web Services - JAXRPC library at: $JAXRPC_JAR"
+        echo "using J2ME Web Services - JAXRPC library at: $JAXRPC_JAR"
 	      shift 2 ;;
 	    --with-location-jar )
 	      LOCATION_JAR=$2
@@ -360,6 +393,10 @@ while true; do
 	      GREENPHONE_SDK_PATH=$2
 	      echo "using Greenphone SDK: $GREENPHONE_SDK_PATH"
 	      shift 2 ;;
+	    --with-jdk-home )
+	      JNI_INCLUDE="-I$2/include -I$2/include/linux"
+	      echo "using JDK. Setting JNI include path to: $JNI_INCLUDE"
+	      shift 2 ;;
 	    --enable-fastjar )
 	      FASTJAR_ENABLED=yes
 				echo "using fastjar utility"
@@ -371,6 +408,14 @@ while true; do
 	    --with-javac )
 	      JAVAC_CMD=$2
 	      echo "using javac command: $JAVAC_CMD"
+	      shift 2 ;;
+	    --with-jni-include )
+	      JNI_INCLUDE=$2
+	      echo "using JNI include paths: $JNI_INCLUDE"
+	      shift 2 ;;
+	    --with-sdl-include )
+	      SDL_INCLUDE=$2
+	      echo "using SDL include paths: $SDL_INCLUDE"
 	      shift 2 ;;
 	    -- ) shift; break;;
 			* ) echo "Unknown argument: $1"; break ;;
@@ -600,61 +645,59 @@ $JAR_CMD uvmf demos/resources/META-INF/MANIFEST.MF $JAR_DIST_HOME/midpath-demos.
 # Build native code
 #-------------------
 
+# Builds a JNI library in a subdirectory.
+# 
+# $1 - yes/no - whether the the item should be build or not.
+# $2 - directory of the Makefile
+# $3 - quoted makefile arguments (e.g. "FOO=bar BAZ=bla")
+build_native()
+{
+  local dir=$2
+
+  if [ $1 = yes ]; then
+
+    local opts=$3
+
+    make -C $dir \
+      JNI_INCLUDE="$JNI_INCLUDE" \
+      SDL_INCLUDE="$SDL_INCLUDE" \
+      $opts \
+    || exit 1
+
+    find $dir -name "*.so" -exec cp \{\} $DIST_HOME/dist \;
+  else
+    echo "skipping native lib: $dir"
+  fi
+}
+
 # Build the GTK native part
-if [ "$GTK_ENABLED" = "yes" ]; then
-	if [ "$HILDON_ENABLED" = "yes" ]; then
-		cd $DIST_HOME/native/microbackend/gtk
-		make -f Makefile.maemo || exit 1
-		cp *.so $DIST_HOME/dist
-	else
-		cd $DIST_HOME/native/microbackend/gtk
-		make -f Makefile || exit 1
-		cp *.so $DIST_HOME/dist
-	fi
+if [ "$HILDON_ENABLED" = "yes" ]; then
+  build_native $GTK_ENABLED native/microbackend/gtk "HILDON=yes"
+else
+  build_native $GTK_ENABLED native/microbackend/gtk
 fi
 
 # Build the ALSA native part
-if [ "$ALSA_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/alsa
-	make || exit 1
-	cp *.so $DIST_HOME/dist
-fi
+build_native $ALSA_ENABLED native/alsa
 
 # Build the ESounD native part
-if [ "$ESD_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/esd
-	make || exit 1
-	cp *.so $DIST_HOME/dist
-fi
+build_native $ESD_ENABLED native/esd
+
+# Build the Pulseaudio native part
+build_native $PULSEAUDIO_ENABLED native/pulseaudio
 
 # Build the Qt3 native part
-if [ "$QT3_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/microbackend/qt
-	make QT3=yes || exit 1
-	cp *.so $DIST_HOME/dist
-fi
+build_native $QT3_ENABLED native/microbackend/qt "QT3=yes"
 
 # Build the Qt4 native part
-if [ "$QT4_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/microbackend/qt
-	if [ "$QTOPIA4_ENABLED" = "yes" ]; then
-		make QTOPIA4=yes GREENPHONE_SDK_PATH=$GREENPHONE_SDK_PATH || exit 1
-	else
-		make || exit 1
-	fi
-	cp *.so $DIST_HOME/dist
+if [ "$QTOPIA4_ENABLED" = "yes" ]; then
+  build_native $QT4_ENABLED native/microbackend/qt 
+else
+	build_native $QT4_ENABLED native/microbackend/qt "QTOPIA4=yes GREENPHONE_SDK_PATH=$GREENPHONE_SDK_PATH"
 fi
 
 # Build the SDLJava native part
-if [ "$SDL_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/external/sdljava-cldc/native
-	make || exit 1
-	cp *.so $DIST_HOME/dist
-fi
+build_native $SDL_ENABLED external/sdljava-cldc/native "FOO=bar BAZ=bla"
 
 # Build the Linux framebuffer native part
-if [ "$FB_ENABLED" = "yes" ]; then
-	cd $DIST_HOME/native/microbackend/fb
-	make || exit 1
-	cp *.so $DIST_HOME/dist
-fi
+build_native $FB_ENABLED native/microbackend/fb

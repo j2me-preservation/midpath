@@ -1,5 +1,6 @@
+JNI_INCLUDE = -I/usr/include/classpath
 
-CFLAGS = -I/usr/include/classpath
+CFLAGS = $(JNI_INCLUDE)
 LDFLAGS =  
 
 SOURCES = org_thenesis_microbackend_ui_fb_FBBackend.c
