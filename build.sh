@@ -117,6 +117,7 @@ disable-demos,\
 \
 with-j2se-jar:,\
 with-cldc-jar:,\
+with-midpath-jar:,\
 with-sdljava-cldc-jar:,\
 with-escher-cldc-jar:,\
 with-jlayerme-cldc-jar:,\
@@ -191,6 +192,7 @@ while true; do
 	        echo
 	        echo "Providable libraries:"
 	        echo "  --with-cldc-jar           : Location of the CLDC class library"
+	        echo "  --with-midpath-jar        : Location of the MIDPath classes"
 	        echo "  --with-sdljava-cldc-jar   : Location of the SDLJava-CLDC library"
 	        echo "  --with-escher-cldc-jar    : Location of the Escher-CLDC library"
 	        echo "  --with-jlayerme-cldc-jar  : Location of the JLayerME-CLDC library"
@@ -313,6 +315,10 @@ while true; do
 	    --with-cldc-jar )
 	      CLDC_JAR=$2
 				echo "using CLDC class library at: $CLDC_JAR"
+	      shift 2 ;;
+	    --with-midpath-jar )
+	      MIDPATH_JAR=$2
+				echo "using MIDPath classes at: $MIDPATH_JAR"
 	      shift 2 ;;
 	    --with-sdljava-cldc-jar )
 	      SDLJAVA_CLDC_JAR=$2
