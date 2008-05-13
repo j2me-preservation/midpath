@@ -132,7 +132,7 @@ with-messaging-jar:,\
 with-svg-core-jar:,\
 with-svg-midp2-jar:,\
 with-svg-awt-jar:,\
-with-jgl-jar:,\
+with-jgl-cldc-jar:,\
 with-opengles-jgl-jar:,\
 with-opengles-nio-jar:,\
 with-opengles-core-jar:,\
