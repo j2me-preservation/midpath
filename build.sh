@@ -70,7 +70,7 @@ MICROBACKEND_JAR=${JAR_DIST_HOME}/microbackend.jar
 KXML2_JAR=`pwd`/lib/kxml2-2.3.0.jar
 SWT_JAR=`pwd`/lib/swt.jar
 
-MIDPATH_JAR=${JAR_DIST_HOME}/midpath.jar
+MIDPATH_JAR=$JAR_DIST_HOME/midpath.jar
 
 # Default include headers location (CC syntax)
 JNI_INCLUDE=-I/usr/include/classpath
@@ -512,7 +512,7 @@ build_java_res()
     
     if [ $FASTJAR_ENABLED = yes ]; then
       # fastjar needs to get the file list via stdin
-      ( cd $resdir && find -type f | grep -v "/.svn" | $JAR_CMD uvf $MIDPATH_JAR -@ )
+      ( cd $resdir && find -type f | grep -v "/.svn" | $JAR_CMD uvf $jarname -@ )
     else
       # Sun's jar has trouble with the first entry when using @ and -C
       echo "ignore_the_error" > resources.list
@@ -550,7 +550,7 @@ build_java \
   :$J2SE_JAR:$SDLJAVA_CLDC_JAR:$ESCHER_CLDC_JAR:$SWT_JAR
 
 # Build the MIDPath core
-build_java_res $MIDPATH_ENABLED components/core/src components/core/resources ${MIDPATH_JAR} \
+build_java_res $MIDPATH_ENABLED components/core/src components/core/resources $MIDPATH_JAR \
   :$J2SE_JAR:$SDLJAVA_CLDC_JAR:$JLAYERME_CLDC_JAR:$JORBIS_CLDC_JAR:$AVETANABT_CLDC_JAR:$MICROBACKEND_JAR:$KXML2_JAR
 
 if [ $MIDPATH_ENABLED = yes ]; then
