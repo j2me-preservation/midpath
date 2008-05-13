@@ -62,6 +62,7 @@ JGL_CLDC_JAR=$JAR_DIST_HOME/jgl-cldc.jar
 OPENGLES_CORE_JAR=$JAR_DIST_HOME/jsr239-opengles-core.jar
 OPENGLES_JGL_JAR=$JAR_DIST_HOME/jsr239-opengles-jgl.jar
 OPENGLES_NIO_JAR=$JAR_DIST_HOME/jsr239-opengles-nio.jar
+M3G_JAR=$JAR_DIST_HOME/jsr184-m3g.jar
 
 MICROBACKEND_JAR=${JAR_DIST_HOME}/microbackend.jar
 
@@ -135,6 +136,7 @@ with-jgl-jar:,\
 with-opengles-jgl-jar:,\
 with-opengles-nio-jar:,\
 with-opengles-core-jar:,\
+with-m3g-jar:,\
 with-kxml2-jar:,\
 with-swt-jar:,\
 with-greenphone-sdk:,\
@@ -209,6 +211,7 @@ while true; do
 	        echo "  --with-opengles-core-jar  : Location of the OpenGL ES core library"
 	        echo "  --with-opengles-jgl-jar   : Location of the jGL-based OpenGL ES library"
 	        echo "  --with-opengles-nio-jar   : Location of the OpenGL ES NIO library"
+	        echo "  --with-m3g-jar            : Location of the JSR184 M3G library"
 	        echo
 	        echo "External libraries:"
 	        echo "  --with-j2se-jar           : Location of the J2SE class library"
@@ -383,6 +386,10 @@ while true; do
 	    --with-opengles-nio-jar )
 	      OPENGLES_NIO_JAR=$2
 				echo "using OpenGL ES NIO library at: $OPENGLES_NIO_JAR"
+	      shift 2 ;;
+	    --with-m3g-jar )
+	      M3G_JAR=$2
+				echo "using M3G library at: $M3G_JAR"
 	      shift 2 ;;
 	    --with-kxml2-jar )
 	      # If kxml2 is provided from somewhere else we do not need to
@@ -635,7 +642,7 @@ build_java $OPENGL_API_ENABLED components/jsr239-opengl/nio-cldc $OPENGLES_NIO_J
   :$OPENGLES_CORE_JAR
 
 # Build M3G (JSR184)
-build_java $M3G_API_ENABLED components/jsr184-m3g/core ${JAR_DIST_HOME}/jsr184-m3g.jar \
+build_java $M3G_API_ENABLED components/jsr184-m3g/core $M3G_JAR \
   :$MIDPATH_JAR:$OPENGLES_CORE_JAR:$OPENGLES_NIO_JAR
 
 #-------------------
@@ -644,7 +651,7 @@ build_java $M3G_API_ENABLED components/jsr184-m3g/core ${JAR_DIST_HOME}/jsr184-m
 
 build_java_res $DEMOS_ENABLED demos/src demos/resources \
   $JAR_DIST_HOME/midpath-demos.jar \
-  :$MIDPATH_JAR:$LOCATION_JAR:$MESSAGING_JAR:$SVG_CORE_JAR:$OPENGLES_CORE_JAR:$OPENGLES_NIO_JAR:$JAR_DIST_HOME/jsr184-m3g.jar
+  :$MIDPATH_JAR:$LOCATION_JAR:$MESSAGING_JAR:$SVG_CORE_JAR:$OPENGLES_CORE_JAR:$OPENGLES_NIO_JAR:$M3G_JAR
 $JAR_CMD uvmf demos/resources/META-INF/MANIFEST.MF $JAR_DIST_HOME/midpath-demos.jar
 
 #------------------- 
