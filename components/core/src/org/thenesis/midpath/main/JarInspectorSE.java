@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -18,8 +16,10 @@ public class JarInspectorSE extends AbstractJarInspector {
 	public JarInspectorSE(File file) throws IOException {
 		this.file = file;
 		try {
-			this.url = new URI(file.getAbsolutePath()).toURL();
-		} catch (URISyntaxException e) {
+			this.url = file.toURL();
+			//this.url= new URI(file.getPath()).toURL();
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw new IOException(e.getMessage());
 		}
 	}
