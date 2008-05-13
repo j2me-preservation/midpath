@@ -710,7 +710,7 @@ else
 fi
 
 # Build the SDLJava native part
-build_native $SDL_ENABLED external/sdljava-cldc/native "FOO=bar BAZ=bla"
+build_native $SDL_ENABLED external/sdljava-cldc/native
 
 # Build the Linux framebuffer native part
 build_native $FB_ENABLED native/microbackend/fb
