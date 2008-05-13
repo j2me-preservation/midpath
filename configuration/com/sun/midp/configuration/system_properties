@@ -1,3 +1,5 @@
+#!/bin/sh
+
 SYSTEM_PROPERTIES="\
 -Djavax.microedition.io.Connector.protocolpath=com.sun.midp.io \
 -Dmicroedition.profiles=MIDP-2.0 \
