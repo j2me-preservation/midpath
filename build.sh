@@ -704,9 +704,9 @@ build_native $QT3_ENABLED native/microbackend/qt "QT3=yes"
 
 # Build the Qt4 native part
 if [ "$QTOPIA4_ENABLED" = "yes" ]; then
-  build_native $QT4_ENABLED native/microbackend/qt 
-else
 	build_native $QT4_ENABLED native/microbackend/qt "QTOPIA4=yes GREENPHONE_SDK_PATH=$GREENPHONE_SDK_PATH"
+else
+  build_native $QT4_ENABLED native/microbackend/qt 
 fi
 
 # Build the SDLJava native part
