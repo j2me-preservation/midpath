@@ -4,6 +4,7 @@
 # Default commands and library locations
 JAVAC_CMD=ecj
 JAR_CMD=jar
+JAR_FLAGS=cvf
 FASTJAR_ENABLED=no
 J2SE_JAR=/usr/share/classpath/glibj.zip
 
@@ -412,6 +413,9 @@ while true; do
 	      shift 2 ;;
 	    --enable-fastjar )
 	      FASTJAR_ENABLED=yes
+        # fastjar has a bug that causes multiple META-INF directories to be created. By adding the "-M"
+        # option the mmake-made makefiles do not generate this directory any more when using fastjar.
+        JAR_FLAGS="-M -cvf"
 				echo "using fastjar utility"
 	      shift ;;
 	    --with-jar )
@@ -494,7 +498,7 @@ build_java ()
       JAVAC=$JAVAC_CMD \
       JAVAC_FLAGS="-bootclasspath ${CLDC_JAR}$auxbcp -sourcepath . $CLDC_FLAGS" \
       JAR=$JAR_CMD \
-      JAR_FLAGS="cvf" \
+      JAR_FLAGS="$JAR_FLAGS" \
       JAR_FILE="$jarname" || exit 1
   else
     echo "skipping: $2"
@@ -519,7 +523,7 @@ build_java_res()
     
     if [ $FASTJAR_ENABLED = yes ]; then
       # fastjar needs to get the file list via stdin
-      ( cd $resdir && find -type f | grep -v "/.svn" | $JAR_CMD uvf $jarname -@ )
+      ( cd $resdir && find -type f | grep -v "/.svn" | $JAR_CMD uvf $jarname -E -M -@ )
     else
       # Sun's jar has trouble with the first entry when using @ and -C
       echo "ignore_the_error" > resources.list

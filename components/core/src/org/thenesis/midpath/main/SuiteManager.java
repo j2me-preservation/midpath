@@ -35,13 +35,13 @@ import com.sun.midp.midletsuite.MIDletInfo;
 
 public class SuiteManager {
 
-	static MIDletRespository repository;
+	static MIDletRepository repository;
 	static String repositoryPath;
 
 	static {
 		repositoryPath = Configuration.getPropertyDefault("org.thenesis.midpath.main.repositoryPath", "");
 		//System.out.println("repositoryPath: " + repositoryPath);
-		repository = new MIDletRespository(repositoryPath);
+		repository = new MIDletRepository(repositoryPath);
 	}
 
 	public SuiteManager() {
@@ -283,7 +283,7 @@ public class SuiteManager {
 		//			//launcher.launchFirstMIDlet(file.toURL());
 		//			//launcher.launchManager("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
 		//
-		//			//			MIDletRespository rep = new MIDletRespository("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
+		//			//			MIDletRepository rep = new MIDletRepository("E:/Development/eclipse-3.2/workspace/mipd2-sdl-test/deployed/");
 		//			//			System.out.println(rep.getInstallDirectory("mipd2-sdl-test.jar"));
 		//		} catch (Exception e) {
 		//			e.printStackTrace();
@@ -362,13 +362,13 @@ class J2SEMIDletClassLoader implements MIDletClassLoader {
 	}
 }
 
-class MIDletRespository {
+class MIDletRepository {
 
 	private File repositoryDir;
 	private Vector installedJars = new Vector();
 	private Vector notInstalledJars = new Vector();
 
-	public MIDletRespository(String path) {
+	public MIDletRepository(String path) {
 		repositoryDir = new File(path);
 		repositoryDir = repositoryDir.getAbsoluteFile();
 	}

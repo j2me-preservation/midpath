@@ -52,7 +52,7 @@ public class SuiteManagerMIDlet extends MIDlet implements CommandListener, ItemC
 
 	private Display display;
 	private Form mainForm;
-	private MIDletRespository repository;
+	private MIDletRepository repository;
 	private ChoiceGroup installedGroup;
 	private ChoiceGroup notInstalledGroup;
 	private List midletList;
