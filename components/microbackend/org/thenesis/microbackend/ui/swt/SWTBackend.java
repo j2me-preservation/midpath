@@ -51,13 +51,12 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 	private Runnable painterRunnable;
 	private Display display;
 	private Shell shell;
-	
+
 	private Thread swtThread;
-	private volatile boolean initialized = false;
-	
+
 	private int canvasWidth;
 	private int canvasHeight;
-	
+
 	private BackendEventListener listener = new NullBackendEventListener();
 
 	public SWTBackend(int w, int h) {
@@ -116,20 +115,26 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 
 		swtThread = new Thread(this);
 		swtThread.start();
-
-		// FIXME Ugly
-		try {
-			while (!initialized) {
-				Thread.sleep(1);
+		
+		// Wait until SWT initialization is done in the SWT thread
+		synchronized (this) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		} catch (InterruptedException e) {
-			// Do nothing
 		}
 
 	}
 
 	private void stop() {
-		shell.dispose();
+		if (!shell.isDisposed()) {
+			display.syncExec(new Runnable() {
+				public void run() {
+					shell.dispose();
+				}
+			});
+		}
 	}
 
 	public void run() {
@@ -148,7 +153,6 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		gc = new GC(canvas);
 
 		painterRunnable = new Runnable() {
-
 			public void run() {
 				image = new Image(display, imageData);
 				gc.drawImage(image, 0, 0);
@@ -164,7 +168,10 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		shell.pack();
 		shell.open();
 
-		initialized = true;
+		// Notify the main thread that SWT initialization is done
+		synchronized (this) {
+			notify();
+		}
 
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
@@ -173,26 +180,24 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		display.dispose();
 
 	}
-	
 
 	public void keyPressed(KeyEvent e) {
 		//System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + e.character);
 		char c = e.character;
 		int keyCode = e.keyCode;
-		
+
 		if (c == 0) {
 			listener.keyPressed(convertKeyCode(keyCode), KeyConstants.CHAR_UNDEFINED, 0);
 		} else {
 			listener.keyPressed(convertCharToKeyCode(c), c, 0);
 		}
-		
 	}
 
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("[DEBUG] SWTBackend.keyReleased(): key code: " + e.keyCode + " char: " + e.character);
 		char c = e.character;
 		int keyCode = e.keyCode;
-		
+
 		if (c == 0) {
 			listener.keyReleased(convertKeyCode(keyCode), KeyConstants.CHAR_UNDEFINED, 0);
 		} else {
@@ -208,7 +213,7 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		// Not used
 	}
 
-	public void mouseDown(MouseEvent e) {	
+	public void mouseDown(MouseEvent e) {
 		//System.out.println("[DEBUG] SWTBackend.mouseDown()");
 		listener.mousePressed(e.x, e.y, 0);
 	}
@@ -228,7 +233,7 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 	}
 
 	protected static int convertKeyCode(int keyCode) {
-		
+
 		// First check if it's a SWT key code
 		switch (keyCode) {
 		case SWT.ARROW_UP:
@@ -331,17 +336,17 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 			return KeyConstants.VK_UNDEFINED;
 		}
 	}
-	
+
 	protected static int convertCharToKeyCode(char c) {
-		
+
 		if (((c >= '0') && (c <= '9')) || ((c >= 'A') && (c <= 'Z'))) {
-    		return c;
-    	} 
-		
+			return c;
+		}
+
 		if (((c >= 'a') && (c <= 'z'))) {
 			return c - 0x20;
 		}
-		
+
 		switch (c) {
 		case '@':
 			return KeyConstants.VK_AT;
@@ -354,13 +359,13 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		case ']':
 			return KeyConstants.VK_CLOSE_BRACKET;
 		case ':':
-			return KeyConstants.VK_COLON ;
+			return KeyConstants.VK_COLON;
 		case ',':
-			return KeyConstants.VK_COMMA ;
+			return KeyConstants.VK_COMMA;
 		case '$':
-			return KeyConstants.VK_DOLLAR ;
+			return KeyConstants.VK_DOLLAR;
 		case '=':
-			return KeyConstants.VK_EQUALS ;
+			return KeyConstants.VK_EQUALS;
 		case '!':
 			return KeyConstants.VK_EXCLAMATION_MARK;
 		case '(':
@@ -368,19 +373,19 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		case '-':
 			return KeyConstants.VK_MINUS;
 		case '*':
-			return KeyConstants.VK_MULTIPLY ;
+			return KeyConstants.VK_MULTIPLY;
 		case '#':
-			return KeyConstants.VK_NUMBER_SIGN ;
+			return KeyConstants.VK_NUMBER_SIGN;
 		case '[':
 			return KeyConstants.VK_OPEN_BRACKET;
 		case '.':
-			return KeyConstants.VK_PERIOD ;
+			return KeyConstants.VK_PERIOD;
 		case '+':
 			return KeyConstants.VK_PLUS;
 		case ')':
 			return KeyConstants.VK_RIGHT_PARENTHESIS;
 		case ';':
-			return KeyConstants.VK_SEMICOLON ;
+			return KeyConstants.VK_SEMICOLON;
 		case '/':
 			return KeyConstants.VK_SLASH;
 		case '_':
