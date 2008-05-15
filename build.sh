@@ -87,6 +87,7 @@ QT3_ENABLED=no
 QT4_ENABLED=no
 SDL_ENABLED=no
 FB_ENABLED=no
+BT_ENABLED=no
 
 #==========================================
 # You should not change anything below
@@ -94,7 +95,7 @@ FB_ENABLED=no
 
 OPTIONS="\
 help,\
-sdl,alsa,esd,pulseaudio,gtk,qt3,qt4,qtopia4,fb,\
+sdl,alsa,esd,pulseaudio,gtk,qt3,qt4,qtopia4,fb,bt,\
 \
 enable-hildon,\
 enable-fastjar,\
@@ -167,6 +168,7 @@ while true; do
 		    echo "  --qt4       : Compile Qt4 native code (default: no)"
 		    echo "  --qtopia4   : Compile Qtopia4 native code (default: no)"
 		    echo "  --fb        : Compile Linux framebuffer native code (default: no)"
+		    echo "  --bt        : Compile AvetanaBT native code (default: no)"
 	    	echo
 	    	echo "Misc. build options:"
 	    	echo "  --enable-hildon           : Compile gtk support library with hildon support (default: no)"
@@ -260,6 +262,9 @@ while true; do
 	      shift ;;
 		--fb ) FB_ENABLED=yes
 				echo "FB enabled"
+	      shift ;;
+		--fb ) BT_ENABLED=yes
+				echo "Bluetooth library native compilation enabled"
 	      shift ;;
 		--enable-hildon ) HILDON_ENABLED=yes
 				echo "hildon support enabled"
@@ -713,8 +718,11 @@ else
   build_native $QT4_ENABLED native/microbackend/qt 
 fi
 
+# Build the Linux framebuffer native part
+build_native $FB_ENABLED native/microbackend/fb
+
 # Build the SDLJava native part
 build_native $SDL_ENABLED external/sdljava-cldc/native
 
-# Build the Linux framebuffer native part
-build_native $FB_ENABLED native/microbackend/fb
+# Build the Bluetooth library native part
+build_native $BT_ENABLED external/avetanabt-cldc/native
