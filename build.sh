@@ -2,7 +2,7 @@
 # Usage: type ./build.sh --help
 
 # Default commands and library locations
-JAVAC_CMD=ecj
+JAVAC_CMD=javac
 JAR_CMD=jar
 JAR_FLAGS=cvf
 FASTJAR_ENABLED=no
@@ -698,6 +698,12 @@ if [ "$HILDON_ENABLED" = "yes" ]; then
 else
   build_native $GTK_ENABLED native/microbackend/gtk
 fi
+
+# Build native file part
+build_native yes native/file
+
+# Build native nio part
+build_native yes native/nio
 
 # Build the ALSA native part
 build_native $ALSA_ENABLED native/alsa
