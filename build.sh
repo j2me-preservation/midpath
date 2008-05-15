@@ -263,7 +263,7 @@ while true; do
 		--fb ) FB_ENABLED=yes
 				echo "FB enabled"
 	      shift ;;
-		--fb ) BT_ENABLED=yes
+		--bt ) BT_ENABLED=yes
 				echo "Bluetooth library native compilation enabled"
 	      shift ;;
 		--enable-hildon ) HILDON_ENABLED=yes
