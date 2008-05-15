@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Adapt the next line to your environment
-JAVA_CMD=cacao
+JAVA_CMD="/vdr/green/midstuff/i686/bin/cacao"
 
 if [ ! $MIDPATH_HOME ]; then
   MIDPATH_HOME=$(pwd)/..
@@ -28,7 +28,7 @@ fi
 
 # Path of the native libraries
 JLP=$MIDPATH_HOME/dist
-export LD_LIBRARY_PATH=$JLP 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JLP 
 
 # System properties required by MIDP2 and JSR specs
 source $MIDPATH_HOME/configuration/com/sun/midp/configuration/system_properties
