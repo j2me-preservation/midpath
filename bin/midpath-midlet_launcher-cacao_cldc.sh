@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Adapt the next line to your environment
-JAVA_CMD="/vdr/green/midstuff/i686/bin/cacao"
+JAVA_CMD=cacao
 
 if [ ! $MIDPATH_HOME ]; then
   MIDPATH_HOME=$(pwd)/..
@@ -19,10 +19,10 @@ BCP=$MIDPATH_HOME/dist/cldc1.1.jar:$MIDPATH_HOME/dist/midpath.jar:$MIDPATH_HOME/
 
 # Parse the arguments
 if [ $1 = "-jar" ]; then
- CP=$CP:$2
+ BCP=$BCP:$2
  ARGS="$1 $2"
 else
- CP=$CP:$1
+ BCP=$BCP:$1
  ARGS="$2 $3"
 fi
 
