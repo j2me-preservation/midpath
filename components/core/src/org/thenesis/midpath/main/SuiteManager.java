@@ -270,7 +270,29 @@ public class SuiteManager {
 
 		try {
 			SuiteManager launcher = new SuiteManager();
-			launcher.launchManager();
+			if (args.length > 0) {
+				if (args[0].equals("-i") || args[0].equals("--install")) {
+					repository.scanRepository();
+					try {
+						String repositoryAbsolutePath = new File(repositoryPath).getAbsolutePath();
+						if (repository.installJar(args[1])) {
+							System.out.println(args[1] + " was installed in " + repositoryAbsolutePath);
+						} else {
+							System.out.println(args[1] + " is already installed in " + repositoryAbsolutePath);
+						}
+					} catch (IOException e) {
+						System.out.println("Error: " + args[1] + " can't be installed");
+						e.printStackTrace();
+						System.exit(1);
+					}		
+				} else {
+					System.out.println("Usage:");
+					System.out.println(" java org.thenesis.midpath.main.SuiteManager");
+					System.out.println(" java org.thenesis.midpath.main.SuiteManager [-i|--install] <jar-name>");
+				}
+			} else {
+				launcher.launchManager();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -449,19 +471,27 @@ class MIDletRepository {
 		return null;
 	}
 
-	public void installJar(String fileName) throws IOException {
+	/**
+	 * 
+	 * @param fileName
+	 * @return true if the jar is already installed, false otherwise
+	 * @throws IOException
+	 */
+	public boolean installJar(String fileName) throws IOException {
 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] J2SEMidletSuiteLauncher.installJar(): " + notInstalledJars.size());
-
+		
 		for (int i = 0; i < notInstalledJars.size(); i++) {
 			JarInspectorSE jar = (JarInspectorSE) notInstalledJars.elementAt(i);
 			File file = jar.getFile();
 			if (file.getName().equals(fileName)) {
 				installJar(jar);
-				break;
+				return true;
 			}
 		}
+		
+		return false;
 	}
 
 	private void installJar(JarInspectorSE jar) throws IOException {
