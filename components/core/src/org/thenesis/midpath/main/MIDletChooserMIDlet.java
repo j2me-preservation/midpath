@@ -49,6 +49,7 @@ public class MIDletChooserMIDlet extends MIDlet implements CommandListener {
 		display = Display.getDisplay(this);
 
 		midletList = new List("MIDlets", List.IMPLICIT);
+		midletList.addCommand(CMD_EXIT);
 		//midletList.addCommand(CMD_START_MIDLET);
 		midletList.setCommandListener(this);  
 		midletList.setSelectCommand(CMD_START_MIDLET);
