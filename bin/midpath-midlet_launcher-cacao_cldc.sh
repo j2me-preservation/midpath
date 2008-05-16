@@ -32,10 +32,11 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JLP
 
 # System properties required by MIDP2 and JSR specs
 source $MIDPATH_HOME/configuration/com/sun/midp/configuration/system_properties
-SYSTEM_PROPERTIES=$SYSTEM_PROPERTIES:" -Djavax.microedition.io.Connector.protocolpath=com.sun.midp.io -Dfile.separator=/"
+
+SYSTEM_PROPERTIES="-Dcom.sun.midp.io.backend=CLDC ${SYSTEM_PROPERTIES} -Dfile.separator=/"
 
 CLASS=org.thenesis.midpath.main.MIDletLauncher
 
 # Note: "-Xbootclasspath/c" argument prepends vm.zip (created at cacao compile time) to the bootclasspath. Use "-Xbootclasspath" instead if you need to override it.
-$JAVA_CMD -Xbootclasspath/c:${BCP} "${SYSTEM_PROPERTIES}" ${CLASS} ${ARGS}
+$JAVA_CMD -Xbootclasspath/c:${BCP} ${SYSTEM_PROPERTIES} ${CLASS} ${ARGS}
 

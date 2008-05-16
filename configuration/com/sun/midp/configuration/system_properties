@@ -15,10 +15,10 @@ SYSTEM_PROPERTIES="\
 -Dsupports.audio.capture=false \
 -Dsupports.video.capture=false \
 -Dsupports.recording=false \
--Daudio.encodings='encoding=audio/wav encoding=audio/x-wav encoding=pcm encoding=audio/mp3 encoding=audio/ogg' \
--Dvideo.snapshot.encodings='encoding=png encoding=image/png' \
+-Daudio.encodings="encoding=audio/wav encoding=audio/x-wav encoding=pcm encoding=audio/mp3 encoding=audio/ogg" \
+-Dvideo.snapshot.encodings="encoding=png encoding=image/png" \
 -Dvideo.encodings= \
--Dstreamable.contents='encoding=audio/wav encoding=audio/x-wav encoding=pcm encoding=audio/mp3 encoding=audio/ogg' \
+-Dstreamable.contents="encoding=audio/wav encoding=audio/x-wav encoding=pcm encoding=audio/mp3 encoding=audio/ogg" \
 -Dmicroedition.io.file.FileConnection.version=1.0 \
 -DBluetooth.api.version=1.1 \
 -Dobex.api.version=1.1 \

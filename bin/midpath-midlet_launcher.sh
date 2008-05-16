@@ -32,7 +32,10 @@ JLP=$MIDPATH_HOME/dist
 # System properties required by MIDP2 and JSR specs
 source $MIDPATH_HOME/configuration/com/sun/midp/configuration/system_properties
 
+SYSTEM_PROPERTIES="-Dcom.sun.midp.io.backend=J2SE ${SYSTEM_PROPERTIES}"
+
 CLASS=org.thenesis.midpath.main.MIDletLauncher
 
-$JAVA_CMD -Djava.library.path=${JLP} "${SYSTEM_PROPERTIES}" -cp ${CP} ${CLASS} ${ARGS}
+
+$JAVA_CMD -Djava.library.path=${JLP} -cp ${CP} ${SYSTEM_PROPERTIES} ${CLASS} ${ARGS}
 
