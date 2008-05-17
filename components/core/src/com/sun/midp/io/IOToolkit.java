@@ -13,7 +13,7 @@ public class IOToolkit {
 	private String backendName;
 
 	private IOToolkit() {
-		backendName = Configuration.getPropertyDefault("com.sun.midp.io.backend", "null");
+		backendName = Configuration.getPropertyDefault("com.sun.midp.io.backend", "J2SE");
 	}
 
 	public BaseFileHandler createBaseFileHandler() {
