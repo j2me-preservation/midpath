@@ -29,13 +29,6 @@ public class MIDletLauncher {
 
 	public static void main(String[] args) {
 
-		if (args.length < 1) {
-			System.out.println("Usage:");
-			System.out.println("java org.thenesis.midpath.main.MIDletLauncher <midlet-class-name> [midlet-name]");
-			System.out.println("java org.thenesis.midpath.main.MIDletLauncher -jar <absolute-jar-path>");
-			System.exit(1);
-		}
-
 		MIDletLauncher launcher = new MIDletLauncher();
 		try {
 			launcher.launch(args);
@@ -45,8 +38,20 @@ public class MIDletLauncher {
 		}
 
 	}
+	
+	private void checkArguments(String[] args) {
+		if (args.length < 1) {
+			System.out.println("Usage:");
+			System.out.println("java org.thenesis.midpath.main.MIDletLauncher <midlet-class-name> [midlet-name]");
+			System.out.println("java org.thenesis.midpath.main.MIDletLauncher -jar <absolute-jar-path>");
+			System.exit(1);
+		}
+	}
 
 	public void launch(String[] args) throws Exception {
+		
+		// Check command arguments
+		checkArguments(args);
 
 		if (args.length == 2) {
 			if (args[0].equals("-jar")) {
