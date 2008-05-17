@@ -29,11 +29,7 @@ fi
 # Path of the native libraries
 JLP=$MIDPATH_HOME/dist
 
-# System properties required by MIDP2 and JSR specs
-source $MIDPATH_HOME/configuration/com/sun/midp/configuration/system_properties
-SYSTEM_PROPERTIES="${SYSTEM_PROPERTIES}"
+CLASS=org.thenesis.midpath.main.MIDletLauncherSE
 
-CLASS=org.thenesis.midpath.main.MIDletLauncher
-
-$JAVA_CMD -Djava.library.path=${JLP} -cp ${CP} ${SYSTEM_PROPERTIES} ${CLASS} ${ARGS}
+$JAVA_CMD -Djava.library.path=${JLP} -cp ${CP} ${CLASS} ${ARGS}
 

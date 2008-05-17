@@ -30,13 +30,54 @@ fi
 JLP=$MIDPATH_HOME/dist
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JLP 
 
-# System properties required by MIDP2 and JSR specs
-source $MIDPATH_HOME/configuration/com/sun/midp/configuration/system_properties
-
-SYSTEM_PROPERTIES="-Dcom.sun.midp.io.backend=CLDC ${SYSTEM_PROPERTIES} -Dfile.separator=/"
-
 CLASS=org.thenesis.midpath.main.MIDletLauncher
 
-# Note: "-Xbootclasspath/c" argument prepends vm.zip (created at cacao compile time) to the bootclasspath. Use "-Xbootclasspath" instead if you need to override it.
-$JAVA_CMD -Xbootclasspath/c:${BCP} ${SYSTEM_PROPERTIES} ${CLASS} ${ARGS}
+# Notes: 
+# "-Xbootclasspath/c" argument prepends vm.zip (created at cacao compile time) to the bootclasspath. Use "-Xbootclasspath" instead if you need to override it.
+# System properties required by MIDP2 and JSR specs are loaded with the help of the VM
+# com.sun.midp.io.backend=CLDC overrides value in the configuration file
+$JAVA_CMD -Xbootclasspath/c:${BCP} \
+-Djavax.microedition.io.Connector.protocolpath=com.sun.midp.io \
+-Dmicroedition.profiles=MIDP-2.0 \
+-Dmicroedition.configuration=CLDC-1.1 \
+-Dmicroedition.locale=en-US \
+-Dmicroedition.platform=generic \
+-Dmicroedition.encoding=ISO8859_1 \
+-Dmicroedition.hostname=localhost \
+-Dmicroedition.commports= \
+-Dmicroedition.jtwi.version=1.0 \
+-Dmicroedition.media.version=1.1 \
+-Dsupports.mixing=true \
+-Dsupports.audio.capture=false \
+-Dsupports.video.capture=false \
+-Dsupports.recording=false \
+-Daudio.encodings="encoding=audio/wav encoding=audio/x-wav encoding=pcm encoding=audio/mp3 encoding=audio/ogg" \
+-Dvideo.snapshot.encodings="encoding=png encoding=image/png" \
+-Dvideo.encodings= \
+-Dstreamable.contents="encoding=audio/wav encoding=audio/x-wav encoding=pcm encoding=audio/mp3 encoding=audio/ogg" \
+-Dmicroedition.io.file.FileConnection.version=1.0 \
+-DBluetooth.api.version=1.1 \
+-Dobex.api.version=1.1 \
+-Dbluetooth.l2cap.receiveMTU.max=1024 \
+-Dbluetooth.master.switch=true \
+-Dbluetooth.connected.devices.max=6 \
+-Dbluetooth.sd.trans.max=8 \
+-Dbluetooth.sd.attr.retrievable.max=16 \
+-Dbluetooth.connected.inquiry=true \
+-Dbluetooth.connected.inquiry.scan=true \
+-Dbluetooth.connected.page=true \
+-Dbluetooth.connected.page.scan=true \
+-Dmicroedition.m3g.version=1.1 \
+-Dmicroedition.location.version=1.1 \
+-Dmicroedition.m2g.version=1.1 \
+-Dmicroedition.m2g.svg.version=1.1 \
+-Dmicroedition.m2g.svg.baseProfile=tiny \
+-Dxml.jaxp.subset.version=1.0 \
+-Dxml.rpc.subset.version=1.0 \
+-Dwireless.messaging.version=2.0 \
+-Dwireless.messaging.sms.smsc=+17815511212 \
+-Dwireless.messaging.mms.mmsc=+17815511212 \
+-Dfile.separator=/ \
+-Dcom.sun.midp.io.backend=CLDC \
+${CLASS} ${ARGS}
 
