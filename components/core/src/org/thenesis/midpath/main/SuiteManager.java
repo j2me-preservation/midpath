@@ -38,13 +38,15 @@ public class SuiteManager {
 	static MIDletRepository repository;
 	static String repositoryPath;
 
-	static {
+	public SuiteManager() {
+		
+		// Load system properties required by MIDP2 and JSR specs
+		MIDletLauncherSE.callSystemPropertiesLoader();
+		
+		// Initialize repository stuff
 		repositoryPath = Configuration.getPropertyDefault("org.thenesis.midpath.main.repositoryPath", "");
 		//System.out.println("repositoryPath: " + repositoryPath);
 		repository = new MIDletRepository(repositoryPath);
-	}
-
-	public SuiteManager() {
 	}
 
 	public void launchManager() throws Exception {

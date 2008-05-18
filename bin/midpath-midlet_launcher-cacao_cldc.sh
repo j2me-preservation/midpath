@@ -41,7 +41,7 @@ $JAVA_CMD -Xbootclasspath/c:${BCP} \
 -Dmicroedition.profiles=MIDP-2.0 \
 -Dmicroedition.configuration=CLDC-1.1 \
 -Dmicroedition.locale=en-US \
--Dmicroedition.platform=generic \
+-Dmicroedition.platform=j2me \
 -Dmicroedition.encoding=ISO8859_1 \
 -Dmicroedition.hostname=localhost \
 -Dmicroedition.commports= \
