@@ -23,7 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <gtk/gtk.h>
-#include <hildon-widgets/hildon-program.h>
+#include <hildon/hildon-program.h>
+#include <hildon/hildon-window.h>
 
 #include "../midpath_ui_peer.h"
 #include "../midpath_ui_backend.h"
