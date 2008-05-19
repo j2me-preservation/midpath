@@ -2,8 +2,8 @@ JNI_INCLUDE = -I/usr/include/classpath
 
 ifdef HILDON
 # Gtk in Hildon AF
-MY_CFLAGS = `pkg-config --cflags gtk+-2.0 libhildon` $(JNI_INCLUDE) $(CFLAGS)
-MY_LDFLAGS = `pkg-config --libs gtk+-2.0 libhildon` $(LDFLAGS)
+MY_CFLAGS = `pkg-config --cflags gtk+-2.0 hildon-1` $(JNI_INCLUDE) $(CFLAGS)
+MY_LDFLAGS = `pkg-config --libs gtk+-2.0 hildon-1` $(LDFLAGS)
 
 SOURCES=org_thenesis_microbackend_ui_gtk_GTKBackend.c maemo/maemo_input.c
 
