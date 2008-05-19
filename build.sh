@@ -2,7 +2,7 @@
 # Usage: type ./build.sh --help
 
 # Default commands and library locations
-JAVAC_CMD=javac
+JAVAC_CMD=ecj
 JAR_CMD=jar
 JAR_FLAGS=cvf
 FASTJAR_ENABLED=no

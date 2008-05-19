@@ -14,52 +14,25 @@ Step 2: Set the Java environment
 * Install your favorite JVM
 
  - JamVM 
- 	
  	# apt-get install jamvm
-
  - Kaffe 
-
     # apt-get install kaffe
-
  - Cacao 
-
     # apt-get install cacao
-    
-  - Cacao-cldc: See "How to compile cacao-cldc for MIDPath" below 
+ - Cacao-cldc: See "How to compile cacao-cldc for MIDPath" below 
 
-Step 3: Install Classpath (not needed if you use Kaffe or cacao-cldc)
----------------------------------------------------------------------
+Step 3: Install Classpath
+--------------------------
 	
-	# apt-get install classpath-common
-	
-Step 4: Compile the native backends
------------------------------------
+# apt-get install classpath-common
 
-Compile the native part for the chosen backends ($MIDPATH_HOME/native directory)
-
-For GTK:
-
-# cd $MIDPATH_HOME/native/gtk
-# make
-# cp *.so $MIDPATH_HOME/dist
-
-Note:
-
-* The SDL backend native part is in a specific directory: $MIDPATH_HOME/external/sdljava/native
-* There is no native part for the AWT backend because it's provided by Classpath
-* Maybe you have to adapt the Makefile to your compilation environment and set cflags at hand instead of using pkg-config if it's not available to you.
-* If you use cross-compilation, set your CC variable adequately in the Makefile or in the make command line. 
-
-Step 5: Configure your MIDP2 environment
+Step 4: Configure your MIDP2 environment
 ----------------------------------------
 
-Modify configuration.cfg file in resources-embedded/com/sun/midp/configuration/ directory
+Modify configuration.cfg file in configuration/com/sun/midp/configuration/ directory
+Set the screen size and choose your backend (see below). 
 
-Set the screen size and choose your backend (see below).
-
-(note: do not modify the parameter javax.microedition.lcdui.toolkit. Let it to "virtual" value)
-
-Default configuration file:
+Extract of the configuration file:
 
 	##========================================
 	## Graphics parameters
@@ -76,58 +49,21 @@ Default configuration file:
 	##======================================
 	# Possible backend values: NULL, SDL, AWT, AWT_GRABBER, SWT, X11, GTK, QT
 	org.thenesis.midpath.ui.backend:AWT
-	# SDL backend configuration.
-	# Possible bitsPerPixels values: 8, 16, 32
-	# Possible video mode values: SW, HW (i.e software, hardware)
-	org.thenesis.midpath.ui.backend.sdl.bitsPerPixel:32
-	org.thenesis.midpath.ui.backend.sdl.videoMode:SW
-	# X11 backend configuration.
-	# Display value examples: :0.0, 192.168.0.1:1.0
-	org.thenesis.midpath.ui.backend.x11.Display::0.0
-	# Possible fontRenderer values: raw, BDF
-	org.thenesis.midpath.ui.fontRenderer:raw
-	org.thenesis.midpath.font.bdf.filename:VeraMono-12-8.bdf
-	
-	##==========================
-	## Parameters for the sound
-	##==========================
-	# Sound configuration (possible values: SDL, virtual)
-	# The "player" parameter should be set to "virtual" unless you know what you do.
-	# The virtual engine requires this hardware configuration: 16 bits, stereo, little endian
-	org.thenesis.midpath.sound.engine:virtual
-	# Possible sound backend values: NULL, ALSA, ESD, PulseAudio
-	org.thenesis.midpath.sound.backend:NULL
-	org.thenesis.midpath.sound.device:default
-	org.thenesis.midpath.sound.sampleRate:44100
-	# Buffer size MUST be a power of two
-	org.thenesis.midpath.sound.bufferSize:8192
-	
-	##======================================
-	## Event parameters
-	##======================================
-	javax.microedition.lcdui.pointerSupported:true
-	javax.microedition.lcdui.pointerMotionSupported:true
-	
-	##======================================
-	## Filesystem parameters
-	##======================================
-	# The RMS root path (if not defined, records are read/written in the current directory)
-	com.sun.midp.rms.rootPath:
-	
-	##======================================
-	## MIDlet Manager (J2SE only)
-	##======================================
-	# The MIDlet repository path (if not defined, MIDlets are searched in the current directory)
-	org.thenesis.midpath.main.repositoryPath:
 
-Step 6: Start the test MIDlet
------------------------------
+Notes: 
+ - Do not modify the parameter javax.microedition.lcdui.toolkit. Let it to "virtual" value)
+ - If don't use the AWT backend, you'll need a native one (see "Compile the native backends")
+
+Step 5: Start the demo MIDlet suite
+------------------------------------
 
 # cd $MIDPATH_HOME/bin
-# chmod u+x midpath-test.sh
-# ./midpath-test.sh
+# chmod u+x midpath-demo.sh midpath-midlet_launcher.sh
+# ./midpath-demo.sh
 
-For cacao-cldc, use the midpath-test-cacao-cldc.sh script
+Notes:
+ - You may have to change the java command in the midpath-midlet_launcher.sh script
+ - For cacao-cldc, adapt the midpath-demo.sh script to use midpath-midlet_launcher-cacao_cldc.sh
 
 Install from the source repository
 ==================================
@@ -153,7 +89,10 @@ Step C : Build
 # chmod u+x build.sh
 # ./build.sh
 
-Now complete steps 2, 4, 5 and 6
+Note:
+ - For cacao-cldc, use this command instead : ./build.sh --enable-cldc-vm
+
+Now complete steps 2, 4 and 5
 
 How to compile cacao-cldc for MIDPath
 =====================================
@@ -168,14 +107,28 @@ Compile cacao-cldc
 
 * Grab cacao sources from SVN 
 
-# svn co svn://c1.complang.tuwien.ac.at/ahome/cacao/svn/cacao/trunk cacao
+# hg clone http://mips.complang.tuwien.ac.at/hg/cacao/
 
 * Compile cacao-cldc 
 
-# ./configure --prefix=/install/cacao-cldc --enable-java=cldc1.1 \
- --with-classpath=cldc1.1 --with-classpath-classes=$MIDPATH_HOME/dist/cldc1.1.jar \
- --with-classpath-includedir=/install/classpath/include --enable-jni
+# cd cacao
+# ./configure --prefix=/install/cacao-cldc \
+--enable-java=cldc1.1 --with-java-runtime-library=cldc1.1 \
+--with-java-runtime-library-classes=$MIDPATH_HOME/dist/cldc1.1.jar \
+--with-jni_h=/install/classpath/include \
+--with-jni_md_h=/install/classpath/include \
+--enable-jni --enable-annotations=no --enable-assertion=no
 # make
 # make install
 
-(adapted from "Howto build CACAO for CLDC1.1") on the cacao wiki.
+Compile the native backends
+============================
+
+Type ./build.sh --help to get the list of available backends 
+
+For example, to compile GTK and ALSA:
+# ./build.sh --gtk --alsa
+
+Note:
+The build script always builds the java part by default. You can prevent it by 
+modifying flags on top of the script.

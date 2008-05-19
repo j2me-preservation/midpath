@@ -1,3 +1,21 @@
+0.3rc1 (19/05/2008)
+-------------------
+
+* Added J2ME Web Services API (JSR172)
+* Added Location API (JSR179)
+* Added Wireless Messaging API (JSR205) (not functional yet)
+* Added Scalable 2D Vector Graphics API (JSR226)
+* Added OpenGL ES 1.0 API (JSR239)
+* Added Mobile 3D Graphics API (JSR184)
+* New build system (contributed by Robert Schuster)
+* Added Qtopia4 support (contributed by Henning Heinold)
+* Improved UI look & feel
+* Added new demos
+
+Contributions:
+- Robert Schuster
+- Henning Heinold
+
 0.2 (28/11/2007)
 ----------------
 
