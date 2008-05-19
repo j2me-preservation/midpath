@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * Copyright (C) Sebastian Mancke
  * 
@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA  
  */
+ 
 #include "midpath_ui_peer.h"
 
 void key_entered(int eventtype, int keycode, int unicode_character);

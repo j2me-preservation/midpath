@@ -1,7 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
- * 
- * Tritonus - Copyright (C) 1999 - 2002 by Matthias Pfisterer <Matthias.Pfisterer@gmx.de>
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -10,14 +8,12 @@
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License version 2 for more details (a copy is
- * included at /legal/license.txt). 
+ * General Public License version 2 for more details. 
  * 
  * You should have received a copy of the GNU General Public License
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
- *
  */
 package org.thenesis.midpath.sound.backend.esd;
 

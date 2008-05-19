@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA 
+ * 02110-1301 USA  
  */
 package org.thenesis.microbackend.ui.x11;
 

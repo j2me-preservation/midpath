@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -8,17 +8,12 @@
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License version 2 for more details (a copy is
- * included at /legal/license.txt). 
+ * General Public License version 2 for more details. 
  * 
  * You should have received a copy of the GNU General Public License
  * version 2 along with this work; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
- * 
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa
- * Clara, CA 95054 or visit www.sun.com if you need additional
- * information or have any questions. 
  */
 package org.thenesis.midpath.io.backend.cldc;
 

@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version
@@ -15,7 +15,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA  
  */
-
 package org.thenesis.microbackend.ui;
 
 public class KeyConstants {

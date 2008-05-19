@@ -1,5 +1,5 @@
 /*
- * MIDPath - Copyright (C) 2006-2007 Guillaume Legris, Mathieu Legris
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
  * 
  * Tritonus - Copyright (C) 1999 - 2002 by Matthias Pfisterer <Matthias.Pfisterer@gmx.de>
  * 
