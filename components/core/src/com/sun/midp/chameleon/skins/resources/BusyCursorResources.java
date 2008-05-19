@@ -29,43 +29,35 @@ import com.sun.midp.chameleon.skins.BusyCursorSkin;
 import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 
 public class BusyCursorResources {
-    private static boolean init;
-    
-    // private constructor
-    private BusyCursorResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        BusyCursorSkin.WIDTH = SkinResources.getInt(
-                SkinPropertiesIDs.BUSYCRSR_WIDTH);
-        BusyCursorSkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.BUSYCRSR_HEIGHT);
-        BusyCursorSkin.NUM_FRAMES = SkinResources.getInt(
-                SkinPropertiesIDs.BUSYCRSR_NUM_FRAMES);
-        BusyCursorSkin.FRAME_X = SkinResources.getInt(
-                SkinPropertiesIDs.BUSYCRSR_FRAME_X);
-        BusyCursorSkin.FRAME_Y = SkinResources.getInt(
-                SkinPropertiesIDs.BUSYCRSR_FRAME_Y);
-        BusyCursorSkin.FRAME_SEQUENCE = SkinResources.getNumbersSequence(
-                SkinPropertiesIDs.BUSYCRSR_FRAME_SEQU);
-        BusyCursorSkin.IMAGE_BG = SkinResources.getImage(
-                SkinPropertiesIDs.BUSYCRSR_IMAGE_BG);
-        BusyCursorSkin.IMAGE_FRAME = SkinResources.getCompositeImage(
-            SkinPropertiesIDs.BUSYCRSR_IMAGE_FRAME, 
-            BusyCursorSkin.NUM_FRAMES);
+	private static boolean init;
 
-        init = true;
-    }
-    
+	// private constructor
+	private BusyCursorResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		BusyCursorSkin.WIDTH = SkinResources.getInt(SkinPropertiesIDs.BUSYCRSR_WIDTH);
+		BusyCursorSkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.BUSYCRSR_HEIGHT);
+		BusyCursorSkin.NUM_FRAMES = SkinResources.getInt(SkinPropertiesIDs.BUSYCRSR_NUM_FRAMES);
+		BusyCursorSkin.FRAME_X = SkinResources.getInt(SkinPropertiesIDs.BUSYCRSR_FRAME_X);
+		BusyCursorSkin.FRAME_Y = SkinResources.getInt(SkinPropertiesIDs.BUSYCRSR_FRAME_Y);
+		BusyCursorSkin.FRAME_SEQUENCE = SkinResources.getNumbersSequence(SkinPropertiesIDs.BUSYCRSR_FRAME_SEQU);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			BusyCursorSkin.IMAGE_BG = SkinResources.getImage(SkinPropertiesIDs.BUSYCRSR_IMAGE_BG);
+			BusyCursorSkin.IMAGE_FRAME = SkinResources.getCompositeImage(SkinPropertiesIDs.BUSYCRSR_IMAGE_FRAME,
+					BusyCursorSkin.NUM_FRAMES);
+		}
+
+		init = true;
+	}
+
 }
-
-
-

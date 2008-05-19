@@ -30,55 +30,45 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 
 /** Resources for predictive text input layer */
 public class PTIResources {
-    /** Flag indicated if resources have been already loaded */
-    private static boolean init;
+	/** Flag indicated if resources have been already loaded */
+	private static boolean init;
 
-    /** Private constructor */
-    private PTIResources() {
-    }
-     
-    /** Load pti resources. Do nothing if they have been already loaded */
-    public static void load() {
-        load(false);
-    }
-        
-    /**
-     *  Load pti resources.
-     * @param reload if true resources are being loaded even if the
-     * initialization has been already done. In case of false don't
-     * reload the resources 
-     */
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        PTISkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_HEIGHT);
-        PTISkin.WIDTH = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_WIDTH);
-        PTISkin.MARGIN = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_MARGIN);
-        PTISkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_COLOR_BG);
-        PTISkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_COLOR_FG);
-        PTISkin.COLOR_FG_HL = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_COLOR_FG_HL);
-        PTISkin.COLOR_BG_HL = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_COLOR_BG_HL);
-        PTISkin.COLOR_BDR = SkinResources.getInt(
-                SkinPropertiesIDs.PTI_COLOR_BDR);
-        PTISkin.FONT = SkinResources.getFont(
-                SkinPropertiesIDs.PTI_FONT);
-        PTISkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.PTI_IMAGE_BG, 3);
-        PTISkin.LEFT_ARROW = SkinResources.getImage(
-                SkinPropertiesIDs.PTI_LEFT_ARROW);
-        PTISkin.RIGHT_ARROW = SkinResources.getImage(
-                SkinPropertiesIDs.PTI_RIGHT_ARROW);
+	/** Private constructor */
+	private PTIResources() {
+	}
 
-        init = true;
-    }
+	/** Load pti resources. Do nothing if they have been already loaded */
+	public static void load() {
+		load(false);
+	}
+
+	/**
+	 *  Load pti resources.
+	 * @param reload if true resources are being loaded even if the
+	 * initialization has been already done. In case of false don't
+	 * reload the resources 
+	 */
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		PTISkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.PTI_HEIGHT);
+		PTISkin.WIDTH = SkinResources.getInt(SkinPropertiesIDs.PTI_WIDTH);
+		PTISkin.MARGIN = SkinResources.getInt(SkinPropertiesIDs.PTI_MARGIN);
+		PTISkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.PTI_COLOR_BG);
+		PTISkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.PTI_COLOR_FG);
+		PTISkin.COLOR_FG_HL = SkinResources.getInt(SkinPropertiesIDs.PTI_COLOR_FG_HL);
+		PTISkin.COLOR_BG_HL = SkinResources.getInt(SkinPropertiesIDs.PTI_COLOR_BG_HL);
+		PTISkin.COLOR_BDR = SkinResources.getInt(SkinPropertiesIDs.PTI_COLOR_BDR);
+		PTISkin.FONT = SkinResources.getFont(SkinPropertiesIDs.PTI_FONT);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			PTISkin.IMAGE_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.PTI_IMAGE_BG, 3);
+			PTISkin.LEFT_ARROW = SkinResources.getImage(SkinPropertiesIDs.PTI_LEFT_ARROW);
+			PTISkin.RIGHT_ARROW = SkinResources.getImage(SkinPropertiesIDs.PTI_RIGHT_ARROW);
+		}
+
+		init = true;
+	}
 }
-

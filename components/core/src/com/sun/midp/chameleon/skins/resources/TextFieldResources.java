@@ -29,57 +29,46 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.chameleon.skins.TextFieldSkin;
 
 public class TextFieldResources {
-    private static boolean init;
-    
-    // private constructor
-    private TextFieldResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        TextFieldSkin.PAD_H = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_PAD_H);
-        TextFieldSkin.PAD_V = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_PAD_V);
-        TextFieldSkin.BOX_MARGIN = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_BOX_MARGIN);
-        TextFieldSkin.WIDTH_CARET = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_WIDTH_CARET);
-        TextFieldSkin.SCROLL_RATE = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_SCRL_RATE);
-        TextFieldSkin.SCROLL_SPEED = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_SCRL_SPD);
-        TextFieldSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_FG);
-        TextFieldSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_BG);
-        TextFieldSkin.COLOR_BORDER = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR);
-        TextFieldSkin.COLOR_BORDER_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR_SHD);     
-        TextFieldSkin.COLOR_FG_UE = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_FG_UE);
-        TextFieldSkin.COLOR_BG_UE = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_BG_UE);
-        TextFieldSkin.COLOR_BORDER_UE = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR_UE);
-        TextFieldSkin.COLOR_BORDER_SHD_UE = SkinResources.getInt(
-                SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR_SHD_UE);
-        /*
-        Uncomment if background image for (un)editable text component is used
-        TextFieldSkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.TEXTFIELD_IMAGE_BG, 9);
-        TextFieldSkin.IMAGE_BG_UE = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.TEXTFIELD_IMAGE_BG_UE, 9);
-        */
+	private static boolean init;
 
-        init = true;
-    }
+	// private constructor
+	private TextFieldResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+		TextFieldSkin.PAD_H = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_PAD_H);
+		TextFieldSkin.PAD_V = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_PAD_V);
+		TextFieldSkin.BOX_MARGIN = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_BOX_MARGIN);
+		TextFieldSkin.WIDTH_CARET = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_WIDTH_CARET);
+		TextFieldSkin.SCROLL_RATE = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_SCRL_RATE);
+		TextFieldSkin.SCROLL_SPEED = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_SCRL_SPD);
+		TextFieldSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_FG);
+		TextFieldSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_BG);
+		TextFieldSkin.COLOR_BORDER = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR);
+		TextFieldSkin.COLOR_BORDER_SHD = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR_SHD);
+		TextFieldSkin.COLOR_FG_UE = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_FG_UE);
+		TextFieldSkin.COLOR_BG_UE = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_BG_UE);
+		TextFieldSkin.COLOR_BORDER_UE = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR_UE);
+		TextFieldSkin.COLOR_BORDER_SHD_UE = SkinResources.getInt(SkinPropertiesIDs.TEXTFIELD_COLOR_BRDR_SHD_UE);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			/*
+			 Uncomment if background image for (un)editable text component is used
+			 TextFieldSkin.IMAGE_BG = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.TEXTFIELD_IMAGE_BG, 9);
+			 TextFieldSkin.IMAGE_BG_UE = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.TEXTFIELD_IMAGE_BG_UE, 9);
+			 */
+		}
+
+		init = true;
+	}
 
 }

@@ -30,76 +30,56 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.chameleon.skins.SoftButtonSkin;
 
 public class SoftButtonResources {
-    private static boolean init;
-    
-    private SoftButtonResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        SoftButtonSkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_HEIGHT);
-        SoftButtonSkin.NUM_BUTTONS = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_NUM_BUTTONS);
-        
-        SoftButtonSkin.BUTTON_ANCHOR_X = SkinResources.getNumbersSequence(
-                SkinPropertiesIDs.SOFTBTN_BUTTON_ANCHOR_X);
-        for (int i = 0; i < SoftButtonSkin.NUM_BUTTONS; i++) {
-            if (SoftButtonSkin.BUTTON_ANCHOR_X[i] < 0) {
-                SoftButtonSkin.BUTTON_ANCHOR_X[i] = ScreenSkin.WIDTH +
-                    SoftButtonSkin.BUTTON_ANCHOR_X[i];
-            }
-        }
-        
-        SoftButtonSkin.BUTTON_ANCHOR_Y = SkinResources.getNumbersSequence(
-                SkinPropertiesIDs.SOFTBTN_BUTTON_ANCHOR_Y);
-               
-        SoftButtonSkin.BUTTON_ALIGN_X = SkinResources.getNumbersSequence(
-                SkinPropertiesIDs.SOFTBTN_BUTTON_ALIGN_X);
-        
-        SoftButtonSkin.BUTTON_MAX_WIDTH = SkinResources.getNumbersSequence(
-                SkinPropertiesIDs.SOFTBTN_BUTTON_MAX_WIDTH);
-        
-        SoftButtonSkin.BUTTON_SHD_ALIGN = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_BUTTON_SHD_ALIGN);
-        SoftButtonSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_FG);
-        SoftButtonSkin.COLOR_FG_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_FG_SHD);
-        SoftButtonSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_BG);
-        SoftButtonSkin.COLOR_MU_FG = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_MU_FG);
-        SoftButtonSkin.COLOR_MU_FG_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_MU_FG_SHD);
-        SoftButtonSkin.COLOR_MU_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_MU_BG);
-        SoftButtonSkin.COLOR_AU_FG = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_AU_FG);
-        SoftButtonSkin.COLOR_AU_FG_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_AU_FG_SHD);
-        SoftButtonSkin.COLOR_AU_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SOFTBTN_COLOR_AU_BG);
-        SoftButtonSkin.FONT = SkinResources.getFont(
-                SkinPropertiesIDs.SOFTBTN_FONT);
-        SoftButtonSkin.TEXT_MENUCMD = SkinResources.getString(
-                SkinPropertiesIDs.SOFTBTN_TEXT_MENUCMD);
-        SoftButtonSkin.TEXT_BACKCMD = SkinResources.getString(
-                SkinPropertiesIDs.SOFTBTN_TEXT_BACKCMD);
-        SoftButtonSkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SOFTBTN_IMAGE_BG, 3);
-        SoftButtonSkin.IMAGE_MU_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SOFTBTN_IMAGE_MU_BG, 3);
-        SoftButtonSkin.IMAGE_AU_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SOFTBTN_IMAGE_AU_BG, 3);
+	private static boolean init;
 
-        init = true;
-    }
+	private SoftButtonResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		SoftButtonSkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_HEIGHT);
+		SoftButtonSkin.NUM_BUTTONS = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_NUM_BUTTONS);
+
+		SoftButtonSkin.BUTTON_ANCHOR_X = SkinResources.getNumbersSequence(SkinPropertiesIDs.SOFTBTN_BUTTON_ANCHOR_X);
+		for (int i = 0; i < SoftButtonSkin.NUM_BUTTONS; i++) {
+			if (SoftButtonSkin.BUTTON_ANCHOR_X[i] < 0) {
+				SoftButtonSkin.BUTTON_ANCHOR_X[i] = ScreenSkin.WIDTH + SoftButtonSkin.BUTTON_ANCHOR_X[i];
+			}
+		}
+
+		SoftButtonSkin.BUTTON_ANCHOR_Y = SkinResources.getNumbersSequence(SkinPropertiesIDs.SOFTBTN_BUTTON_ANCHOR_Y);
+
+		SoftButtonSkin.BUTTON_ALIGN_X = SkinResources.getNumbersSequence(SkinPropertiesIDs.SOFTBTN_BUTTON_ALIGN_X);
+
+		SoftButtonSkin.BUTTON_MAX_WIDTH = SkinResources.getNumbersSequence(SkinPropertiesIDs.SOFTBTN_BUTTON_MAX_WIDTH);
+
+		SoftButtonSkin.BUTTON_SHD_ALIGN = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_BUTTON_SHD_ALIGN);
+		SoftButtonSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_FG);
+		SoftButtonSkin.COLOR_FG_SHD = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_FG_SHD);
+		SoftButtonSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_BG);
+		SoftButtonSkin.COLOR_MU_FG = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_MU_FG);
+		SoftButtonSkin.COLOR_MU_FG_SHD = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_MU_FG_SHD);
+		SoftButtonSkin.COLOR_MU_BG = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_MU_BG);
+		SoftButtonSkin.COLOR_AU_FG = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_AU_FG);
+		SoftButtonSkin.COLOR_AU_FG_SHD = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_AU_FG_SHD);
+		SoftButtonSkin.COLOR_AU_BG = SkinResources.getInt(SkinPropertiesIDs.SOFTBTN_COLOR_AU_BG);
+		SoftButtonSkin.FONT = SkinResources.getFont(SkinPropertiesIDs.SOFTBTN_FONT);
+		SoftButtonSkin.TEXT_MENUCMD = SkinResources.getString(SkinPropertiesIDs.SOFTBTN_TEXT_MENUCMD);
+		SoftButtonSkin.TEXT_BACKCMD = SkinResources.getString(SkinPropertiesIDs.SOFTBTN_TEXT_BACKCMD);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			SoftButtonSkin.IMAGE_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.SOFTBTN_IMAGE_BG, 3);
+			SoftButtonSkin.IMAGE_MU_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.SOFTBTN_IMAGE_MU_BG, 3);
+			SoftButtonSkin.IMAGE_AU_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.SOFTBTN_IMAGE_AU_BG, 3);
+		}
+
+		init = true;
+	}
 }

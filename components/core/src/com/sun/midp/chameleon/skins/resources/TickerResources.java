@@ -29,48 +29,37 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.chameleon.skins.TickerSkin;
 
 public class TickerResources {
-    private static boolean init;
-    
-    private TickerResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        TickerSkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_HEIGHT);
-        TickerSkin.ALIGN = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_ALIGN);
-        TickerSkin.DIRECTION = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_DIRECTION);
-        TickerSkin.RATE = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_RATE);
-        TickerSkin.SPEED = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_SPEED);
-        TickerSkin.TEXT_ANCHOR_Y = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_TEXT_ANCHOR_Y);
-        TickerSkin.TEXT_SHD_ALIGN = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_TEXT_SHD_ALIGN);
-        TickerSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_COLOR_BG);
-        TickerSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_COLOR_FG);
-        TickerSkin.COLOR_FG_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.TICKER_COLOR_FG_SHD);
-        TickerSkin.FONT = SkinResources.getFont(
-                SkinPropertiesIDs.TICKER_FONT);
-        TickerSkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.TICKER_IMAGE_BG, 3);
-        TickerSkin.IMAGE_AU_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.TICKER_IMAGE_AU_BG, 3);
+	private static boolean init;
 
-        init = true;
-    }
+	private TickerResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		TickerSkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.TICKER_HEIGHT);
+		TickerSkin.ALIGN = SkinResources.getInt(SkinPropertiesIDs.TICKER_ALIGN);
+		TickerSkin.DIRECTION = SkinResources.getInt(SkinPropertiesIDs.TICKER_DIRECTION);
+		TickerSkin.RATE = SkinResources.getInt(SkinPropertiesIDs.TICKER_RATE);
+		TickerSkin.SPEED = SkinResources.getInt(SkinPropertiesIDs.TICKER_SPEED);
+		TickerSkin.TEXT_ANCHOR_Y = SkinResources.getInt(SkinPropertiesIDs.TICKER_TEXT_ANCHOR_Y);
+		TickerSkin.TEXT_SHD_ALIGN = SkinResources.getInt(SkinPropertiesIDs.TICKER_TEXT_SHD_ALIGN);
+		TickerSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.TICKER_COLOR_BG);
+		TickerSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.TICKER_COLOR_FG);
+		TickerSkin.COLOR_FG_SHD = SkinResources.getInt(SkinPropertiesIDs.TICKER_COLOR_FG_SHD);
+		TickerSkin.FONT = SkinResources.getFont(SkinPropertiesIDs.TICKER_FONT);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			TickerSkin.IMAGE_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.TICKER_IMAGE_BG, 3);
+			TickerSkin.IMAGE_AU_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.TICKER_IMAGE_AU_BG, 3);
+		}
+
+		init = true;
+	}
 }
-

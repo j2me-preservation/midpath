@@ -29,53 +29,40 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.chameleon.skins.StringItemSkin;
 
 public class StringItemResources {
-    private static boolean init;
-    
-    // private constructor
-    private StringItemResources() {
-    }   
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        StringItemSkin.PAD_BUTTON_H = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_PAD_BUTTON_H);
-        StringItemSkin.PAD_BUTTON_V = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_PAD_BUTTON_V);
-        StringItemSkin.BUTTON_BORDER_W = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_BUTTON_BORDER_W);
-        StringItemSkin.COLOR_FG_LINK = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_FG_LNK);
-        StringItemSkin.COLOR_FG_LINK_FOCUS = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_FG_LNK_FOC);
-        StringItemSkin.COLOR_BG_LINK_FOCUS = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_BG_LNK_FOC);
-        StringItemSkin.COLOR_FG_BUTTON = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_FG_BTN);
-        StringItemSkin.COLOR_BG_BUTTON = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_BG_BTN);
-        StringItemSkin.COLOR_BORDER_LT = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_BORDER_LT);
-        StringItemSkin.COLOR_BORDER_DK = SkinResources.getInt(
-                SkinPropertiesIDs.STRINGITEM_COLOR_BORDER_DK);
-        StringItemSkin.FONT = SkinResources.getFont(
-                SkinPropertiesIDs.STRINGITEM_FONT);
-        StringItemSkin.FONT_LINK = SkinResources.getFont(
-                SkinPropertiesIDs.STRINGITEM_FONT_LNK);
-        StringItemSkin.FONT_BUTTON = SkinResources.getFont(
-                SkinPropertiesIDs.STRINGITEM_FONT_BTN);
-        StringItemSkin.IMAGE_LINK = SkinResources.getImage(
-                SkinPropertiesIDs.STRINGITEM_IMAGE_LNK);
-        StringItemSkin.IMAGE_BUTTON = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.STRINGITEM_IMAGE_BTN, 9);
+	private static boolean init;
 
-        init = true;
-    }
+	// private constructor
+	private StringItemResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		StringItemSkin.PAD_BUTTON_H = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_PAD_BUTTON_H);
+		StringItemSkin.PAD_BUTTON_V = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_PAD_BUTTON_V);
+		StringItemSkin.BUTTON_BORDER_W = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_BUTTON_BORDER_W);
+		StringItemSkin.COLOR_FG_LINK = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_FG_LNK);
+		StringItemSkin.COLOR_FG_LINK_FOCUS = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_FG_LNK_FOC);
+		StringItemSkin.COLOR_BG_LINK_FOCUS = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_BG_LNK_FOC);
+		StringItemSkin.COLOR_FG_BUTTON = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_FG_BTN);
+		StringItemSkin.COLOR_BG_BUTTON = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_BG_BTN);
+		StringItemSkin.COLOR_BORDER_LT = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_BORDER_LT);
+		StringItemSkin.COLOR_BORDER_DK = SkinResources.getInt(SkinPropertiesIDs.STRINGITEM_COLOR_BORDER_DK);
+		StringItemSkin.FONT = SkinResources.getFont(SkinPropertiesIDs.STRINGITEM_FONT);
+		StringItemSkin.FONT_LINK = SkinResources.getFont(SkinPropertiesIDs.STRINGITEM_FONT_LNK);
+		StringItemSkin.FONT_BUTTON = SkinResources.getFont(SkinPropertiesIDs.STRINGITEM_FONT_BTN);
+		
+		if (SkinResources.isSkinImageEnabled()) {
+			StringItemSkin.IMAGE_LINK = SkinResources.getImage(SkinPropertiesIDs.STRINGITEM_IMAGE_LNK);
+			StringItemSkin.IMAGE_BUTTON = SkinResources.getCompositeImage(SkinPropertiesIDs.STRINGITEM_IMAGE_BTN, 9);
+		}
+
+		init = true;
+	}
 }
-

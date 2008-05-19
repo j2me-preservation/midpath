@@ -30,90 +30,71 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.configurator.Constants;
 
 public class ScreenResources {
-    private static boolean init;
-    
-    private ScreenResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
+	private static boolean init;
 
-        // These 3 values come from the underlying system and get compiled
-        // into MIDP using the constants.xml and generator
-        ScreenSkin.WIDTH = Constants.CHAM_WIDTH;
-        ScreenSkin.HEIGHT = Constants.CHAM_HEIGHT;
-        ScreenSkin.FULLHEIGHT = Constants.CHAM_FULLHEIGHT;
+	private ScreenResources() {
+	}
 
-        ScreenSkin.TEXT_ORIENT = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_TEXT_ORIENT);
-        ScreenSkin.PAD_FORM_ITEMS = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_PAD_FORM_ITEMS);
-        ScreenSkin.PAD_LABEL_VERT = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_PAD_LABEL_VERT);
-        ScreenSkin.PAD_LABEL_HORIZ = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_PAD_LABEL_HORIZ);
-        ScreenSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_BG);
-        ScreenSkin.COLOR_HS_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_HS_BG);
-        ScreenSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_FG);
-        ScreenSkin.COLOR_BG_HL = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_BG_HL);
-        ScreenSkin.COLOR_FG_HL = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_FG_HL);
-        ScreenSkin.COLOR_BORDER = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_BORDER);
-        ScreenSkin.COLOR_BORDER_HL = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_BORDER_HL);
-        ScreenSkin.COLOR_TRAVERSE_IND = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_COLOR_TRAVERSE_IND);
-        ScreenSkin.BORDER_STYLE = SkinResources.getInt(
-                SkinPropertiesIDs.SCREEN_BORDER_STYLE);
-        ScreenSkin.FONT_LABEL = SkinResources.getFont(
-                SkinPropertiesIDs.SCREEN_FONT_LABEL);
-        ScreenSkin.FONT_INPUT_TEXT = SkinResources.getFont(
-                SkinPropertiesIDs.SCREEN_FONT_INPUT_TEXT);
-        ScreenSkin.FONT_STATIC_TEXT = SkinResources.getFont(
-                SkinPropertiesIDs.SCREEN_FONT_STATIC_TEXT);
+	public static void load() {
+		load(false);
+	}
 
-        ScreenSkin.IMAGE_WASH = SkinResources.getImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_WASH);
-        ScreenSkin.IMAGE_BG = SkinResources.getImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_BG);
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
 
-        /*
-        Uncomment if 9 pc screen background images are used
-        ScreenSkin.IMAGE_BG_W_TITLE = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_BG_W_TITLE, 9);
-        ScreenSkin.IMAGE_BG_WO_TITLE = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_BG_WO_TITLE, 9);
-        */
+		// These 3 values come from the underlying system and get compiled
+		// into MIDP using the constants.xml and generator
+		ScreenSkin.WIDTH = Constants.CHAM_WIDTH;
+		ScreenSkin.HEIGHT = Constants.CHAM_HEIGHT;
+		ScreenSkin.FULLHEIGHT = Constants.CHAM_FULLHEIGHT;
 
-        // IMPL NOTE: There shouldn't be any "Homescreen" resources in
-        // ScreenResources. There should be a new window altogether which
-        // handles the app manager stuff and its resources should be in a
-        // separate resource class all together.
+		ScreenSkin.TEXT_ORIENT = SkinResources.getInt(SkinPropertiesIDs.SCREEN_TEXT_ORIENT);
+		ScreenSkin.PAD_FORM_ITEMS = SkinResources.getInt(SkinPropertiesIDs.SCREEN_PAD_FORM_ITEMS);
+		ScreenSkin.PAD_LABEL_VERT = SkinResources.getInt(SkinPropertiesIDs.SCREEN_PAD_LABEL_VERT);
+		ScreenSkin.PAD_LABEL_HORIZ = SkinResources.getInt(SkinPropertiesIDs.SCREEN_PAD_LABEL_HORIZ);
+		ScreenSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_BG);
+		ScreenSkin.COLOR_HS_BG = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_HS_BG);
+		ScreenSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_FG);
+		ScreenSkin.COLOR_BG_HL = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_BG_HL);
+		ScreenSkin.COLOR_FG_HL = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_FG_HL);
+		ScreenSkin.COLOR_BORDER = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_BORDER);
+		ScreenSkin.COLOR_BORDER_HL = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_BORDER_HL);
+		ScreenSkin.COLOR_TRAVERSE_IND = SkinResources.getInt(SkinPropertiesIDs.SCREEN_COLOR_TRAVERSE_IND);
+		ScreenSkin.BORDER_STYLE = SkinResources.getInt(SkinPropertiesIDs.SCREEN_BORDER_STYLE);
+		ScreenSkin.FONT_LABEL = SkinResources.getFont(SkinPropertiesIDs.SCREEN_FONT_LABEL);
+		ScreenSkin.FONT_INPUT_TEXT = SkinResources.getFont(SkinPropertiesIDs.SCREEN_FONT_INPUT_TEXT);
+		ScreenSkin.FONT_STATIC_TEXT = SkinResources.getFont(SkinPropertiesIDs.SCREEN_FONT_STATIC_TEXT);
 
-        /*
-        Uncomment if background images for "home" screen are used
-        ScreenSkin.IMAGE_HS_BG_TILE = SkinResources.getImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_HS_BG_TILE);
-        ScreenSkin.IMAGE_HS_BG_W_TITLE = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_HS_BG_W_TITLE, 9);
-        ScreenSkin.IMAGE_HS_BG_WO_TITLE = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCREEN_IMAGE_HS_BG_WO_TITLE, 9);
-        */
+		if (SkinResources.isSkinImageEnabled()) {
+			ScreenSkin.IMAGE_WASH = SkinResources.getImage(SkinPropertiesIDs.SCREEN_IMAGE_WASH);
+			ScreenSkin.IMAGE_BG = SkinResources.getImage(SkinPropertiesIDs.SCREEN_IMAGE_BG);
 
-        init = true;
-    }
+			/*
+			 Uncomment if 9 pc screen background images are used
+			 ScreenSkin.IMAGE_BG_W_TITLE = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.SCREEN_IMAGE_BG_W_TITLE, 9);
+			 ScreenSkin.IMAGE_BG_WO_TITLE = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.SCREEN_IMAGE_BG_WO_TITLE, 9);
+			 */
+
+			// IMPL NOTE: There shouldn't be any "Homescreen" resources in
+			// ScreenResources. There should be a new window altogether which
+			// handles the app manager stuff and its resources should be in a
+			// separate resource class all together.
+			/*
+			 Uncomment if background images for "home" screen are used
+			 ScreenSkin.IMAGE_HS_BG_TILE = SkinResources.getImage(
+			 SkinPropertiesIDs.SCREEN_IMAGE_HS_BG_TILE);
+			 ScreenSkin.IMAGE_HS_BG_W_TITLE = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.SCREEN_IMAGE_HS_BG_W_TITLE, 9);
+			 ScreenSkin.IMAGE_HS_BG_WO_TITLE = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.SCREEN_IMAGE_HS_BG_WO_TITLE, 9);
+			 */
+		}
+
+		init = true;
+	}
 
 }
-
-

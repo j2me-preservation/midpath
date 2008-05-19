@@ -29,68 +29,51 @@ import com.sun.midp.chameleon.skins.ChoiceGroupSkin;
 import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 
 public class ChoiceGroupResources {
-    private static boolean init;
-    
-    // private constructor
-    private ChoiceGroupResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
+	private static boolean init;
 
-        ChoiceGroupSkin.WIDTH_IMAGE = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_WIDTH_IMAGE);
-        ChoiceGroupSkin.HEIGHT_IMAGE = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_HEIGHT_IMAGE);
-        ChoiceGroupSkin.WIDTH_SCROLL = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_WIDTH_SCROLL);
-        ChoiceGroupSkin.WIDTH_THUMB = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_WIDTH_THUMB);
-        ChoiceGroupSkin.HEIGHT_THUMB = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_HEIGHT_THUMB);
-        ChoiceGroupSkin.PAD_H = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_PAD_H);
-        ChoiceGroupSkin.PAD_V = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_PAD_V);
-        ChoiceGroupSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_COLOR_FG);
-        ChoiceGroupSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_COLOR_BG);
-        ChoiceGroupSkin.COLOR_BORDER = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_COLOR_BRDR);
-        ChoiceGroupSkin.COLOR_BORDER_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_COLOR_BRDR_SHD);
-        ChoiceGroupSkin.COLOR_SCROLL = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_COLOR_SCROLL);
-        ChoiceGroupSkin.COLOR_THUMB = SkinResources.getInt(
-                SkinPropertiesIDs.CHOICE_COLOR_THUMB);
-        ChoiceGroupSkin.FONT = SkinResources.getFont(
-                SkinPropertiesIDs.CHOICE_FONT);
-        ChoiceGroupSkin.FONT_FOCUS = SkinResources.getFont(
-                SkinPropertiesIDs.CHOICE_FONT_FOCUS);
-        ChoiceGroupSkin.IMAGE_RADIO = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.CHOICE_IMAGE_RADIO, 2);
-        ChoiceGroupSkin.IMAGE_CHKBOX = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.CHOICE_IMAGE_CHKBX, 2);
-        /*
-        Uncomment if background image is used
-        ChoiceGroupSkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.CHOICE_IMAGE_BG, 9);
-        */
-        ChoiceGroupSkin.IMAGE_BUTTON_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.CHOICE_IMAGE_BTN_BG, 9);
-        ChoiceGroupSkin.IMAGE_BUTTON_ICON = SkinResources.getImage(
-                SkinPropertiesIDs.CHOICE_IMAGE_BTN_ICON);
-        ChoiceGroupSkin.IMAGE_POPUP_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.CHOICE_IMAGE_POPUP_BG, 9);
+	// private constructor
+	private ChoiceGroupResources() {
+	}
 
-        init = true;
-    }
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		ChoiceGroupSkin.WIDTH_IMAGE = SkinResources.getInt(SkinPropertiesIDs.CHOICE_WIDTH_IMAGE);
+		ChoiceGroupSkin.HEIGHT_IMAGE = SkinResources.getInt(SkinPropertiesIDs.CHOICE_HEIGHT_IMAGE);
+		ChoiceGroupSkin.WIDTH_SCROLL = SkinResources.getInt(SkinPropertiesIDs.CHOICE_WIDTH_SCROLL);
+		ChoiceGroupSkin.WIDTH_THUMB = SkinResources.getInt(SkinPropertiesIDs.CHOICE_WIDTH_THUMB);
+		ChoiceGroupSkin.HEIGHT_THUMB = SkinResources.getInt(SkinPropertiesIDs.CHOICE_HEIGHT_THUMB);
+		ChoiceGroupSkin.PAD_H = SkinResources.getInt(SkinPropertiesIDs.CHOICE_PAD_H);
+		ChoiceGroupSkin.PAD_V = SkinResources.getInt(SkinPropertiesIDs.CHOICE_PAD_V);
+		ChoiceGroupSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.CHOICE_COLOR_FG);
+		ChoiceGroupSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.CHOICE_COLOR_BG);
+		ChoiceGroupSkin.COLOR_BORDER = SkinResources.getInt(SkinPropertiesIDs.CHOICE_COLOR_BRDR);
+		ChoiceGroupSkin.COLOR_BORDER_SHD = SkinResources.getInt(SkinPropertiesIDs.CHOICE_COLOR_BRDR_SHD);
+		ChoiceGroupSkin.COLOR_SCROLL = SkinResources.getInt(SkinPropertiesIDs.CHOICE_COLOR_SCROLL);
+		ChoiceGroupSkin.COLOR_THUMB = SkinResources.getInt(SkinPropertiesIDs.CHOICE_COLOR_THUMB);
+		ChoiceGroupSkin.FONT = SkinResources.getFont(SkinPropertiesIDs.CHOICE_FONT);
+		ChoiceGroupSkin.FONT_FOCUS = SkinResources.getFont(SkinPropertiesIDs.CHOICE_FONT_FOCUS);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			ChoiceGroupSkin.IMAGE_RADIO = SkinResources.getCompositeImage(SkinPropertiesIDs.CHOICE_IMAGE_RADIO, 2);
+			ChoiceGroupSkin.IMAGE_CHKBOX = SkinResources.getCompositeImage(SkinPropertiesIDs.CHOICE_IMAGE_CHKBX, 2);
+			/*
+			 Uncomment if background image is used
+			 ChoiceGroupSkin.IMAGE_BG = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.CHOICE_IMAGE_BG, 9);
+			 */
+			ChoiceGroupSkin.IMAGE_BUTTON_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.CHOICE_IMAGE_BTN_BG, 9);
+			ChoiceGroupSkin.IMAGE_BUTTON_ICON = SkinResources.getImage(SkinPropertiesIDs.CHOICE_IMAGE_BTN_ICON);
+			ChoiceGroupSkin.IMAGE_POPUP_BG = SkinResources
+					.getCompositeImage(SkinPropertiesIDs.CHOICE_IMAGE_POPUP_BG, 9);
+		}
+
+		init = true;
+	}
 }
-

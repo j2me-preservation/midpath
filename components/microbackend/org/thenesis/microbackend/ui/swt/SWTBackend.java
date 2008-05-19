@@ -86,20 +86,17 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 		this.listener = listener;
 	}
 
-	public void updateARGBPixels(int[] argbPixels, int x, int y, int width, int heigth) {
+	public void updateARGBPixels(int[] argbPixels, int x, int y, int width, int height) {
 
 		//System.out.println("[DEBUG] SWTBackend.updateSurfacePixels(): " + x + " " + y + " " + width + " " + height);	
 
-		int w = canvasWidth;
-		int h = canvasHeight;
+//		for (int j = 0; j < canvasHeight; j++) {
+//			imageData.setPixels(0, j, canvasWidth, argbPixels, canvasWidth * j);
+//		}
 
-		for (int j = 0; j < h; j++) {
-			imageData.setPixels(0, j, w, argbPixels, w * j);
+		for (int j = 0; j < height; j++) {
+			imageData.setPixels(x, y + j, width, argbPixels, canvasWidth * (y + j) + x);
 		}
-
-		//		for (int j = 0; j < height; j++) {
-		//			imageData.setPixels(x, j, (int) width, rootVirtualSurface.data, rootVirtualSurface.width * j + x);
-		//		}
 
 		if (display != null) {
 			display.syncExec(painterRunnable);
@@ -115,7 +112,7 @@ public class SWTBackend implements UIBackend, Runnable, KeyListener, MouseListen
 
 		swtThread = new Thread(this);
 		swtThread.start();
-		
+
 		// Wait until SWT initialization is done in the SWT thread
 		synchronized (this) {
 			try {

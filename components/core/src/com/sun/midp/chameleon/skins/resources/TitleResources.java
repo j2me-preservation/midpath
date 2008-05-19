@@ -29,40 +29,34 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.chameleon.skins.TitleSkin;
 
 public class TitleResources {
-    private static boolean init;
-    
-    private TitleResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        TitleSkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_HEIGHT);
-        TitleSkin.MARGIN = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_MARGIN);
-        TitleSkin.TEXT_ALIGN_X = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_TEXT_ALIGN_X);
-        TitleSkin.TEXT_SHD_ALIGN = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_TEXT_SHD_ALIGN);
-        TitleSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_COLOR_FG);
-        TitleSkin.COLOR_FG_SHD = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_COLOR_FG_SHD);
-        TitleSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.TITLE_COLOR_BG);
-        TitleSkin.FONT = SkinResources.getFont(
-                SkinPropertiesIDs.TITLE_FONT);
-        TitleSkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.TITLE_IMAGE_BG, 3);
+	private static boolean init;
 
-        init = true;
-    }
-    
+	private TitleResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		TitleSkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.TITLE_HEIGHT);
+		TitleSkin.MARGIN = SkinResources.getInt(SkinPropertiesIDs.TITLE_MARGIN);
+		TitleSkin.TEXT_ALIGN_X = SkinResources.getInt(SkinPropertiesIDs.TITLE_TEXT_ALIGN_X);
+		TitleSkin.TEXT_SHD_ALIGN = SkinResources.getInt(SkinPropertiesIDs.TITLE_TEXT_SHD_ALIGN);
+		TitleSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.TITLE_COLOR_FG);
+		TitleSkin.COLOR_FG_SHD = SkinResources.getInt(SkinPropertiesIDs.TITLE_COLOR_FG_SHD);
+		TitleSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.TITLE_COLOR_BG);
+		TitleSkin.FONT = SkinResources.getFont(SkinPropertiesIDs.TITLE_FONT);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			TitleSkin.IMAGE_BG = SkinResources.getCompositeImage(SkinPropertiesIDs.TITLE_IMAGE_BG, 3);
+		}
+
+		init = true;
+	}
+
 }

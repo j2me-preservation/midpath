@@ -31,6 +31,7 @@ import javax.microedition.lcdui.Image;
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.log.LogChannels;
 import com.sun.midp.log.Logging;
+import com.sun.midp.main.Configuration;
 import com.sun.midp.security.SecurityToken;
 import com.sun.midp.util.ResourceHandler;
 
@@ -72,6 +73,8 @@ public class SkinResources {
      */
     private static boolean isAmsIsolate;
     
+    private static boolean skinImageEnabled;
+    
     /**
      * This class needs no real constructor, but its here as 'public'
      * so the SecurityIntializer can do a newInstance() on it and call
@@ -107,6 +110,10 @@ public class SkinResources {
      * @param reload if true, ignore previously loaded resources and reload
      */
     public static void loadSkin(boolean reload) {
+    	
+    	// Check if skin images are enabled
+    	skinImageEnabled = Configuration.getPropertyDefault("com.sun.midp.chameleon.skins.imageEnabled", "yes").equals("yes") ? true : false;
+    	
         resources = null;
         skinProperties = null;
         isAmsIsolate = isAmsIsolate();
@@ -413,10 +420,17 @@ public class SkinResources {
                     "resource: " + identifier + ": " + e);
         }
         return null;
-    }    
-
-
+    } 
+    
+    
     /**
+	 * @return the resourceImageEnabled
+	 */
+	static boolean isSkinImageEnabled() {
+		return skinImageEnabled;
+	}
+
+	/**
      * Load resources data.
      * 
      * @param loadAll if true, load all resources. Otherwise, 

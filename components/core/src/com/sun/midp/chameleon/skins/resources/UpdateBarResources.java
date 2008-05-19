@@ -29,42 +29,35 @@ import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 import com.sun.midp.chameleon.skins.UpdateBarSkin;
 
 public class UpdateBarResources {
-    private static boolean init;
-    
-    // private constructor
-    private UpdateBarResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        UpdateBarSkin.WIDTH = SkinResources.getInt(
-                SkinPropertiesIDs.UPDATEBAR_WIDTH);
-        UpdateBarSkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.UPDATEBAR_HEIGHT);
-        UpdateBarSkin.NUM_FRAMES = SkinResources.getInt(
-                SkinPropertiesIDs.UPDATEBAR_NUM_FRAMES);
-        UpdateBarSkin.FRAME_X = SkinResources.getInt(
-                SkinPropertiesIDs.UPDATEBAR_FRAME_X);
-        UpdateBarSkin.FRAME_Y = SkinResources.getInt(
-                SkinPropertiesIDs.UPDATEBAR_FRAME_Y);
-        UpdateBarSkin.FRAME_SEQUENCE = SkinResources.getNumbersSequence(
-                SkinPropertiesIDs.UPDATEBAR_FRAME_SEQU);
-        UpdateBarSkin.IMAGE_BG = SkinResources.getImage(
-                SkinPropertiesIDs.UPDATEBAR_IMAGE_BG);
-        UpdateBarSkin.IMAGE_FRAME = SkinResources.getCompositeImage(
-            SkinPropertiesIDs.UPDATEBAR_IMAGE_FRAME,
-            UpdateBarSkin.NUM_FRAMES);
+	private static boolean init;
 
-        init = true;
-    }
-    
+	// private constructor
+	private UpdateBarResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		UpdateBarSkin.WIDTH = SkinResources.getInt(SkinPropertiesIDs.UPDATEBAR_WIDTH);
+		UpdateBarSkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.UPDATEBAR_HEIGHT);
+		UpdateBarSkin.NUM_FRAMES = SkinResources.getInt(SkinPropertiesIDs.UPDATEBAR_NUM_FRAMES);
+		UpdateBarSkin.FRAME_X = SkinResources.getInt(SkinPropertiesIDs.UPDATEBAR_FRAME_X);
+		UpdateBarSkin.FRAME_Y = SkinResources.getInt(SkinPropertiesIDs.UPDATEBAR_FRAME_Y);
+		UpdateBarSkin.FRAME_SEQUENCE = SkinResources.getNumbersSequence(SkinPropertiesIDs.UPDATEBAR_FRAME_SEQU);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			UpdateBarSkin.IMAGE_BG = SkinResources.getImage(SkinPropertiesIDs.UPDATEBAR_IMAGE_BG);
+			UpdateBarSkin.IMAGE_FRAME = SkinResources.getCompositeImage(SkinPropertiesIDs.UPDATEBAR_IMAGE_FRAME,
+					UpdateBarSkin.NUM_FRAMES);
+		}
+
+		init = true;
+	}
+
 }
-
-

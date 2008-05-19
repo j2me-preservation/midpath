@@ -29,59 +29,52 @@ import com.sun.midp.chameleon.skins.ScrollIndSkin;
 import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 
 public class ScrollIndResources {
-    private static boolean init;
-    
-    // private constructor
-    private ScrollIndResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        ScrollIndSkin.MODE = SkinResources.getInt(
-                SkinPropertiesIDs.SCROLL_MODE);
-        ScrollIndSkin.WIDTH = SkinResources.getInt(
-                SkinPropertiesIDs.SCROLL_WIDTH);
-    
-        ScrollIndSkin.COLOR_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SCROLL_COLOR_BG);
-        ScrollIndSkin.COLOR_FG = SkinResources.getInt(
-                SkinPropertiesIDs.SCROLL_COLOR_FG);
+	private static boolean init;
 
-        /*
-        Uncomment if background/foreground images are used
-        ScrollIndSkin.IMAGE_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_BG, 3);
-        ScrollIndSkin.IMAGE_FG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_FG, 3);
-        */
-        ScrollIndSkin.IMAGE_UP = SkinResources.getImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_UP);
-        ScrollIndSkin.IMAGE_DN = SkinResources.getImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_DN);
-    
-        ScrollIndSkin.COLOR_AU_BG = SkinResources.getInt(
-                SkinPropertiesIDs.SCROLL_COLOR_AU_BG);
-        ScrollIndSkin.COLOR_AU_FG = SkinResources.getInt(
-                SkinPropertiesIDs.SCROLL_COLOR_AU_FG);
-        /*
-        Uncomment if background/foreground images are used for an Alert
-        ScrollIndSkin.IMAGE_AU_BG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_AU_BG, 3);
-        ScrollIndSkin.IMAGE_AU_FG = SkinResources.getCompositeImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_AU_FG, 3);
-        */
-        ScrollIndSkin.IMAGE_AU_UP = SkinResources.getImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_AU_UP);
-        ScrollIndSkin.IMAGE_AU_DN = SkinResources.getImage(
-                SkinPropertiesIDs.SCROLL_IMAGE_AU_DN);
+	// private constructor
+	private ScrollIndResources() {
+	}
 
-        init = true;
-    }
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		ScrollIndSkin.MODE = SkinResources.getInt(SkinPropertiesIDs.SCROLL_MODE);
+		ScrollIndSkin.WIDTH = SkinResources.getInt(SkinPropertiesIDs.SCROLL_WIDTH);
+
+		ScrollIndSkin.COLOR_BG = SkinResources.getInt(SkinPropertiesIDs.SCROLL_COLOR_BG);
+		ScrollIndSkin.COLOR_FG = SkinResources.getInt(SkinPropertiesIDs.SCROLL_COLOR_FG);
+
+		/*
+		 Uncomment if background/foreground images are used
+		 ScrollIndSkin.IMAGE_BG = SkinResources.getCompositeImage(
+		 SkinPropertiesIDs.SCROLL_IMAGE_BG, 3);
+		 ScrollIndSkin.IMAGE_FG = SkinResources.getCompositeImage(
+		 SkinPropertiesIDs.SCROLL_IMAGE_FG, 3);
+		 */
+		ScrollIndSkin.IMAGE_UP = SkinResources.getImage(SkinPropertiesIDs.SCROLL_IMAGE_UP);
+		ScrollIndSkin.IMAGE_DN = SkinResources.getImage(SkinPropertiesIDs.SCROLL_IMAGE_DN);
+
+		ScrollIndSkin.COLOR_AU_BG = SkinResources.getInt(SkinPropertiesIDs.SCROLL_COLOR_AU_BG);
+		ScrollIndSkin.COLOR_AU_FG = SkinResources.getInt(SkinPropertiesIDs.SCROLL_COLOR_AU_FG);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			/*
+			 Uncomment if background/foreground images are used for an Alert
+			 ScrollIndSkin.IMAGE_AU_BG = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.SCROLL_IMAGE_AU_BG, 3);
+			 ScrollIndSkin.IMAGE_AU_FG = SkinResources.getCompositeImage(
+			 SkinPropertiesIDs.SCROLL_IMAGE_AU_FG, 3);
+			 */
+			ScrollIndSkin.IMAGE_AU_UP = SkinResources.getImage(SkinPropertiesIDs.SCROLL_IMAGE_AU_UP);
+			ScrollIndSkin.IMAGE_AU_DN = SkinResources.getImage(SkinPropertiesIDs.SCROLL_IMAGE_AU_DN);
+		}
+
+		init = true;
+	}
 }

@@ -29,59 +29,43 @@ import com.sun.midp.chameleon.skins.GaugeSkin;
 import com.sun.midp.chameleon.skins.SkinPropertiesIDs;
 
 public class GaugeResources {
-    private static boolean init;
-    
-    // private constructor
-    private GaugeResources() {
-    }
-    
-    public static void load() {
-        load(false);
-    }
-        
-    public static void load(boolean reload) {
-        if (init && !reload) {
-            return;
-        }
-        
-        GaugeSkin.ORIENTATION = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_ORIENT);
-        GaugeSkin.WIDTH = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_WIDTH);
-        GaugeSkin.HEIGHT = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_HEIGHT);
-        GaugeSkin.METER_X = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_METER_X);
-        GaugeSkin.METER_Y = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_METER_Y);
-        GaugeSkin.INC_BTN_X = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_INC_BTN_X);
-        GaugeSkin.INC_BTN_Y = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_INC_BTN_Y);
-        GaugeSkin.DEC_BTN_X = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_DEC_BTN_X);
-        GaugeSkin.DEC_BTN_Y = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_DEC_BTN_Y);
-        GaugeSkin.VALUE_X = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_VALUE_X);
-        GaugeSkin.VALUE_Y = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_VALUE_Y);
-        GaugeSkin.VALUE_WIDTH = SkinResources.getInt(
-                SkinPropertiesIDs.GAUGE_VALUE_WIDTH);
-        GaugeSkin.IMAGE_BG = SkinResources.getImage(
-                SkinPropertiesIDs.GAUGE_IMAGE_BG);
-        GaugeSkin.IMAGE_METER_EMPTY = SkinResources.getImage(
-                SkinPropertiesIDs.GAUGE_IMAGE_MTR_EMPTY);
-        GaugeSkin.IMAGE_METER_FULL = SkinResources.getImage(
-                SkinPropertiesIDs.GAUGE_IMAGE_MTR_FULL);
-        GaugeSkin.IMAGE_INC_BTN = SkinResources.getImage(
-                SkinPropertiesIDs.GAUGE_IMAGE_INC_BTN);
-        GaugeSkin.IMAGE_DEC_BTN = SkinResources.getImage(
-                SkinPropertiesIDs.GAUGE_IMAGE_DEC_BTN);
-        GaugeSkin.IMAGE_VALUES = SkinResources.getImage(
-                SkinPropertiesIDs.GAUGE_IMAGE_VALUES);
-        
-        init = true;
-    }
-}
+	private static boolean init;
 
+	// private constructor
+	private GaugeResources() {
+	}
+
+	public static void load() {
+		load(false);
+	}
+
+	public static void load(boolean reload) {
+		if (init && !reload) {
+			return;
+		}
+
+		GaugeSkin.ORIENTATION = SkinResources.getInt(SkinPropertiesIDs.GAUGE_ORIENT);
+		GaugeSkin.WIDTH = SkinResources.getInt(SkinPropertiesIDs.GAUGE_WIDTH);
+		GaugeSkin.HEIGHT = SkinResources.getInt(SkinPropertiesIDs.GAUGE_HEIGHT);
+		GaugeSkin.METER_X = SkinResources.getInt(SkinPropertiesIDs.GAUGE_METER_X);
+		GaugeSkin.METER_Y = SkinResources.getInt(SkinPropertiesIDs.GAUGE_METER_Y);
+		GaugeSkin.INC_BTN_X = SkinResources.getInt(SkinPropertiesIDs.GAUGE_INC_BTN_X);
+		GaugeSkin.INC_BTN_Y = SkinResources.getInt(SkinPropertiesIDs.GAUGE_INC_BTN_Y);
+		GaugeSkin.DEC_BTN_X = SkinResources.getInt(SkinPropertiesIDs.GAUGE_DEC_BTN_X);
+		GaugeSkin.DEC_BTN_Y = SkinResources.getInt(SkinPropertiesIDs.GAUGE_DEC_BTN_Y);
+		GaugeSkin.VALUE_X = SkinResources.getInt(SkinPropertiesIDs.GAUGE_VALUE_X);
+		GaugeSkin.VALUE_Y = SkinResources.getInt(SkinPropertiesIDs.GAUGE_VALUE_Y);
+		GaugeSkin.VALUE_WIDTH = SkinResources.getInt(SkinPropertiesIDs.GAUGE_VALUE_WIDTH);
+
+		if (SkinResources.isSkinImageEnabled()) {
+			GaugeSkin.IMAGE_BG = SkinResources.getImage(SkinPropertiesIDs.GAUGE_IMAGE_BG);
+			GaugeSkin.IMAGE_METER_EMPTY = SkinResources.getImage(SkinPropertiesIDs.GAUGE_IMAGE_MTR_EMPTY);
+			GaugeSkin.IMAGE_METER_FULL = SkinResources.getImage(SkinPropertiesIDs.GAUGE_IMAGE_MTR_FULL);
+			GaugeSkin.IMAGE_INC_BTN = SkinResources.getImage(SkinPropertiesIDs.GAUGE_IMAGE_INC_BTN);
+			GaugeSkin.IMAGE_DEC_BTN = SkinResources.getImage(SkinPropertiesIDs.GAUGE_IMAGE_DEC_BTN);
+			GaugeSkin.IMAGE_VALUES = SkinResources.getImage(SkinPropertiesIDs.GAUGE_IMAGE_VALUES);
+		}
+
+		init = true;
+	}
+}
