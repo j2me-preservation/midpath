@@ -34,12 +34,12 @@ Repository structure:
 -----------------------
 	
 	|-- bin: script files
-	|-- demos: sources of the demos classes
+	|-- components: sources of the MIDPath components
+	|-- configuration: configuration files
+	|-- demos: sources of the demos 
 	|-- external: sources of external libraries
 	|-- lib: libraries needed by MIDPath's core library
 	|-- native: native code (JNI)
-	|-- resources-embedded: resources required by MIDPath's core library
-	|-- components: Java sources of the MIDPath components 
 	|-- tests: sources of the test classes
 	. AUTHORS
 	. build.sh: the build script
