@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Adapt the next line to your environment
-JAVA_CMD=cacao
+JAVA_CMD="/devel/arm/green/mid/bin/cacao"
 
 if [ ! $MIDPATH_HOME ]; then
   MIDPATH_HOME=$(pwd)/..
