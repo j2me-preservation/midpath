@@ -1,4 +1,21 @@
-package org.thenesis.midpath.test.suite;
+/* 
+ * MIDPath - Copyright (C) 2006-2008 Guillaume Legris, Mathieu Legris
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version
+ * 2 only, as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License version 2 for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License
+ * version 2 along with this work; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA 
+ */
+package org.thenesis.midpath.test.suite.cldc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,13 +27,42 @@ import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
+import org.thenesis.midpath.test.suite.AbstractTestSuite;
+
 public class CLDCTestSuite extends AbstractTestSuite {
 
 	public CLDCTestSuite() {
-		super("TestSuite");
+		super("CLDCTestSuite");
+	}
+
+	/*
+	 * Number tests
+	 */
+	public void testBoolean() {
+		checkPoint("Boolean");
+		new BooleanTest().test(this);
+	}
+	public void testByte() {
+        checkPoint("Byte");
+        new ByteTest().test(this);
+    }
+	public void testInteger() {
+		checkPoint("Integer");
+		new IntegerTest().test(this);
+	}
+	public void testLong() {
+        checkPoint("Long");
+        new LongTest().test(this);
+    }
+	public void testFloat() {
+		checkPoint("Float");
+		new FloatTest().test(this);
+	}
+	public void testDouble() {
+		checkPoint("Double");
+		new DoubleTest().test(this);
 	}
 	
-
 	/*
 	 * Class tests
 	 */
@@ -26,7 +72,7 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		Class c = null;
 
 		try {
-			c = Class.forName("org.thenesis.midpath.test.suite.TestClass");
+			c = Class.forName("org.thenesis.midpath.test.suite.cldc.TestClass");
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			fail("Can't get a Class from a class name");
@@ -91,15 +137,15 @@ public class CLDCTestSuite extends AbstractTestSuite {
 
 	public void testGetName() {
 		checkPoint("Class.getName");
-		check(TestClass.class.getName(), "org.thenesis.midpath.test.suite.TestClass");
+		check(TestClass.class.getName(), "org.thenesis.midpath.test.suite.cldc.TestClass");
 	}
 
 	public void testGetResourceAsStream() {
 
-		checkPoint("getResourceAsStream");
+		checkPoint("Class.getResourceAsStream");
 		
 		// Test 1
-		InputStream is = CLDCTestSuite.class.getResourceAsStream("/org/thenesis/midpath/test/suite/file.txt");
+		InputStream is = CLDCTestSuite.class.getResourceAsStream("/org/thenesis/midpath/test/suite/cldc/file.txt");
 
 		int val = -1;
 		try {
@@ -123,40 +169,42 @@ public class CLDCTestSuite extends AbstractTestSuite {
 
 	}
 	
-	public void testIsAlive() {
-		
-		checkPoint("Thread.isAlive");
-		
-		Thread thread = new Thread() {
-			public void run() {	
-			}
-		};
-		
-		thread.start();
-		check(thread.isAlive());
-		
-		// Wait for the thread to die
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {}
-		
-		check(!thread.isAlive());
-		
-		/* Test isAlive() on a non-started thread */
-		
-		thread = new Thread() {
-			public void run() {	
-			}
-		};
-		
-		check(!thread.isAlive());
-	}
-
+	
 	/*
 	 * Thread tests
 	 */
-
-	public void testWait() {
+	
+	public void testInterrupt() {
+		checkPoint("Thread.interrupt");
+		new InterruptTest().test(this);
+	}
+	
+	public void testIsAlive() {
+		checkPoint("Thread.isAlive");
+		new IsAliveTest().test(this);
+	}
+	
+	public void testJoin() {
+		checkPoint("Thread.join");
+		new JoinTest().test(this);
+	}
+	
+	public void testTheadName() {
+		checkPoint("Thread.getName");
+		new ThreadNameTest().test(this);
+	}
+	
+	public void testPriority() {
+		checkPoint("Thread.setPriority");
+		new PriorityTest().test(this);
+	}
+	
+	public void testSleep() {
+		checkPoint("Thread.sleep");
+		new SleepTest().test(this);
+	}
+	
+	public void testWait2() {
 
 		long waitTime = 500;
 
@@ -165,14 +213,26 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		long startTime = System.currentTimeMillis();
 		thread.start();
 		try {
-			Thread.sleep(waitTime);
+			Thread.sleep(waitTime + 100);
 		} catch (InterruptedException e) {
 		}
 		long delta = System.currentTimeMillis() - startTime;
 
-		checkPoint("Object.wait");
+		checkPoint("Object.wait (2)");
 		check((delta > 0) && (delta < 1000));
 
+	}
+	
+	/* Object tests */
+	
+	public void testObject() {
+		checkPoint("Object.wait");
+		new ObjectTest().test(this);
+	}
+
+	public void testWait() {
+		checkPoint("Object.wait");
+		new WaitTest().test(this);
 	}
 	
 	public void testNotify() {
@@ -196,7 +256,16 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		check(thread.fieldValue, 16);
 
 	}
+	
+	/*
+     * Math tests
+     */
 
+	public void testMath() {
+        checkPoint("Math");
+        new MathTest().test(this);
+    }
+	
 	/*
 	 * Runtime tests
 	 */
@@ -220,71 +289,11 @@ public class CLDCTestSuite extends AbstractTestSuite {
 	/*
 	 * String tests
 	 */
-
-	public void testStringHashCode() {
-
-		String s = "helloworld";
-		char val[] = s.toCharArray();
-		int h = 0;
-		int len = val.length;
-
-		for (int i = 0; i < len; i++) {
-			h = 31 * h + val[i];
-		}
-
-		checkPoint("String.hashCode");
-		check(s.hashCode(), h);
-	}
-
-	public void testIndexOf() {
-
-		String s = "helloworld";
-		char v[] = s.toCharArray();
-		int count = v.length;
-		int max = count;
-
-		int ch = 'w';
-		int fromIndex = 0;
-		int position = -1;
-
-		if (fromIndex < 0) {
-			fromIndex = 0;
-		} else if (fromIndex >= count) {
-			position = -1;
-		}
-		for (int i = fromIndex; i < max; i++) {
-			if (v[i] == ch) {
-				position = i;
-			}
-		}
-		
-		checkPoint("String.indexOf");
-		check(s.indexOf('w'), position);
-		check(s.indexOf('w', 0), position);
-
-	}
 	
-	public void testLastIndexOf() {
-		String s = "helloworld";
-		char v[] = s.toCharArray();
-		int count = v.length;
-		
-		int min = 0;
-		
-		int ch = 'w';
-		int fromIndex = 8;
-		int position = -1;
-
-        for (int i =((fromIndex >= count) ? count - 1 : fromIndex) ; i >= min ; i--) {
-            if (v[i] == ch) {
-            	position = i;
-            }
-        }
-        
-        checkPoint("String.lastIndexOf");
-		check(s.lastIndexOf('w', fromIndex), position);
-        
-	}
+	public void testString() {
+        checkPoint("String");
+        new StringTest().test(this);
+    }
 	
 	/*
 	 * System tests
@@ -304,25 +313,16 @@ public class CLDCTestSuite extends AbstractTestSuite {
 	}
 	
 	public void testArrayCopy() {
-		
-		int[] array = new int[] { 0, 1, 2, 3, 4, 5 };
-		int srcOffset = 2;
-		int destOffset = 5;
-		int length = 3;
-		int[] copy = new int[destOffset + length];
-
-		System.arraycopy(array, srcOffset, copy, destOffset, length);
-		
-		boolean failed = false;
-		for (int i = 0; i < length; i++) {
-			failed = (copy[destOffset + i] == array[srcOffset + i]);
-			if (failed) break;
-		}
-		
 		checkPoint("System.arraycopy");
-		check(failed);
-		
+		new ArrayCopyTest().test(this);
 	}
+	
+	public void testIdentityHashCode() {
+		checkPoint("System.identityHashCode");
+		new IdentityHashCodeTest().test(this);
+	}
+	
+	
 	
 	public void testSocketConnection() {
 		
@@ -445,9 +445,7 @@ public class CLDCTestSuite extends AbstractTestSuite {
 			array[0] = i;
 		}
 		
-		check(true);
-		
-		
+		check(true);	
 	}
 	
 	private void testThreadCreation() {
@@ -476,11 +474,18 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		// System
 		testCurrentTimeMillis();
 		testArrayCopy();
+		testIdentityHashCode();
+		
+		// Numbers
+		testBoolean();
+		testByte();
+		testInteger();
+		testLong();
+		testFloat();
+		testDouble();
 		
 		// String
-		testStringHashCode();
-		testIndexOf();
-		testLastIndexOf();
+		testString();
 		
 		// Class
 		testForName();
@@ -491,11 +496,23 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		testIsArray();
 		testGetName();
 		testGetResourceAsStream();
+		
+		// Object
+		testObject();
+		testWait();
 
 		// Thread
-		testWait();
+		testInterrupt();
 		testIsAlive();
+		testJoin();
 		testNotify();
+		testTheadName();
+		testPriority();
+		testSleep();
+		testWait2();
+		
+		// Maths
+		testMath();
 
 		// Runtime
 		testFreeMemory();

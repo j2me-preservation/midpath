@@ -1,15 +1,12 @@
-package org.thenesis.midpath.test.suite;
+package org.thenesis.midpath.test.suite.midp;
 
 import java.io.IOException;
 
-//import java.io.File;
-//import java.io.RandomAccessFile;
-
 import org.thenesis.midpath.io.backend.cldc.File;
 import org.thenesis.midpath.io.backend.cldc.RandomAccessFile;
-import org.thenesis.midpath.test.TestHarness;
+import org.thenesis.midpath.test.suite.AbstractTestSuite;
 
-public class FileTestSuite extends TestHarness {
+public class FileTestSuite extends AbstractTestSuite {
 
 	/**
 	 * @param args

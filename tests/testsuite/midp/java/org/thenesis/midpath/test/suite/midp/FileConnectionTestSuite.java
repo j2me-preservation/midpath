@@ -1,4 +1,4 @@
-package org.thenesis.midpath.test.suite;
+package org.thenesis.midpath.test.suite.midp;
 
 import java.io.IOException;
 import java.io.InputStream;
