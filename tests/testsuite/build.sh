@@ -39,6 +39,10 @@ disable-cldc-testuite,\
 disable-jni-testuite,\
 \
 with-cldc-jar:,\
+with-jni-include:,\
+\
+with-jar:,\
+with-javac:\
 "
 
 TEMP=`getopt -l $OPTIONS -o h -- "$@"`
@@ -67,26 +71,26 @@ while true; do
       exit 0
       ;;
     --disable-cldc-testsuite ) CLDC_TESTSUITE_ENABLED=no
-      echo "compiling CLDC testsuite disabled"
+      echo "Compiling CLDC testsuite disabled"
       shift ;;
     --disable-jni-testuite ) JNI_TESTSUITE_ENABLED=no
-      echo "compiling JNI testsuite disabled"
+      echo "Compiling JNI testsuite disabled"
       shift ;;
     --with-cldc-jar )
       CLDC_JAR=$2
-      echo "using CLDC class library at: $CLDC_JAR"
+      echo "Using CLDC class library at: $CLDC_JAR"
       shift 2 ;;
     --with-jar )
       JAR_CMD=$2
-      echo "using jar command: $JAR_CMD"
+      echo "Using jar command: $JAR_CMD"
       shift 2 ;;
     --with-javac )
       JAVAC_CMD=$2
-      echo "using javac command: $JAVAC_CMD"
+      echo "Using javac command: $JAVAC_CMD"
       shift 2 ;;
     --with-jni-include )
       JNI_INCLUDE=$2
-      echo "using JNI include paths: $JNI_INCLUDE"
+      echo "Using JNI include paths: $JNI_INCLUDE"
       shift 2 ;;
     -- ) shift; break;;
     * ) echo "Unknown argument: $1"; break ;;
