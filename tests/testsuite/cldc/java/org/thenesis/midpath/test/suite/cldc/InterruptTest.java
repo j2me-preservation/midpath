@@ -53,15 +53,6 @@ public class InterruptTest implements Testlet {
 		}
 		harness.check(interrupted_exception, "Thread.interrupt: sleep with interrupt flag throws InterruptedException");
 
-		// Set interrupt flag again for join test
-		current.interrupt();
-		interrupted_exception = false;
-		try {
-			current.join(50, 50);
-		} catch (InterruptedException ie) {
-			interrupted_exception = true;
-		}
-		harness.check(interrupted_exception, "Thread.interrupt: join with interrupt flag throws InterruptedException");
 
 	}
 }

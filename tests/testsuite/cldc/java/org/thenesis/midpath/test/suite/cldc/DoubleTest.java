@@ -360,11 +360,6 @@ public class DoubleTest implements Testlet {
 		check_remainder(1.25, 0.50, 0.25, 9);
 		check_remainder(12345.678, 1234.5678, 1234.5678000000, 10);
 
-		if (!System.getProperty("os.name").equals("VxWorks")) {
-			// bug EJWcr00686, has not been fixed yet.
-			// Test is disabled for smallvm 2.0.1 release.
-			check_remainder(Double.MAX_VALUE, Double.MIN_VALUE, 0.00000000000000, 11);
-		}
 
 		check_remainder(0.0, 999.99, 0.00000000000000, 12);
 		check_remainder(123.0, 25.0, 23.0, 13);
