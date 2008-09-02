@@ -71,6 +71,10 @@ public class UIBackendFactory {
     }
 
     public static UIBackend createBackend(Object m) {
+        
+        if (m == null) {
+            return null;
+        }
 
         if (m instanceof UIBackend) {
             return (UIBackend) m;
