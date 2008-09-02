@@ -1,5 +1,5 @@
 #
-# Makefile created at Sat Nov 10 11:12:49 2007, by mmake
+# Makefile created at Tue Sep  2 00:57:51 2008, by mmake
 #
 
 # Programs (with common options):
@@ -112,11 +112,15 @@ PACKAGES = \
 	org.thenesis.microbackend.ui.qt \
 	org.thenesis.microbackend.ui \
 	org.thenesis.microbackend.ui.swt \
-	org.thenesis.microbackend.ui.sdl
+	org.thenesis.microbackend.zip \
+	org.thenesis.microbackend.ui.image.png \
+	org.thenesis.microbackend.ui.sdl \
+	org.thenesis.microbackend.ui.graphics
 
 
 # All packages that can be recursively compiled.
 ALL_PACKAGES = \
+	org.thenesis.microbackend.ui.image \
 	org \
 	org.thenesis.microbackend \
 	org.thenesis \
@@ -409,6 +413,7 @@ ifneq ($(DEPEND),)
 endif
 
 #package targets
+org.thenesis.microbackend.ui.image : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui.image)
 org : $(call PACKAGE_OBJS,org)
 org.thenesis.microbackend : $(call PACKAGE_OBJS,org.thenesis.microbackend)
 org.thenesis : $(call PACKAGE_OBJS,org.thenesis)
@@ -420,5 +425,8 @@ org.thenesis.microbackend.ui.fb : $(call PACKAGE_OBJS,org.thenesis.microbackend.
 org.thenesis.microbackend.ui.qt : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui.qt)
 org.thenesis.microbackend.ui : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui)
 org.thenesis.microbackend.ui.swt : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui.swt)
+org.thenesis.microbackend.zip : $(call PACKAGE_OBJS,org.thenesis.microbackend.zip)
+org.thenesis.microbackend.ui.image.png : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui.image.png)
 org.thenesis.microbackend.ui.sdl : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui.sdl)
+org.thenesis.microbackend.ui.graphics : $(call PACKAGE_OBJS,org.thenesis.microbackend.ui.graphics)
 

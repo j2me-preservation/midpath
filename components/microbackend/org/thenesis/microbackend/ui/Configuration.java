@@ -76,7 +76,7 @@ public class Configuration {
 		return p;
 	}
 	
-	public int getIntParamater(String key, int defaultValue) {
+	public int getIntParameter(String key, int defaultValue) {
        
         String p = getParameter(key);
         if (p == null) {

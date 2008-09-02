@@ -188,7 +188,7 @@ class VirtualBackendImpl implements VirtualBackend {
 			backendConfig.addParameter(properties.getKeyAt(i), properties.getValueAt(i));
 		}
 		backend.setBackendEventListener(listener);
-		backend.initialize(backendConfig, w, h);
+		backend.configure(backendConfig, w, h);
 	}
 
 	public EventMapper getEventMapper() {

@@ -17,160 +17,51 @@
  */
 package org.thenesis.microbackend.ui.awt;
 
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Panel;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import org.thenesis.microbackend.ui.BackendEventListener;
 import org.thenesis.microbackend.ui.Configuration;
-import org.thenesis.microbackend.ui.NullBackendEventListener;
-import org.thenesis.microbackend.ui.UIBackend;
 
-public class AWTBackend implements UIBackend {
+public class AWTBackend extends AbstractAWTBackend {
 
-	private Panel panel;
-	private Frame frame;
-	protected BufferedImage screenImage;
-	
-	private int canvasWidth;
-	private int canvasHeight;
-	
-	private BackendEventListener listener = new NullBackendEventListener();
+    private Frame frame;
 
-	public AWTBackend(int w, int h) {
-		canvasWidth = w;
-		canvasHeight = h;
-	}
-	
-	public AWTBackend() {
-		
-	}
-	
-	/* UIBackend interface */
+    public AWTBackend(int w, int h) {
+        canvasWidth = w;
+        canvasHeight = h;
+    }
 
-	public void initialize(Configuration conf, int width, int height) {
-		canvasWidth = width;
-		canvasHeight = height;
-	}
+    public AWTBackend() {
+    }
 
-	public void setBackendEventListener(BackendEventListener listener) {
-		this.listener = listener;
-	}
+    /* UIBackend interface */
 
-	
-	public void open() throws IOException {
-		final Dimension dimension = new Dimension(canvasWidth, canvasHeight);
-		panel = new Panel() {
+    public void configure(Configuration conf, int width, int height) {
+        canvasWidth = width;
+        canvasHeight = height;
+    }
 
-			public void update(Graphics g) {
-				paint(g);
-			}
+    public void setBackendEventListener(BackendEventListener listener) {
+        this.listener = listener;
+    }
 
-			public Dimension getMinimumSize() {
-				return dimension;
-			}
+    public void open() throws IOException {
+        Panel panel = createPanel();
+        
+        frame = new Frame();
+        frame.setResizable(false);
+        frame.addWindowListener(converter);
+        frame.add(panel);
+        frame.pack();
+        frame.setVisible(true);
+        
+        panel.requestFocus();
+    }
 
-			public Dimension getPreferredSize() {
-				return dimension;
-			}
-
-			public void paint(Graphics g) {
-				if (screenImage != null) {
-					g.drawImage(screenImage, 0, 0, null);
-				}
-			}
-		};
-
-		AWTEventConverter listener = new AWTEventConverter();
-
-		frame = new Frame();
-		frame.addWindowListener(listener);
-		panel.addKeyListener(listener);
-		panel.addMouseListener(listener);
-		panel.addMouseMotionListener(listener);
-		frame.add(panel);
-		frame.setResizable(false);
-		frame.pack();
-		frame.setVisible(true);
-		panel.requestFocus();
-	}
-
-
-	public void updateARGBPixels(int[] argbPixels, int x, int y, int width, int heigth) {
-
-		int w = canvasWidth;
-		int h = canvasHeight;
-
-		if (screenImage == null) {
-			screenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		}
-
-		screenImage.setRGB(0, 0, w, h, argbPixels, 0, w);
-		panel.repaint();
-	}
-	
-	public void close() {
-		frame.dispose();
-	}
-	
-	/* Internals */
-
-	private class AWTEventConverter implements KeyListener, MouseListener, MouseMotionListener, WindowListener {
-
-		public void keyPressed(KeyEvent e) {
-			//System.out.println("[DEBUG] AWTBackend.keyPressed(): key code: " + e.getKeyCode() + " char: "+ e.getKeyChar());
-			listener.keyPressed(e.getKeyCode(), e.getKeyChar(), e.getModifiers());
-		}
-
-		public void keyReleased(KeyEvent e) {
-			//System.out.println("[DEBUG] AWTBackend.keyReleased(): key code: " + e.getKeyCode() + " char: " + e.getKeyChar());
-			listener.keyReleased(e.getKeyCode(), e.getKeyChar(), e.getModifiers());
-		}
-
-		// Not used
-		public void keyTyped(KeyEvent e) {}
-		public void mouseClicked(MouseEvent e) {}
-		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
-		public void mouseDragged(MouseEvent e) {}
-		
-		public void mousePressed(MouseEvent e) {
-			//System.out.println("[DEBUG] AWTBackend.mousePressed()");
-			listener.mousePressed(e.getX(), e.getY(), e.getModifiers());
-		}
-
-		public void mouseReleased(MouseEvent e) {
-			//System.out.println("[DEBUG] AWTBackend.mouseReleased()");
-			listener.mouseReleased(e.getX(), e.getY(), e.getModifiers());
-		}
-
-		public void mouseMoved(MouseEvent e) { 
-			//System.out.println("[DEBUG] AWTBackend.mouseMoved()");
-			listener.mouseMoved(e.getX(), e.getY(), e.getModifiers());
-		}
-		
-		public void windowClosing(WindowEvent e) {
-			listener.windowClosed();
-		}
-
-		// Not used
-		public void windowClosed(WindowEvent e) {}
-		public void windowActivated(WindowEvent arg0) {}
-		public void windowDeactivated(WindowEvent arg0) {}
-		public void windowDeiconified(WindowEvent arg0) {}
-		public void windowIconified(WindowEvent arg0) {}
-		public void windowOpened(WindowEvent arg0) {}
-
-	}
+    public void close() {
+        frame.dispose();
+    }
 
 }

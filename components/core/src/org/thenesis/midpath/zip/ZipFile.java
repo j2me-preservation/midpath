@@ -46,6 +46,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
+import org.thenesis.microbackend.zip.Inflater;
+import org.thenesis.microbackend.zip.InflaterInputStream;
+import org.thenesis.microbackend.zip.ZipException;
+
 import com.sun.midp.io.j2me.file.BaseFileHandler;
 import com.sun.midp.io.j2me.file.RandomAccessStream;
 

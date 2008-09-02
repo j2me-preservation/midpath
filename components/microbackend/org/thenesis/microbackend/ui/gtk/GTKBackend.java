@@ -49,7 +49,7 @@ public class GTKBackend implements UIBackend {
 
 	/* UIBackend interface */
 
-	public void initialize(Configuration conf, int width, int height) {
+	public void configure(Configuration conf, int width, int height) {
 		canvasWidth = width;
 		canvasHeight = height;
 	}
@@ -69,6 +69,14 @@ public class GTKBackend implements UIBackend {
 			}
 		});
 	}
+	
+	public int getWidth() {
+        return canvasWidth;
+    }
+
+    public int getHeight() {
+        return canvasHeight;
+    }
 
 	public void open() {
 

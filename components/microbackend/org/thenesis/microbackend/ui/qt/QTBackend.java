@@ -49,7 +49,7 @@ public class QTBackend implements UIBackend {
 
 	/* UICanvas interface */
 
-	public void initialize(Configuration conf, int width, int height) {
+	public void configure(Configuration conf, int width, int height) {
 		this.canvasWidth = width;
 		this.canvasHeight = height;
 	}
@@ -86,6 +86,15 @@ public class QTBackend implements UIBackend {
 			final int height) {
 		writeARGB(argbBuffer, x_src, y_src, width, height);
 	}
+	
+	public int getWidth() {
+        return canvasWidth;
+    }
+
+    public int getHeight() {
+        return canvasHeight;
+    }
+
 
 	/* Event callback methods (called by native code) */
 

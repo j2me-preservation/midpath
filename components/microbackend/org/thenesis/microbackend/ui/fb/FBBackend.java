@@ -67,7 +67,7 @@ public class FBBackend implements UIBackend {
 
 	/* UIBackend interface */
 
-	public void initialize(Configuration conf, int width, int height) {
+	public void configure(Configuration conf, int width, int height) {
 		canvasWidth = width;
 		canvasHeight = height;
 		fbDeviceName = conf.getParameterDefault("org.thenesis.microbackend.ui.fb.framebufferDevice", null);
@@ -105,6 +105,14 @@ public class FBBackend implements UIBackend {
 		drawARGB(argbBuffer, y * canvasWidth + x, canvasWidth, x, y, w, h);
 		drawARGB(mouseImage, 0, MOUSE_WIDTH, mouseX, mouseY, MOUSE_WIDTH, MOUSE_HEIGHT);
 	}
+	
+	public int getWidth() {
+        return canvasWidth;
+    }
+
+    public int getHeight() {
+        return canvasHeight;
+    }
 
 	/* Event callbacks */
 

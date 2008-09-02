@@ -18,7 +18,45 @@
 package org.thenesis.microbackend.ui;
 
 public class Logging {
-	
-	public static final boolean TRACE_ENABLED = false;
+
+    public static final int DEBUG = 1;
+    public static final int INFO = 2;
+    public static final int WARNING = 3;
+    public static final int ERROR = 4;
+
+    private static String STRING_DEBUG = "[DEBUG]";
+    private static String STRING_INFO = "[INFO]";
+    private static String STRING_WARNING = "[WARNING]";
+    private static String STRING_ERROR = "[ERROR]";
+
+    public static final boolean TRACE_ENABLED = false;
+
+    public static int currentLevel = 4;
+
+    public static int getLevel() {
+        return currentLevel;
+    }
+
+    public static void log(String message, int level) {
+        if (currentLevel >= level) {
+            String levelString = "";
+            switch (level) {
+            case DEBUG:
+                levelString = STRING_DEBUG;
+                break;
+            case INFO:
+                levelString = STRING_INFO;
+                break;
+            case WARNING:
+                levelString = STRING_WARNING;
+                break;
+            case ERROR:
+                levelString = STRING_ERROR;
+                break;
+            }
+
+            System.out.println(levelString + " " + message);
+        }
+    }
 
 }

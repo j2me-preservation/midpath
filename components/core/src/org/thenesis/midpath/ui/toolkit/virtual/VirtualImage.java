@@ -27,9 +27,9 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.UIToolkit;
 import javax.microedition.lcdui.game.Sprite;
 
-import org.thenesis.midpath.image.png.ColorModel;
-import org.thenesis.midpath.image.png.ImageConsumer;
-import org.thenesis.midpath.image.png.PngImage;
+import org.thenesis.microbackend.ui.image.png.ColorModel;
+import org.thenesis.microbackend.ui.image.png.ImageConsumer;
+import org.thenesis.microbackend.ui.image.png.PngImage;
 
 import com.sun.midp.log.Logging;
 
