@@ -270,6 +270,8 @@ public abstract class AbstractSWTBackend implements UIBackend, KeyListener, Mous
         }
 
         switch (c) {
+        case '\r': 
+            return KeyConstants.VK_ENTER;
         case '@':
             return KeyConstants.VK_AT;
         case '`':
