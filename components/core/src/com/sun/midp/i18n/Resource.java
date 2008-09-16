@@ -59,7 +59,7 @@ abstract public class Resource {
 	res = null;
 	String loc = Configuration.getProperty("microedition.locale");
 	
-	if ((loc == null) || (loc.equals("en-US"))) {
+	if ((loc == null) || loc.equals("en-US") || loc.equals("en_US")) {
 	    // the default case
 	    res = (ResourceBundle) new LocalizedStrings();
 	} else {
