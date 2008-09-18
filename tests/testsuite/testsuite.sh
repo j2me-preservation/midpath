@@ -1,8 +1,9 @@
 #!/bin/bash
-# Usage: type ./build.sh --help
+# Usage: type ./testsuite.sh --help
 
 # Default commands and library locations
-JAVAC_CMD=javac
+JAVAC_CMD=ecj
+JAVA_CMD=java
 JAR_CMD=jar
 JAR_FLAGS=cvf
 FASTJAR_ENABLED=no
@@ -18,6 +19,8 @@ CLDC_JAR=${JAR_DIST_HOME}/cldc1.1.jar
 CLDC_FLAGS="-source 1.3 -target 1.1"
 
 # Defaults
+BUILD=no
+TEST=no
 CLDC_TESTSUITE_ENABLED=yes
 JNI_TESTSUITE_ENABLED=yes
 
@@ -35,6 +38,9 @@ JNI_TESTSUITE_JAR=${JAR_DIST_HOME}/testsuite-jni.jar
 OPTIONS="\
 help,\
 \
+build,\
+test,\
+\
 disable-cldc-testuite,\
 disable-jni-testuite,\
 \
@@ -42,7 +48,8 @@ with-cldc-jar:,\
 with-jni-include:,\
 \
 with-jar:,\
-with-javac:\
+with-javac:,\
+with-java:\
 "
 
 TEMP=`getopt -l $OPTIONS -o h -- "$@"`
@@ -55,8 +62,10 @@ while true; do
       echo "  --help                    : Show this help"
       echo
       echo "Core features:"
-      echo "  --disable-cldc-testsuite  : Do not compile CLDC test suite (default: yes)"
-      echo "  --disable-jni-testuite    : Do not compile JNI test suite (default: yes)"
+      echo "  --build                   : Build test suites
+      echo "  --test                    : Start test suites
+      echo "  --disable-cldc-testsuite  : Do not build/test CLDC test suite (default: yes)"
+      echo "  --disable-jni-testuite    : Do not build/test JNI test suite (default: yes)"
       echo
       echo "Providable libraries:"
       echo "  --with-cldc-jar           : Location of the CLDC class library"
@@ -64,12 +73,19 @@ while true; do
       echo "External programs:"
       echo "  --with-jar                : Location and name of the jar tool (default: $JAR_CMD)"
       echo "  --with-javac              : Location and name of the javac tool (default: $JAVAC_CMD)"
+      echo "  --with-java               : Location and name of the java tool (default: $JAVA_CMD)"
       echo
       echo "Header file locations:"
       echo "Note: Quoting is neccessary for multiple path elements."
       echo "  --with-jni-include        : Location of the JNI headers (CC syntax) (default: $JNI_INCLUDE)"
       exit 0
       ;;
+    --build ) BUILD=yes
+      echo "Building test suites enabled"
+      shift ;;
+    --test ) TEST=yes
+      echo "Starting test suites enabled"
+      shift ;;
     --disable-cldc-testsuite ) CLDC_TESTSUITE_ENABLED=no
       echo "Compiling CLDC testsuite disabled"
       shift ;;
@@ -88,6 +104,10 @@ while true; do
       JAVAC_CMD=$2
       echo "Using javac command: $JAVAC_CMD"
       shift 2 ;;
+    --with-java )
+      JAVA_CMD=$2
+      echo "Using java command: $JAVA_CMD"
+      shift 2 ;;
     --with-jni-include )
       JNI_INCLUDE=$2
       echo "Using JNI include paths: $JNI_INCLUDE"
@@ -96,11 +116,6 @@ while true; do
     * ) echo "Unknown argument: $1"; break ;;
   esac
 done
-
-# Create the dist directory
-if [ ! -d $JAR_DIST_HOME ]; then
-  mkdir $JAR_DIST_HOME
-fi
 
 # Builds mmake-managed Java sources and creates a Jar.
 #
@@ -161,22 +176,8 @@ build_java_res()
   fi
 }
 
-#------------------------
-# Build test suites
-#------------------------
-
-# Build CLDC test suite
-build_java_res $CLDC_TESTSUITE_ENABLED cldc/java cldc/resources $CLDC_TESTSUITE_JAR
-
-# Build JNI test suite 
-build_java $JNI_TESTSUITE_ENABLED jni/java $JNI_TESTSUITE_JAR :$CLDC_TESTSUITE_JAR
-
-#------------------- 
-# Build native code
-#-------------------
-
 # Builds a JNI library in a subdirectory.
-# 
+#
 # $1 - yes/no - whether the the item should be build or not.
 # $2 - directory of the Makefile
 # $3 - quoted makefile arguments (e.g. "FOO=bar BAZ=bla")
@@ -200,5 +201,44 @@ build_native()
   fi
 }
 
-# Build native part of the JNI test suite
-build_native $JNI_TESTSUITE_ENABLED jni/native
+#------------------------
+# Build test suites
+#------------------------
+
+if [ $BUILD = yes ]; then
+
+  # Create the dist directory
+  if [ ! -d $JAR_DIST_HOME ]; then
+    mkdir $JAR_DIST_HOME
+  fi
+
+  # Build CLDC test suite
+  build_java_res $CLDC_TESTSUITE_ENABLED cldc/java cldc/resources $CLDC_TESTSUITE_JAR
+
+  # Build JNI test suite 
+  build_java $JNI_TESTSUITE_ENABLED jni/java $JNI_TESTSUITE_JAR :$CLDC_TESTSUITE_JAR
+
+  # Build native part of the JNI test suite
+  build_native $JNI_TESTSUITE_ENABLED jni/native
+
+fi
+
+#------------------------
+# Start test suites
+#------------------------
+
+if [ $TEST = yes ]; then
+
+  if [ $CLDC_TESTSUITE_ENABLED = yes ]; then
+    echo "Starting CLDC test suite..."
+    ${JAVA_CMD} -Xbootclasspath/c:$CLDC_JAR:$CLDC_TESTSUITE_JAR org.thenesis.midpath.test.suite.cldc.CLDCTestSuite || exit 1
+    # Test against a Java SE VM
+    # ${JAVA_CMD} -cp $CLDC_JAR:$CLDC_TESTSUITE_JAR org.thenesis.midpath.test.suite.cldc.CLDCTestSuite || exit 1
+  fi
+  
+  if [ $JNI_TESTSUITE_ENABLED = yes ]; then
+    echo "Starting JNI test suite...."
+    ${JAVA_CMD} -Xbootclasspath/c:$CLDC_JAR:$CLDC_TESTSUITE_JAR:$JNI_TESTSUITE_JAR org.thenesis.midpath.test.suite.jni.JNITestSuite
+  fi
+
+fi
