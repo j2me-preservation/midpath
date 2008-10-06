@@ -25,6 +25,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -44,14 +46,16 @@ public abstract class AbstractSWTBackend implements UIBackend, KeyListener, Mous
     protected ImageData imageData;
     protected Image image;
     protected GC gc;
-    protected Runnable painterRunnable;
+    protected RedrawTask redrawTask;
     protected Display display;
+    protected Canvas canvas;
 
     protected int canvasWidth;
     protected int canvasHeight;
 
     protected BackendEventListener listener = new NullBackendEventListener();
-
+    private int keyCode;
+    private int keyChar;
 
     public void setBackendEventListener(BackendEventListener listener) {
         this.listener = listener;
@@ -70,7 +74,8 @@ public abstract class AbstractSWTBackend implements UIBackend, KeyListener, Mous
         }
 
         if (display != null) {
-            display.syncExec(painterRunnable);
+            redrawTask.setRegion(x, y, width, height);
+            display.syncExec(redrawTask);
         }
 
     }
@@ -82,19 +87,23 @@ public abstract class AbstractSWTBackend implements UIBackend, KeyListener, Mous
     public int getHeight() {
         return canvasHeight;
     }
-    
-    protected void configureCanvas(Canvas canvas) {
+
+    protected void configureCanvas(final Canvas canvas) {
+
+        this.canvas = canvas;
         PaletteData palette = new PaletteData(0x00FF0000, 0x0000FF00, 0x000000FF);
         imageData = new ImageData(canvasWidth, canvasHeight, 32, palette);
         gc = new GC(canvas);
 
-        painterRunnable = new Runnable() {
-            public void run() {
+        canvas.addPaintListener(new PaintListener() {
+            public void paintControl(PaintEvent e) {
                 image = new Image(display, imageData);
-                gc.drawImage(image, 0, 0);
+                e.gc.drawImage(image, e.x, e.y, e.width, e.height, e.x, e.y, e.width, e.height);
                 image.dispose();
             }
-        };
+        });
+
+        redrawTask = new RedrawTask(canvas);
 
         canvas.addKeyListener(this);
         canvas.addMouseListener(this);
@@ -102,29 +111,16 @@ public abstract class AbstractSWTBackend implements UIBackend, KeyListener, Mous
         canvas.addDisposeListener(this);
     }
 
-
     public void keyPressed(KeyEvent e) {
-        //System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + e.character);
-        char c = e.character;
-        int keyCode = e.keyCode;
-
-        if (c == 0) {
-            listener.keyPressed(convertKeyCode(keyCode), KeyConstants.CHAR_UNDEFINED, 0);
-        } else {
-            listener.keyPressed(convertCharToKeyCode(c), c, 0);
-        }
+        //System.out.println("[DEBUG] SWTBackend.keyPressed(): key code: " + e.keyCode + " char: " + (int) e.character);
+        mapKey(e.keyCode, e.character);
+        listener.keyPressed(keyCode, (char)keyChar, 0);
     }
 
     public void keyReleased(KeyEvent e) {
         //System.out.println("[DEBUG] SWTBackend.keyReleased(): key code: " + e.keyCode + " char: " + e.character);
-        char c = e.character;
-        int keyCode = e.keyCode;
-
-        if (c == 0) {
-            listener.keyReleased(convertKeyCode(keyCode), KeyConstants.CHAR_UNDEFINED, 0);
-        } else {
-            listener.keyReleased(convertCharToKeyCode(c), c, 0);
-        }
+        mapKey(e.keyCode, e.character);
+        listener.keyReleased(keyCode, (char)keyChar, 0);
     }
 
     public void keyTyped(KeyEvent e) {
@@ -154,173 +150,290 @@ public abstract class AbstractSWTBackend implements UIBackend, KeyListener, Mous
         listener.windowClosed();
     }
 
-    protected static int convertKeyCode(int keyCode) {
+    protected void mapKey(int inputKeyCode, char inputChar) {
 
-        // First check if it's a SWT key code
-        switch (keyCode) {
+        keyCode = KeyConstants.VK_UNDEFINED;
+
+        //  First check if it's a SWT key code
+        switch (inputKeyCode) {
         case SWT.ARROW_UP:
-            return KeyConstants.VK_UP;
+            keyCode = KeyConstants.VK_UP;
+            break;
         case SWT.ARROW_DOWN:
-            return KeyConstants.VK_DOWN;
+            keyCode = KeyConstants.VK_DOWN;
+            break;
         case SWT.ARROW_LEFT:
-            return KeyConstants.VK_LEFT;
+            keyCode = KeyConstants.VK_LEFT;
+            break;
         case SWT.ARROW_RIGHT:
-            return KeyConstants.VK_RIGHT;
+            keyCode = KeyConstants.VK_RIGHT;
+            break;
         case SWT.PAGE_UP:
-            return KeyConstants.VK_PAGE_UP;
+            keyCode = KeyConstants.VK_PAGE_UP;
+            break;
         case SWT.PAGE_DOWN:
-            return KeyConstants.VK_PAGE_DOWN;
+            keyCode = KeyConstants.VK_PAGE_DOWN;
+            break;
         case SWT.HOME:
-            return KeyConstants.VK_HOME;
+            keyCode = KeyConstants.VK_HOME;
+            break;
         case SWT.END:
-            return KeyConstants.VK_END;
+            keyCode = KeyConstants.VK_END;
+            break;
         case SWT.INSERT:
-            return KeyConstants.VK_INSERT;
+            keyCode = KeyConstants.VK_INSERT;
+            break;
         case SWT.F1:
-            return KeyConstants.VK_F1;
+            keyCode = KeyConstants.VK_F1;
+            break;
         case SWT.F2:
-            return KeyConstants.VK_F2;
+            keyCode = KeyConstants.VK_F2;
+            break;
         case SWT.F3:
-            return KeyConstants.VK_F3;
+            keyCode = KeyConstants.VK_F3;
+            break;
         case SWT.F4:
-            return KeyConstants.VK_F4;
+            keyCode = KeyConstants.VK_F4;
+            break;
         case SWT.F5:
-            return KeyConstants.VK_F5;
+            keyCode = KeyConstants.VK_F5;
+            break;
         case SWT.F6:
-            return KeyConstants.VK_F6;
+            keyCode = KeyConstants.VK_F6;
+            break;
         case SWT.F7:
-            return KeyConstants.VK_F7;
+            keyCode = KeyConstants.VK_F7;
+            break;
         case SWT.F8:
-            return KeyConstants.VK_F8;
+            keyCode = KeyConstants.VK_F8;
+            break;
         case SWT.F9:
-            return KeyConstants.VK_F9;
+            keyCode = KeyConstants.VK_F9;
+            break;
         case SWT.F10:
-            return KeyConstants.VK_F10;
+            keyCode = KeyConstants.VK_F10;
+            break;
         case SWT.F11:
-            return KeyConstants.VK_F11;
+            keyCode = KeyConstants.VK_F11;
+            break;
         case SWT.F12:
-            return KeyConstants.VK_F12;
+            keyCode = KeyConstants.VK_F12;
+            break;
         case SWT.F13:
-            return KeyConstants.VK_F13;
+            keyCode = KeyConstants.VK_F13;
+            break;
         case SWT.F14:
-            return KeyConstants.VK_F14;
+            keyCode = KeyConstants.VK_F14;
+            break;
         case SWT.F15:
-            return KeyConstants.VK_F15;
+            keyCode = KeyConstants.VK_F15;
+            break;
         case SWT.KEYPAD_MULTIPLY:
-            return KeyConstants.VK_MULTIPLY;
+            keyCode = KeyConstants.VK_MULTIPLY;
+            break;
         case SWT.KEYPAD_ADD:
-            return KeyConstants.VK_ADD;
+            keyCode = KeyConstants.VK_ADD;
+            break;
         case SWT.KEYPAD_SUBTRACT:
-            return KeyConstants.VK_SUBTRACT;
+            keyCode = KeyConstants.VK_SUBTRACT;
+            break;
         case SWT.KEYPAD_DECIMAL:
-            return KeyConstants.VK_DECIMAL;
+            keyCode = KeyConstants.VK_DECIMAL;
+            break;
         case SWT.KEYPAD_DIVIDE:
-            return KeyConstants.VK_DIVIDE;
+            keyCode = KeyConstants.VK_DIVIDE;
+            break;
         case SWT.KEYPAD_0:
-            return KeyConstants.VK_NUMPAD0;
+            keyCode = KeyConstants.VK_NUMPAD0;
+            break;
         case SWT.KEYPAD_1:
-            return KeyConstants.VK_NUMPAD1;
+            keyCode = KeyConstants.VK_NUMPAD1;
+            break;
         case SWT.KEYPAD_2:
-            return KeyConstants.VK_NUMPAD2;
+            keyCode = KeyConstants.VK_NUMPAD2;
+            break;
         case SWT.KEYPAD_3:
-            return KeyConstants.VK_NUMPAD3;
+            keyCode = KeyConstants.VK_NUMPAD3;
+            break;
         case SWT.KEYPAD_4:
-            return KeyConstants.VK_NUMPAD4;
+            keyCode = KeyConstants.VK_NUMPAD4;
+            break;
         case SWT.KEYPAD_5:
-            return KeyConstants.VK_NUMPAD5;
+            keyCode = KeyConstants.VK_NUMPAD5;
+            break;
         case SWT.KEYPAD_6:
-            return KeyConstants.VK_NUMPAD6;
+            keyCode = KeyConstants.VK_NUMPAD6;
+            break;
         case SWT.KEYPAD_7:
-            return KeyConstants.VK_NUMPAD7;
+            keyCode = KeyConstants.VK_NUMPAD7;
+            break;
         case SWT.KEYPAD_8:
-            return KeyConstants.VK_NUMPAD8;
+            keyCode = KeyConstants.VK_NUMPAD8;
+            break;
         case SWT.KEYPAD_9:
-            return KeyConstants.VK_NUMPAD9;
+            keyCode = KeyConstants.VK_NUMPAD9;
+            break;
         case SWT.KEYPAD_EQUAL:
-            return KeyConstants.VK_EQUALS;
+            keyCode = KeyConstants.VK_EQUALS;
+            break;
         case SWT.KEYPAD_CR:
-            return KeyConstants.VK_ENTER;
+            keyCode = KeyConstants.VK_ENTER;
+            break;
+        case SWT.CR:
+            keyCode = KeyConstants.VK_ENTER;
+            break;
         case SWT.HELP:
-            return KeyConstants.VK_HELP;
+            keyCode = KeyConstants.VK_HELP;
+            break;
         case SWT.CAPS_LOCK:
-            return KeyConstants.VK_CAPS_LOCK;
+            keyCode = KeyConstants.VK_CAPS_LOCK;
+            break;
         case SWT.NUM_LOCK:
-            return KeyConstants.VK_NUM_LOCK;
+            keyCode = KeyConstants.VK_NUM_LOCK;
+            break;
         case SWT.SCROLL_LOCK:
-            return KeyConstants.VK_SCROLL_LOCK;
+            keyCode = KeyConstants.VK_SCROLL_LOCK;
+            break;
         case SWT.PAUSE:
-            return KeyConstants.VK_PAUSE;
+            keyCode = KeyConstants.VK_PAUSE;
+            break;
         case SWT.BREAK:
-            return KeyConstants.VK_UNDEFINED;
+            keyCode = KeyConstants.VK_UNDEFINED;
+            break;
         case SWT.PRINT_SCREEN:
-            return KeyConstants.VK_PRINTSCREEN;
+            keyCode = KeyConstants.VK_PRINTSCREEN;
+            break;
         default:
-            return KeyConstants.VK_UNDEFINED;
+            keyCode = KeyConstants.VK_UNDEFINED;
         }
+
+        // Map SWT char to AWT key codes and AWT chars
+        keyChar = KeyConstants.CHAR_UNDEFINED;
+
+        if (inputChar != 0) {
+
+            keyChar = inputChar;
+
+            // Convert letter and number key codes
+            if (((inputChar >= '0') && (inputChar <= '9')) || ((inputChar >= 'A') && (inputChar <= 'Z'))) {
+                keyCode = inputChar;
+            }
+
+            if (((inputChar >= 'a') && (inputChar <= 'z'))) {
+                keyCode = inputChar - 0x20;
+            }
+
+            // Convert RETURN and ENTER keys
+            if (inputKeyCode == SWT.CR) {
+                keyChar = '\n';
+            } else if (inputKeyCode == SWT.KEYPAD_CR) {
+                keyChar = KeyConstants.CHAR_UNDEFINED;
+            }
+
+            // Try to get key code from key character
+            if (keyCode == KeyConstants.VK_UNDEFINED) {
+                switch (inputChar) {
+                case '\b':
+                    keyCode = KeyConstants.VK_BACK_SPACE;
+                    break;
+                case 127:
+                    keyCode = KeyConstants.VK_DELETE;
+                    break;
+                case '@':
+                    keyCode = KeyConstants.VK_AT;
+                    break;
+                case '`':
+                    keyCode = KeyConstants.VK_BACK_QUOTE;
+                    break;
+                case '\\':
+                    keyCode = KeyConstants.VK_BACK_SLASH;
+                    break;
+                case '^':
+                    keyCode = KeyConstants.VK_CIRCUMFLEX;
+                    break;
+                case ']':
+                    keyCode = KeyConstants.VK_CLOSE_BRACKET;
+                    break;
+                case ':':
+                    keyCode = KeyConstants.VK_COLON;
+                    break;
+                case ',':
+                    keyCode = KeyConstants.VK_COMMA;
+                    break;
+                case '$':
+                    keyCode = KeyConstants.VK_DOLLAR;
+                    break;
+                case '=':
+                    keyCode = KeyConstants.VK_EQUALS;
+                    break;
+                case '!':
+                    keyCode = KeyConstants.VK_EXCLAMATION_MARK;
+                    break;
+                case '(':
+                    keyCode = KeyConstants.VK_LEFT_PARENTHESIS;
+                    break;
+                case '-':
+                    keyCode = KeyConstants.VK_MINUS;
+                    break;
+                case '*':
+                    keyCode = KeyConstants.VK_MULTIPLY;
+                    break;
+                case '#':
+                    keyCode = KeyConstants.VK_NUMBER_SIGN;
+                    break;
+                case '[':
+                    keyCode = KeyConstants.VK_OPEN_BRACKET;
+                    break;
+                case '.':
+                    keyCode = KeyConstants.VK_PERIOD;
+                    break;
+                case '+':
+                    keyCode = KeyConstants.VK_PLUS;
+                    break;
+                case ')':
+                    keyCode = KeyConstants.VK_RIGHT_PARENTHESIS;
+                    break;
+                case ';':
+                    keyCode = KeyConstants.VK_SEMICOLON;
+                    break;
+                case '/':
+                    keyCode = KeyConstants.VK_SLASH;
+                    break;
+                case '_':
+                    keyCode = KeyConstants.VK_UNDERSCORE;
+                    break;
+                default:
+                    keyCode = KeyConstants.VK_UNDEFINED;
+                }
+            }
+        }
+
     }
 
-    protected static int convertCharToKeyCode(char c) {
+    private class RedrawTask implements Runnable {
 
-        if (((c >= '0') && (c <= '9')) || ((c >= 'A') && (c <= 'Z'))) {
-            return c;
+        private int x;
+        private int y;
+        private int width;
+        private int height;
+        private Canvas canvas;
+
+        public RedrawTask(Canvas canvas) {
+            this.canvas = canvas;
         }
 
-        if (((c >= 'a') && (c <= 'z'))) {
-            return c - 0x20;
+        public void setRegion(int x, int y, int width, int height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
         }
 
-        switch (c) {
-        case '\r': 
-            return KeyConstants.VK_ENTER;
-        case '\b':
-            return KeyConstants.VK_BACK_SPACE;
-        case 127:
-            return KeyConstants.VK_DELETE;
-        case '@':
-            return KeyConstants.VK_AT;
-        case '`':
-            return KeyConstants.VK_BACK_QUOTE;
-        case '\\':
-            return KeyConstants.VK_BACK_SLASH;
-        case '^':
-            return KeyConstants.VK_CIRCUMFLEX;
-        case ']':
-            return KeyConstants.VK_CLOSE_BRACKET;
-        case ':':
-            return KeyConstants.VK_COLON;
-        case ',':
-            return KeyConstants.VK_COMMA;
-        case '$':
-            return KeyConstants.VK_DOLLAR;
-        case '=':
-            return KeyConstants.VK_EQUALS;
-        case '!':
-            return KeyConstants.VK_EXCLAMATION_MARK;
-        case '(':
-            return KeyConstants.VK_LEFT_PARENTHESIS;
-        case '-':
-            return KeyConstants.VK_MINUS;
-        case '*':
-            return KeyConstants.VK_MULTIPLY;
-        case '#':
-            return KeyConstants.VK_NUMBER_SIGN;
-        case '[':
-            return KeyConstants.VK_OPEN_BRACKET;
-        case '.':
-            return KeyConstants.VK_PERIOD;
-        case '+':
-            return KeyConstants.VK_PLUS;
-        case ')':
-            return KeyConstants.VK_RIGHT_PARENTHESIS;
-        case ';':
-            return KeyConstants.VK_SEMICOLON;
-        case '/':
-            return KeyConstants.VK_SLASH;
-        case '_':
-            return KeyConstants.VK_UNDERSCORE;
-        default:
-            return KeyConstants.CHAR_UNDEFINED;
+        public void run() {
+            canvas.redraw(x, y, width, height, true);
+            //canvas.update();
         }
+
     }
 
 }

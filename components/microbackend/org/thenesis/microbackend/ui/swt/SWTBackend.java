@@ -92,7 +92,7 @@ public class SWTBackend extends AbstractSWTBackend implements Runnable {
         shell = new Shell(display);
         shell.setText("");
 
-        Canvas canvas = new Canvas(shell, SWT.NONE);
+        Canvas canvas = new Canvas(shell, SWT.NO_BACKGROUND);
         canvas.setSize(w, h);
         configureCanvas(canvas);
         canvas.forceFocus();
