@@ -1,3 +1,17 @@
+0.3rc2 (20/10/2008)
+-------------------
+
+* Improved key handling in SWT and AWT backends
+* Fixed window redrawing problem in SWT backend
+* Fixed resources loading bug (allows phoneME Advanced VM to work)
+* Added CLDC and JNI test suites
+* Moved zip and png packages to MicroBackend
+* Fixed start failures caused by trailing whitespace in system properties file
+
+Contributions:
+- Robert Schuster
+- Henning Heinold
+
 0.3rc1 (21/05/2008)
 -------------------
 
