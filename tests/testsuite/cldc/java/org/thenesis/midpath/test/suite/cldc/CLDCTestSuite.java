@@ -223,6 +223,20 @@ public class CLDCTestSuite extends AbstractTestSuite {
 
 	}
 	
+	public void testActiveCount() {
+	    checkPoint("Thread.activeCount");
+	    check(Thread.activeCount() == 1);
+	    
+	    long waitTime = 500;
+        TestClass thread = new TestClass(waitTime);
+        thread.start();
+        check(Thread.activeCount() == 2);
+        try {
+            Thread.sleep(waitTime + 100);
+        } catch (InterruptedException e) {
+        }
+	}
+	
 	/* Object tests */
 	
 	public void testObject() {
@@ -510,6 +524,7 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		testPriority();
 		testSleep();
 		testWait2();
+		testActiveCount();
 		
 		// Maths
 		testMath();
