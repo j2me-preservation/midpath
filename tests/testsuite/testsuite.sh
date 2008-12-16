@@ -168,10 +168,7 @@ build_java_res()
       ( cd $resdir && find -type f | grep -v "/.svn" | $JAR_CMD uvf $jarname -E -M -@ )
     else
       # Sun's jar has trouble with the first entry when using @ and -C
-      echo "ignore_the_error" > resources.list
-      # all other jar commands handle the resources via a file
-      find $resdir -type f | grep -v "/.svn" >> resources.list
-      $JAR_CMD uvf $jarname -C $resdir @resources.list
+      ( cd $resdir && find -type f | grep -v "/.svn" | xargs $JAR_CMD uvf $jarname )
     fi
   fi
 }
