@@ -41,8 +41,8 @@ help,\
 build,\
 test,\
 \
-disable-cldc-testuite,\
-disable-jni-testuite,\
+disable-cldc-testsuite,\
+disable-jni-testsuite,\
 \
 with-cldc-jar:,\
 with-jni-include:,\
@@ -65,7 +65,7 @@ while true; do
       echo "  --build                   : Build test suites
       echo "  --test                    : Start test suites
       echo "  --disable-cldc-testsuite  : Do not build/test CLDC test suite (default: yes)"
-      echo "  --disable-jni-testuite    : Do not build/test JNI test suite (default: yes)"
+      echo "  --disable-jni-testsuite    : Do not build/test JNI test suite (default: yes)"
       echo
       echo "Providable libraries:"
       echo "  --with-cldc-jar           : Location of the CLDC class library"
@@ -89,7 +89,7 @@ while true; do
     --disable-cldc-testsuite ) CLDC_TESTSUITE_ENABLED=no
       echo "Compiling CLDC testsuite disabled"
       shift ;;
-    --disable-jni-testuite ) JNI_TESTSUITE_ENABLED=no
+    --disable-jni-testsuite ) JNI_TESTSUITE_ENABLED=no
       echo "Compiling JNI testsuite disabled"
       shift ;;
     --with-cldc-jar )
