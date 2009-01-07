@@ -219,25 +219,6 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		new SleepTest().test(this);
 	}
 	
-	public void testWait2() {
-
-		long waitTime = 500;
-
-		TestClass thread = new TestClass(waitTime);
-
-		long startTime = System.currentTimeMillis();
-		thread.start();
-		try {
-			Thread.sleep(waitTime + 100);
-		} catch (InterruptedException e) {
-		}
-		long delta = System.currentTimeMillis() - startTime;
-
-		checkPoint("Object.wait (2)");
-		check((delta > 0) && (delta < 1000));
-
-	}
-	
 	public void testActiveCount() {
 	    checkPoint("Thread.activeCount");
 	    check(Thread.activeCount() == 1);
@@ -541,7 +522,6 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		testTheadName();
 		testPriority();
 		testSleep();
-		testWait2();
 		testActiveCount();
 		
 		// Maths
