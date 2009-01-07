@@ -28,12 +28,31 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
 import org.thenesis.midpath.test.suite.AbstractTestSuite;
+import org.thenesis.midpath.test.suite.cldc.sub.AttributeTester;
 
 public class CLDCTestSuite extends AbstractTestSuite {
 
 	public CLDCTestSuite() {
 		super("CLDCTestSuite");
 	}
+	
+	/* 
+	 * Attributes tests
+	 */
+	private void testAttributeAccess() {
+	    
+	    AttributeTester tester = new AttributeTester();
+	    checkPoint("Public attribute access");
+	    check(tester.publicNumber, 32);
+	    check(tester.publicMethod(), 32);
+	    
+	    AttributeTesterChild childTester = new AttributeTesterChild();
+	    checkPoint("Protected attribute access");
+	    check(childTester.checkProtectedField());
+	    check(childTester.checkProtectedMethod());
+        
+    }
+    
 
 	/*
 	 * Number tests
@@ -74,7 +93,6 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		try {
 			c = Class.forName("org.thenesis.midpath.test.suite.cldc.TestClass");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			fail("Can't get a Class from a class name");
 			debug(e);
 		}
@@ -108,18 +126,15 @@ public class CLDCTestSuite extends AbstractTestSuite {
 
 		checkPoint("Class.isInstance");
 		check(TestClass.class.isInstance(instance));
-		check(!TestClass.class.isInstance(new Object()));
+		check(!TestClass.class.isInstance(new Integer(1)));
 
 	}
 
 	public void testIsAssignable() {
-
-		Object instance = new TestClass();
-
 		checkPoint("Class.isAssignable");
 		check(TestClass.class.isAssignableFrom(TestClass.class));
+		check(AttributeTester.class.isAssignableFrom(AttributeTesterChild.class));
 		check(!String.class.isAssignableFrom(TestClass.class));
-
 	}
 
 	public void testIsInterface() {
@@ -484,6 +499,9 @@ public class CLDCTestSuite extends AbstractTestSuite {
 
 	
 	public void testAll() {
+	    
+	    // Class attributes access
+	    testAttributeAccess();
 		
 		// System
 		testCurrentTimeMillis();
@@ -543,9 +561,8 @@ public class CLDCTestSuite extends AbstractTestSuite {
 //		testThreadCreation();
 		
 	}
-	
 
-	/**
+    /**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -553,6 +570,22 @@ public class CLDCTestSuite extends AbstractTestSuite {
 		suite.testAll();
 	}
 
+}
+
+class AttributeTesterChild extends AttributeTester {
+    
+    public AttributeTesterChild() {
+        super(1);
+    }
+    
+    public boolean checkProtectedField() {
+        return (protectedNumber == 86);
+    }
+    
+    public boolean checkProtectedMethod() {
+        return (protectedMethod() == 86);
+    }
+    
 }
 
 interface TestInterface {
