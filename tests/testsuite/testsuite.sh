@@ -62,10 +62,10 @@ while true; do
       echo "  --help                    : Show this help"
       echo
       echo "Core features:"
-      echo "  --build                   : Build test suites
-      echo "  --test                    : Start test suites
+      echo "  --build                   : Build test suites"
+      echo "  --test                    : Start test suites"
       echo "  --disable-cldc-testsuite  : Do not build/test CLDC test suite (default: yes)"
-      echo "  --disable-jni-testsuite    : Do not build/test JNI test suite (default: yes)"
+      echo "  --disable-jni-testsuite   : Do not build/test JNI test suite (default: yes)"
       echo
       echo "Providable libraries:"
       echo "  --with-cldc-jar           : Location of the CLDC class library"
