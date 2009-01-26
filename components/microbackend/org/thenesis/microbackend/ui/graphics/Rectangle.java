@@ -17,7 +17,7 @@
  */
 package org.thenesis.microbackend.ui.graphics;
 
-class Rectangle {
+public class Rectangle {
 	
 	public int xmin, ymin, xmax, ymax, w, h;
 	

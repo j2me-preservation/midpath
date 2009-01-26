@@ -17,23 +17,15 @@
  */
 package org.thenesis.microbackend.ui.graphics;
 
-public class VirtualSurface {
+public interface VirtualSurface {
 	
-	public int width;
-	public int height;
+	public void lock();
+	public void unlock();
 	
-	public int[] data;
+	public int getHeight();
 	
-	public void lock() { }
-	public void unlock() { }
+	public int getWidth();
 	
-	public int getHeight() {
-		return height;
-	}
-	
-	public int getWidth() {
-		return width;
-	}
-	
+	public int[] getData();
 
 }

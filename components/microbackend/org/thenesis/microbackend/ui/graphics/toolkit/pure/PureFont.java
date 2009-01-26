@@ -15,12 +15,16 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
  */
-package org.thenesis.microbackend.ui.graphics;
+package org.thenesis.microbackend.ui.graphics.toolkit.pure;
 
 import org.thenesis.microbackend.ui.Logging;
+import org.thenesis.microbackend.ui.graphics.Rectangle;
+import org.thenesis.microbackend.ui.graphics.VirtualFont;
+import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
+import org.thenesis.microbackend.ui.graphics.VirtualSurface;
 
 
-public class VirtualFontImpl implements VirtualFont {
+public class PureFont implements VirtualFont {
 
 	private static final int FONT_8X8 = 0;
 	private static final int FONT_8X16 = 1;
@@ -30,10 +34,10 @@ public class VirtualFontImpl implements VirtualFont {
 	private int inset = 1;
 	private int size;
 	
-	VirtualFontImpl() { 
+	PureFont() { 
 	}
 
-	VirtualFontImpl(int face, int style, int size) {
+	PureFont(int face, int style, int size) {
 
 		this.size = size;
 
@@ -102,7 +106,7 @@ public class VirtualFontImpl implements VirtualFont {
 		return len * FONTS_WIDTH[font];
 	}
 
-	public void render(VirtualGraphics g, String str, int x, int y, int anchor) {
+	public void render(PureGraphics g, String str, int x, int y, int anchor) {
 		x += g.getTranslateX();
 		y += g.getTranslateY();
 
@@ -172,14 +176,14 @@ public class VirtualFontImpl implements VirtualFont {
 			}
 
 			//System.out.println(chars[i] + "  currentX=" + currentX + " cxmin=" + cxmin + " cxmax=" + cxmax + " cymin=" + cymin + " cymax=" + cymax);
-
+			int[] surfaceData = surface.getData();
 			pk += pw * cymin;
 			for (int cy = cymin; cy < cymax; cy++, pk += pw) {
 				int d = data[dk + cy];
 				int bit = 1 << (15 - cxmin);
 				for (int cx = cxmin; cx < cxmax; cx++, bit >>= 1) {
 					if ((d & bit) != 0) {
-						surface.data[pk + cx] = color;
+					    surfaceData[pk + cx] = color;
 					}
 				}
 			}
