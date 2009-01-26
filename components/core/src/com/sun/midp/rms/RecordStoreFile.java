@@ -33,13 +33,13 @@ public class RecordStoreFile implements AbstractRecordStoreFile {
 		//stream =  toolkit.getBaseFileHandler().getRandomAccessStream();
 		fileHandler = toolkit.createBaseFileHandler();
 		fileHandler.connect(RMS_ROOT_PATH, buildRecordStoreName(suiteID, name, idx_extension));
-		fileHandler.openForRead();
+		
+		if (!fileHandler.exists()) {
+		    fileHandler.create();
+		}
 		fileHandler.openForWrite();
+		fileHandler.openForRead();
 		stream = fileHandler.getRandomAccessStream();
-		//		} catch (IOException e) {
-		//			Logging.trace(e,"");
-		//			//e.printStackTrace();
-		//		}
 	}
 
 	public void close() throws IOException {
