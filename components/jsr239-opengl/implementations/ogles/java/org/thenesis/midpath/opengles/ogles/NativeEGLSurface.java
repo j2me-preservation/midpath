@@ -25,7 +25,6 @@
 package org.thenesis.midpath.opengles.ogles;
 
 import javax.microedition.khronos.egl.EGLSurface;
-import javax.microedition.lcdui.Graphics;
 import java.util.Hashtable;
 import java.lang.ref.WeakReference;
 
@@ -45,9 +44,9 @@ final class NativeEGLSurface extends EGLSurface {
 	private int pixmapPointer = 0;
 
 	/**
-	 * An LCDUI Graphics object referencing the surface.
+	 * An Graphics object referencing the surface.
 	 */
-	private Graphics target;
+	private Object target;
 
 	public NativeEGLSurface(int nativeId, int width, int height) {
 		synchronized (byId) {
@@ -92,11 +91,11 @@ final class NativeEGLSurface extends EGLSurface {
 		return this.pixmapPointer;
 	}
 
-	public void setTarget(Graphics target) {
+	public void setTarget(Object target) {
 		this.target = target;
 	}
 
-	public Graphics getTarget() {
+	public Object getTarget() {
 		return this.target;
 	}
 

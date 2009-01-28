@@ -46,10 +46,11 @@ import com.sun.jsr239.Errors;
 import com.sun.jsr239.GLConfiguration;
 
 public class NativeGL10 implements GL10, GL10Ext {
+   
 
-    static final boolean debugQueue = false;
+    static final boolean debugQueue = true;
 
-    static final boolean DEBUG_MEM = false;
+    static final boolean DEBUG_MEM = true;
 
     static EGL10 egl = (EGL10)EGLContext.getEGL();
 
@@ -471,6 +472,8 @@ public class NativeGL10 implements GL10, GL10Ext {
         "GEN_BUFFERSB",
         "GEN_TEXTURESB"
     };
+    
+    static native boolean _isPlatformBigEndian();
 
     native void    _glGenerateError(int error);
     
@@ -674,6 +677,9 @@ public class NativeGL10 implements GL10, GL10Ext {
 
     int pointer(Buffer buffer) {
         int offset = buffer.position();
+        if (offset != 0) {
+            throw new UnsupportedOperationException(); // FIXME
+        }
         int nativeAddress = _getNativeAddress(buffer, offset);
 
         return nativeAddress;
@@ -1081,6 +1087,9 @@ public class NativeGL10 implements GL10, GL10Ext {
              type == GL_FIXED ||
              type == GL_FLOAT) &&
             (stride >= 0)) {
+            
+            pointer = NativeEGL10.platformHelper.convertToPlatformByteOrder(pointer);
+            
             BufferManager.releaseBuffer(pointerBuffer[COLOR_POINTER]);
             BufferManager.useBuffer(pointer);
             
@@ -2290,6 +2299,9 @@ public class NativeGL10 implements GL10, GL10Ext {
              type == GL_FIXED ||
              type == GL_FLOAT) &&
             (stride >= 0)) {
+            
+            pointer = NativeEGL10.platformHelper.convertToPlatformByteOrder(pointer);
+            
             BufferManager.releaseBuffer(pointerBuffer[NORMAL_POINTER]);
             BufferManager.useBuffer(pointer);
 
@@ -2631,6 +2643,9 @@ public class NativeGL10 implements GL10, GL10Ext {
              type == GL_FIXED ||
              type == GL_FLOAT) &&
             (stride >= 0)) {
+            
+            pointer = NativeEGL10.platformHelper.convertToPlatformByteOrder(pointer);
+            
             BufferManager.releaseBuffer(pointerBuffer[TEX_COORD_POINTER]);
             BufferManager.useBuffer(pointer);
 
@@ -3066,6 +3081,9 @@ public class NativeGL10 implements GL10, GL10Ext {
              type == GL_FIXED ||
              type == GL_FLOAT) &&
             (stride >= 0)) {
+            
+            pointer = NativeEGL10.platformHelper.convertToPlatformByteOrder(pointer);
+            
             BufferManager.releaseBuffer(pointerBuffer[VERTEX_POINTER]);
             BufferManager.useBuffer(pointer);
 
@@ -3263,4 +3281,9 @@ public class NativeGL10 implements GL10, GL10Ext {
     public NativeGL10(EGLContext context) {
         this.context = context;
     }
+    
+    public boolean isBufferOrderBigEndian(Buffer buffer) {
+        return NativeEGL10.platformHelper.isBufferOrderBigEndian(buffer);
+    }
+
 }

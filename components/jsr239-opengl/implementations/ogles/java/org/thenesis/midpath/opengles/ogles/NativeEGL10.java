@@ -31,15 +31,15 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL;
-import javax.microedition.lcdui.Graphics;
-
+import javax.microedition.khronos.opengles.GL10;
 
 import com.sun.jsr239.Errors;
 import com.sun.jsr239.GLConfiguration;
-import com.sun.midp.lcdui.GameMap;
 
 class NativeEGL10 implements EGL10 {
 
+    static final PlatformHelper platformHelper = PlatformHelper.getPlatformHelper();
+    
 	static NativeEGL10 theInstance;
 
 	static {
@@ -48,9 +48,11 @@ class NativeEGL10 implements EGL10 {
 		} else {
 			theInstance = new NativeEGL10();
 		}
+		
+		System.loadLibrary("midpath-ogles");
 	}
 
-	static final boolean DEBUG = false;
+	static final boolean DEBUG = true;
 
 	// eglCreateWindowSurface strategies
 	static final int STRATEGY_USE_WINDOW = 0;
@@ -73,19 +75,19 @@ class NativeEGL10 implements EGL10 {
 
 	native int _eglGetConfigAttrib(int display, int config, int attribute, int[] value);
 
-	native int _getWindowStrategy(Graphics winGraphics);
+	//native int _getWindowStrategy(Graphics winGraphics);
 
-	native int _getWindowNativeID(Graphics winGraphics);
+	//native int _getWindowNativeID(Graphics winGraphics);
 
-	native int _getWindowPixmap(int displayId, int configId, Graphics winGraphics, int width, int height);
+	//native int _getWindowPixmap(int displayId, int configId, Graphics winGraphics, int width, int height);
 
-	native int _getImagePixmap(int displayId, int configId, Graphics imageGraphics, int width, int height);
+	//native int _getImagePixmap(int displayId, int configId, Graphics imageGraphics, int width, int height);
 
-	native void _destroyPixmap(int pixmapPtr);
+	//native void _destroyPixmap(int pixmapPtr);
 
-	native void _getWindowContents(Graphics winGraphics, int deltaHeight, int pixmapPointer);
+	//native void _getWindowContents(Graphics winGraphics, int deltaHeight, int pixmapPointer);
 
-	native void _putWindowContents(Graphics target, int deltaHeight, int pixmapPointer);
+	//native void _putWindowContents(Graphics target, int deltaHeight, int pixmapPointer);
 
 	native int _eglCreateWindowSurface(int display, int config, int win, int[] attrib_list);
 
@@ -117,7 +119,7 @@ class NativeEGL10 implements EGL10 {
 
 	native int _eglSwapBuffers(int display, int surface);
 
-	native int _eglCopyBuffers(int display, int surface, Graphics target, int width, int height, int deltaHeight);
+//	native int _eglCopyBuffers(int display, int surface, Graphics target, int width, int height, int deltaHeight);
 
 	native int _eglSurfaceAttrib(int display, int surface, int attribute, int value);
 
@@ -127,11 +129,11 @@ class NativeEGL10 implements EGL10 {
 
 	native int _eglSwapInterval(int display, int interval);
 
-	private native int _getFullDisplayWidth();
+//	private native int _getFullDisplayWidth();
+//
+//	private native int _getFullDisplayHeight();
 
-	private native int _getFullDisplayHeight();
-
-	private native int _garbageCollect(boolean fullGC);
+//	private native int _garbageCollect(boolean fullGC);
 
 	public static NativeEGL10 getInstance() {
 		return theInstance;
@@ -314,33 +316,184 @@ class NativeEGL10 implements EGL10 {
 		if (retval && (attribute == EGL10.EGL_CONFIG_CAVEAT)) {
 			value[0] = EGL10.EGL_NONE;
 		}
+		
+		if (DEBUG) {
+
+            String msg = "";
+
+            switch (attribute) {
+            case EGL_BUFFER_SIZE:
+            case EGL_RED_SIZE:
+                msg = ("EGL_RED_SIZE:" + value[0]);
+                break;
+            case EGL_GREEN_SIZE:
+                msg = ("EGL_GREEN_SIZE:" + value[0]);
+                break;
+            case EGL_BLUE_SIZE:
+                msg = ("EGL_BLUE_SIZE:" + value[0]);
+                break;
+            case EGL_ALPHA_SIZE:
+                msg = ("EGL_ALPHA_SIZE:" + value[0]);
+                break;
+            //		case EGL_BIND_TO_TEXTURE_RGB:
+            //		    msg=("EGL_BIND_TO_TEXTURE_RGB:" + value[0]);
+            //            break;
+            //		case EGL_BIND_TO_TEXTURE_RGBA:
+            //		    msg=("EGL_BIND_TO_TEXTURE_RGBA:" + value[0]);
+            //            break;
+            case EGL_CONFIG_CAVEAT:
+                switch (value[0]) {
+                case EGL_NONE:
+                    msg = ("EGL_CONFIG_CAVEAT: EGL_NONE");
+                    break;
+                case EGL_SLOW_CONFIG:
+                    msg = ("EGL_CONFIG_CAVEAT: EGL_NONE");
+                    break;
+                }
+            case EGL_CONFIG_ID:
+                msg = ("EGL_CONFIG_ID:" + value[0]);
+                break;
+            case EGL_DEPTH_SIZE:
+                msg = ("EGL_DEPTH_SIZE:" + value[0]);
+                break;
+            case EGL_LEVEL:
+                msg = ("EGL_LEVEL:" + value[0]);
+                break;
+            case EGL_MAX_PBUFFER_WIDTH:
+                msg = ("EGL_MAX_PBUFFER_WIDTH:" + value[0]);
+                break;
+            case EGL_MAX_PBUFFER_HEIGHT:
+                msg = ("EGL_MAX_PBUFFER_HEIGHT:" + value[0]);
+                break;
+            case EGL_MAX_PBUFFER_PIXELS:
+                msg = ("EGL_MAX_PBUFFER_PIXELS:" + value[0]);
+                break;
+            //		case EGL_MAX_SWAP_INTERVAL:
+            //		    msg=("EGL_MAX_SWAP_INTERVAL:" + value[0]);
+            //            break;       
+            //		case EGL_MIN_SWAP_INTERVAL:
+            //		    msg=("EGL_MIN_SWAP_INTERVAL:" + value[0]);
+            //            break;
+            case EGL_NATIVE_RENDERABLE:
+                msg = ("EGL_NATIVE_RENDERABLE:" + value[0]);
+                break;
+            case EGL_NATIVE_VISUAL_ID:
+                msg = ("EGL_NATIVE_VISUAL_ID:" + value[0]);
+                break;
+            case EGL_NATIVE_VISUAL_TYPE:
+                msg = "EGL_NATIVE_VISUAL_TYPE:" + value[0];
+                break;
+            case EGL_SAMPLE_BUFFERS:
+                msg = "EGL_SAMPLE_BUFFERS:" + value[0];
+                break;
+            case EGL_SAMPLES:
+                msg = "EGL_SAMPLES:" + value[0];
+                break;
+            case EGL_STENCIL_SIZE:
+                msg = "EGL_STENCIL_SIZE:" + value[0];
+                break;
+            case EGL_SURFACE_TYPE:
+                msg = "EGL_SURFACE_TYPE: ";
+                if ((value[0] & EGL_WINDOW_BIT) == EGL_WINDOW_BIT) {
+                    msg += "EGL_WINDOW_BIT, ";
+                }
+                if ((value[0] & EGL_PIXMAP_BIT) == EGL_PIXMAP_BIT) {
+                    msg += "EGL_PIXMAP_BIT, ";
+                }
+                if ((value[0] & EGL_PBUFFER_BIT) == EGL_PBUFFER_BIT) {
+                    msg += "EGL_PBUFFER_BIT";
+                }
+                break;
+            case EGL_TRANSPARENT_TYPE:
+                msg = "EGL_TRANSPARENT_TYPE:";
+                switch (value[0]) {
+                case EGL_NONE:
+                    msg += "EGL_NONE";
+                    break;
+                case EGL_SLOW_CONFIG:
+                    msg += "EGL_SLOW_CONFIG";
+                    break;
+                }
+            case EGL_TRANSPARENT_RED_VALUE:
+                msg = "EGL_TRANSPARENT_RED_VALUE:" + value[0];
+                break;
+            case EGL_TRANSPARENT_GREEN_VALUE:
+                msg = "EGL_TRANSPARENT_GREEN_VALUE:" + value[0];
+                break;
+            case EGL_TRANSPARENT_BLUE_VALUE:
+                msg = "EGL_TRANSPARENT_BLUE_VALUE:" + value[0];
+                break;
+            }
+            System.out.println("[DEBUG] eglGetConfigAttrib: " + msg);
+        }
 
 		return retval;
 	}
 
-	private int createWindowPixmap(int displayId, int configId, Graphics winGraphics, int width, int height) {
-		int pixmapPointer;
+//	private int createWindowPixmap(int displayId, int configId, Graphics winGraphics, int width, int height) {
+//		int pixmapPointer;
+//
+//		// Duplicate mutable image contents
+//		try {
+//			pixmapPointer = _getWindowPixmap(displayId, configId, winGraphics, width, height);
+//
+//		} catch (OutOfMemoryError e) {
+//			_garbageCollect(false);
+//
+//			try {
+//				pixmapPointer = _getWindowPixmap(displayId, configId, winGraphics, width, height);
+//			} catch (OutOfMemoryError e2) {
+//				_garbageCollect(true);
+//
+//				pixmapPointer = _getWindowPixmap(displayId, configId, winGraphics, width, height);
+//			}
+//		}
+//		return pixmapPointer;
+//	}
+	
+	private synchronized EGLSurface createGraphicsSurface(EGLDisplay display, EGLConfig config, Object graphics, int[] attrib_list) {
+	    
+	    
+        int width = platformHelper.getGraphicsWidth(graphics);
+        int height = platformHelper.getGraphicsHeight(graphics);
+        //System.out.println("[DEBUG]NativeELG10: createGraphicsSurface(): width=" + width + " height=" + height);
 
-		// Duplicate mutable image contents
-		try {
-			pixmapPointer = _getWindowPixmap(displayId, configId, winGraphics, width, height);
+        int displayId = ((NativeEGLDisplay) display).nativeId();
+        int configId = ((NativeEGLConfig) config).nativeId();
 
-		} catch (OutOfMemoryError e) {
-			_garbageCollect(false);
+        NativeEGLSurface surface;
 
-			try {
-				pixmapPointer = _getWindowPixmap(displayId, configId, winGraphics, width, height);
-			} catch (OutOfMemoryError e2) {
-				_garbageCollect(true);
+        int attrib_size = (attrib_list != null) ? attrib_list.length : 0;
+        int[] new_attrib_list = new int[attrib_size + 5];
 
-				pixmapPointer = _getWindowPixmap(displayId, configId, winGraphics, width, height);
-			}
-		}
-		return pixmapPointer;
+        // Create Pbuffer surface
+        int sidx = 0;
+        int didx = 0;
+        while (sidx < attrib_size - 1) {
+            if (attrib_list[sidx] == EGL_WIDTH || attrib_list[sidx] == EGL_HEIGHT) {
+                sidx += 2;
+                continue;
+            } else if (attrib_list[sidx] == EGL_NONE) {
+                break;
+            }
+
+            new_attrib_list[didx++] = attrib_list[sidx++];
+            new_attrib_list[didx++] = attrib_list[sidx++];
+        }
+        new_attrib_list[didx++] = EGL_WIDTH;
+        new_attrib_list[didx++] = width;
+        new_attrib_list[didx++] = EGL_HEIGHT;
+        new_attrib_list[didx++] = height;
+        new_attrib_list[didx] = EGL_NONE;
+
+        int surf = _eglCreatePbufferSurface(displayId, configId, new_attrib_list);
+        surface = NativeEGLSurface.getInstance(surf, width, height);
+        
+        surface.setTarget(graphics);
+        return surface;
 	}
 
-	public synchronized EGLSurface eglCreateWindowSurface(EGLDisplay display, EGLConfig config, Object win,
-			int[] attrib_list) {
+	public synchronized EGLSurface eglCreateWindowSurface(EGLDisplay display, EGLConfig config, Object win, int[] attrib_list) {
 		if (display == null) {
 			throwIAE(Errors.EGL_DISPLAY_NULL);
 		}
@@ -357,125 +510,92 @@ class NativeEGL10 implements EGL10 {
 			throwIAE(Errors.EGL_ATTRIBS_NOT_TERMINATED);
 		}
 
-		if (!(win instanceof Graphics)) {
+		if (!platformHelper.isGraphicsCompatibleWithWindowSurface(win)) {
 			throwIAE(Errors.EGL_BAD_WINDOW_SURFACE);
 		}
 
-		Graphics winGraphics = (Graphics) win;
-
-		int width = _getFullDisplayWidth();
-		int height = _getFullDisplayHeight();
-
-		int displayId = ((NativeEGLDisplay) display).nativeId();
-		int configId = ((NativeEGLConfig) config).nativeId();
-
-		NativeEGLSurface surface;
-		int strategy = _getWindowStrategy(winGraphics);
-		if (strategy == STRATEGY_USE_WINDOW) {
-			int winId = _getWindowNativeID(winGraphics);
-			int surf = _eglCreateWindowSurface(displayId, configId, winId, attrib_list);
-			surface = NativeEGLSurface.getInstance(surf, width, height);
-		} else if (strategy == STRATEGY_USE_PIXMAP) {
-			int pixmapPointer = createWindowPixmap(displayId, configId, winGraphics, width, height);
-			int surf = _eglCreatePixmapSurface(displayId, configId, pixmapPointer, attrib_list);
-			surface = NativeEGLSurface.getInstance(surf, width, height);
-			surface.setPixmapPointer(pixmapPointer);
-		} else if (strategy == STRATEGY_USE_PBUFFER) {
-			int attrib_size = (attrib_list != null) ? attrib_list.length : 0;
-			int[] new_attrib_list = new int[attrib_size + 5];
-
-			int sidx = 0;
-			int didx = 0;
-			while (sidx < attrib_size - 1) {
-				if (attrib_list[sidx] == EGL_WIDTH || attrib_list[sidx] == EGL_HEIGHT) {
-					sidx += 2;
-					continue;
-				} else if (attrib_list[sidx] == EGL_NONE) {
-					break;
-				}
-
-				new_attrib_list[didx++] = attrib_list[sidx++];
-				new_attrib_list[didx++] = attrib_list[sidx++];
-			}
-			new_attrib_list[didx++] = EGL_WIDTH;
-			new_attrib_list[didx++] = width;
-			new_attrib_list[didx++] = EGL_HEIGHT;
-			new_attrib_list[didx++] = height;
-			new_attrib_list[didx] = EGL_NONE;
-
-			int surf = _eglCreatePbufferSurface(displayId, configId, new_attrib_list);
-			surface = NativeEGLSurface.getInstance(surf, width, height);
-		} else {
-			// This should never happen
-			throw new RuntimeException(Errors.EGL_CANT_HAPPEN);
-		}
-
-		surface.setTarget(winGraphics);
-		return surface;
+		return createGraphicsSurface(display, config, win, attrib_list);
 	}
+	
+	public synchronized EGLSurface eglCreatePixmapSurface(EGLDisplay display, EGLConfig config, Object pixmap, int[] attrib_list) {
+        if (display == null) {
+            throwIAE(Errors.EGL_DISPLAY_NULL);
+        }
+        if (config == null) {
+            throwIAE(Errors.EGL_CONFIG_NULL);
+        }
+        if (pixmap == null) {
+            throwIAE(Errors.EGL_PIXMAP_NULL);
+        }
+        if (!platformHelper.isGraphicsCompatibleWithPixmapSurface(pixmap)) {
+            throwIAE(Errors.EGL_BAD_PIXMAP);
+        }
 
-	private int createImagePixmap(int displayId, int configId, Graphics imageGraphics, int width, int height) {
-		int pixmapPointer;
+        return createGraphicsSurface(display, config, pixmap, attrib_list);
+    }
 
-		// Duplicate mutable image contents
-		try {
-			pixmapPointer = _getImagePixmap(displayId, configId, imageGraphics, width, height);
-
-		} catch (OutOfMemoryError e) {
-			_garbageCollect(false);
-
-			try {
-				pixmapPointer = _getImagePixmap(displayId, configId, imageGraphics, width, height);
-			} catch (OutOfMemoryError e2) {
-				_garbageCollect(true);
-
-				pixmapPointer = _getImagePixmap(displayId, configId, imageGraphics, width, height);
-			}
-		}
-		return pixmapPointer;
-	}
-
-	public synchronized EGLSurface eglCreatePixmapSurface(EGLDisplay display, EGLConfig config, Object pixmap,
-			int[] attrib_list) {
-		if (display == null) {
-			throwIAE(Errors.EGL_DISPLAY_NULL);
-		}
-		if (config == null) {
-			throwIAE(Errors.EGL_CONFIG_NULL);
-		}
-		if (pixmap == null) {
-			throwIAE(Errors.EGL_PIXMAP_NULL);
-		}
-		if (!(pixmap instanceof Graphics)) {
-			throwIAE(Errors.EGL_BAD_PIXMAP);
-		}
-
-		Graphics imageGraphics = (Graphics) pixmap;
-		int width = GameMap.getGraphicsAccess().getGraphicsWidth(imageGraphics);
-		int height = GameMap.getGraphicsAccess().getGraphicsHeight(imageGraphics);
-
-		int displayId = ((NativeEGLDisplay) display).nativeId();
-		int configId = ((NativeEGLConfig) config).nativeId();
-
-		// Clone the attribute list and check the clone for termination.
-		// This prevents another thread from altering the list between
-		// the time of the check and the time it is passed to the GL.
-		if (attrib_list != null) {
-			attrib_list = clone(attrib_list);
-		}
-		if (!isTerminated(attrib_list)) {
-			throwIAE(Errors.EGL_ATTRIBS_NOT_TERMINATED);
-		}
-
-		int pixmapPointer = createImagePixmap(displayId, configId, imageGraphics, width, height);
-
-		int surf = _eglCreatePixmapSurface(displayId, configId, pixmapPointer, attrib_list);
-		NativeEGLSurface surface = NativeEGLSurface.getInstance(surf, width, height);
-		surface.setPixmapPointer(pixmapPointer);
-		surface.setTarget(imageGraphics);
-
-		return surface;
-	}
+//	private int createImagePixmap(int displayId, int configId, Graphics imageGraphics, int width, int height) {
+//		int pixmapPointer;
+//
+//		// Duplicate mutable image contents
+//		try {
+//			pixmapPointer = _getImagePixmap(displayId, configId, imageGraphics, width, height);
+//
+//		} catch (OutOfMemoryError e) {
+//			_garbageCollect(false);
+//
+//			try {
+//				pixmapPointer = _getImagePixmap(displayId, configId, imageGraphics, width, height);
+//			} catch (OutOfMemoryError e2) {
+//				_garbageCollect(true);
+//
+//				pixmapPointer = _getImagePixmap(displayId, configId, imageGraphics, width, height);
+//			}
+//		}
+//		return pixmapPointer;
+//	}
+//
+//	public synchronized EGLSurface eglCreatePixmapSurface(EGLDisplay display, EGLConfig config, Object pixmap,
+//			int[] attrib_list) {
+//		if (display == null) {
+//			throwIAE(Errors.EGL_DISPLAY_NULL);
+//		}
+//		if (config == null) {
+//			throwIAE(Errors.EGL_CONFIG_NULL);
+//		}
+//		if (pixmap == null) {
+//			throwIAE(Errors.EGL_PIXMAP_NULL);
+//		}
+//		if (!(pixmap instanceof Graphics)) {
+//			throwIAE(Errors.EGL_BAD_PIXMAP);
+//		}
+//
+//		Graphics imageGraphics = (Graphics) pixmap;
+//		int width = GameMap.getGraphicsAccess().getGraphicsWidth(imageGraphics);
+//		int height = GameMap.getGraphicsAccess().getGraphicsHeight(imageGraphics);
+//
+//		int displayId = ((NativeEGLDisplay) display).nativeId();
+//		int configId = ((NativeEGLConfig) config).nativeId();
+//
+//		// Clone the attribute list and check the clone for termination.
+//		// This prevents another thread from altering the list between
+//		// the time of the check and the time it is passed to the GL.
+//		if (attrib_list != null) {
+//			attrib_list = clone(attrib_list);
+//		}
+//		if (!isTerminated(attrib_list)) {
+//			throwIAE(Errors.EGL_ATTRIBS_NOT_TERMINATED);
+//		}
+//
+//		int pixmapPointer = createImagePixmap(displayId, configId, imageGraphics, width, height);
+//
+//		int surf = _eglCreatePixmapSurface(displayId, configId, pixmapPointer, attrib_list);
+//		NativeEGLSurface surface = NativeEGLSurface.getInstance(surf, width, height);
+//		surface.setPixmapPointer(pixmapPointer);
+//		surface.setTarget(imageGraphics);
+//
+//		return surface;
+//	}
 
 	public synchronized EGLSurface eglCreatePbufferSurface(EGLDisplay display, EGLConfig config, int[] attrib_list) {
 		if (display == null) {
@@ -528,15 +648,15 @@ class NativeEGL10 implements EGL10 {
 
 		boolean success = EGL_TRUE == _eglDestroySurface(disp.nativeId(), surf.nativeId());
 
-		if (success) {
-			int pixmapPtr = surf.getPixmapPointer();
-			if (pixmapPtr != 0) {
-				_destroyPixmap(pixmapPtr);
-				surf.setPixmapPointer(0);
-			}
-
-			surf.dispose();
-		}
+//		if (success) {
+//			int pixmapPtr = surf.getPixmapPointer();
+//			if (pixmapPtr != 0) {
+//				_destroyPixmap(pixmapPtr);
+//				surf.setPixmapPointer(0);
+//			}
+//
+//			surf.dispose();
+//		}
 
 		return success;
 	}
@@ -755,23 +875,17 @@ class NativeEGL10 implements EGL10 {
 		NativeEGLSurface currentDrawSurface = cimpl.getDrawSurfaceImpl();
 
 		if (currentDrawSurface != null) {
-			final Graphics targetGraphics = currentDrawSurface.getTarget();
-			// Creator is null if Graphics is obtained from Image.
-			// In case of Image there are no manus and hence no
-			// shift is required.
-			final Object creator = (targetGraphics != null) ? GameMap.getGraphicsAccess().getGraphicsCreator(
-					targetGraphics) : null;
-			int deltaHeight = 0;
-			if (creator != null) {
-				deltaHeight = _getFullDisplayHeight() - GameMap.getGraphicsAccess().getGraphicsHeight(targetGraphics);
-			}
-			_putWindowContents(targetGraphics, deltaHeight, currentDrawSurface.getPixmapPointer());
+			Object targetGraphics = currentDrawSurface.getTarget();
+			platformHelper.drawColorBufferToGraphics((GL10)currGL, targetGraphics);
 		} else {
 			// Do nothing
 		}
 
 		return returnValue;
 	}
+	
+	
+	
 
 	public synchronized boolean eglWaitNative(int engine, Object bindTarget) {
 		NativeEGLContext cimpl = (NativeEGLContext) eglGetCurrentContext();
@@ -780,18 +894,18 @@ class NativeEGL10 implements EGL10 {
 			NativeEGLSurface currentDrawSurface = cimpl.getDrawSurfaceImpl();
 
 			if (currentDrawSurface != null) {
-				Graphics targetGraphics = currentDrawSurface.getTarget();
-				// Creator is null if Graphics is obtained from Image.
-				// In case of Image there are no manus and hence no
-				// shift is required.
-				Object creator = (targetGraphics != null) ? GameMap.getGraphicsAccess().getGraphicsCreator(
-						targetGraphics) : null;
-				int deltaHeight = 0;
-				if (creator != null) {
-					deltaHeight = _getFullDisplayHeight()
-							- GameMap.getGraphicsAccess().getGraphicsHeight(targetGraphics);
-				}
-				_getWindowContents(targetGraphics, deltaHeight, currentDrawSurface.getPixmapPointer());
+				Object targetGraphics = currentDrawSurface.getTarget();
+//				// Creator is null if Graphics is obtained from Image.
+//				// In case of Image there are no manus and hence no
+//				// shift is required.
+//				Object creator = (targetGraphics != null) ? GameMap.getGraphicsAccess().getGraphicsCreator(
+//						targetGraphics) : null;
+//				int deltaHeight = 0;
+//				if (creator != null) {
+//					deltaHeight = _getFullDisplayHeight()
+//							- GameMap.getGraphicsAccess().getGraphicsHeight(targetGraphics);
+//				}
+//				_getWindowContents(targetGraphics, deltaHeight, currentDrawSurface.getPixmapPointer());
 			} else {
 				// Do nothing
 			}
@@ -827,47 +941,48 @@ class NativeEGL10 implements EGL10 {
 		if (native_pixmap == null) {
 			throwIAE(Errors.EGL_NATIVE_PIXMAP_NULL);
 		}
-		if (!(native_pixmap instanceof Graphics)) {
+		if (!platformHelper.isGraphicsCompatibleWithPixmapSurface(native_pixmap)) {
 			throwIAE(Errors.EGL_BAD_PIXMAP);
 		}
-
-		Graphics imageGraphics = (Graphics) native_pixmap;
 
 		NativeGL10.grabContext();
 
 		NativeEGLSurface surf = (NativeEGLSurface) surface;
-
-		final Graphics targetGraphics = surf.getTarget();
-		// Creator is null if Graphics is obtained from Image.
-		// In case of Image there are no manus and hence no
-		// shift is required.
-		final Object creator = (targetGraphics != null) ? GameMap.getGraphicsAccess()
-				.getGraphicsCreator(targetGraphics) : null;
-		int deltaHeight = 0;
-		if (creator != null) {
-			deltaHeight = _getFullDisplayHeight() - GameMap.getGraphicsAccess().getGraphicsHeight(targetGraphics);
-		}
-		int pixmapPointer;
-
-		boolean retval;
-		// Duplicate mutable image contents
-		try {
-			retval = EGL_TRUE == _eglCopyBuffers(((NativeEGLDisplay) display).nativeId(), surf.nativeId(), imageGraphics,
-					surf.getWidth(), surf.getHeight(), deltaHeight);
-		} catch (OutOfMemoryError e) {
-			_garbageCollect(false);
-
-			try {
-				retval = EGL_TRUE == _eglCopyBuffers(((NativeEGLDisplay) display).nativeId(), surf.nativeId(),
-						imageGraphics, surf.getWidth(), surf.getHeight(), deltaHeight);
-			} catch (OutOfMemoryError e2) {
-				_garbageCollect(true);
-
-				retval = EGL_TRUE == _eglCopyBuffers(((NativeEGLDisplay) display).nativeId(), surf.nativeId(),
-						imageGraphics, surf.getWidth(), surf.getHeight(), deltaHeight);
-			}
-		}
-		return retval;
+		final Object srcGraphics = surf.getTarget();
+		
+		return platformHelper.copySurfaceToPixmap(srcGraphics, native_pixmap);
+		
+		
+//		// Creator is null if Graphics is obtained from Image.
+//		// In case of Image there are no manus and hence no
+//		// shift is required.
+//		final Object creator = (targetGraphics != null) ? GameMap.getGraphicsAccess()
+//				.getGraphicsCreator(targetGraphics) : null;
+//		int deltaHeight = 0;
+//		if (creator != null) {
+//			deltaHeight = _getFullDisplayHeight() - GameMap.getGraphicsAccess().getGraphicsHeight(targetGraphics);
+//		}
+//		int pixmapPointer;
+//
+//		boolean retval;
+//		// Duplicate mutable image contents
+//		try {
+//			retval = EGL_TRUE == _eglCopyBuffers(((NativeEGLDisplay) display).nativeId(), surf.nativeId(), imageGraphics,
+//					surf.getWidth(), surf.getHeight(), deltaHeight);
+//		} catch (OutOfMemoryError e) {
+//			_garbageCollect(false);
+//
+//			try {
+//				retval = EGL_TRUE == _eglCopyBuffers(((NativeEGLDisplay) display).nativeId(), surf.nativeId(),
+//						imageGraphics, surf.getWidth(), surf.getHeight(), deltaHeight);
+//			} catch (OutOfMemoryError e2) {
+//				_garbageCollect(true);
+//
+//				retval = EGL_TRUE == _eglCopyBuffers(((NativeEGLDisplay) display).nativeId(), surf.nativeId(),
+//						imageGraphics, surf.getWidth(), surf.getHeight(), deltaHeight);
+//			}
+//		}
+//		return retval;
 	}
 
 	public NativeEGL10() {
