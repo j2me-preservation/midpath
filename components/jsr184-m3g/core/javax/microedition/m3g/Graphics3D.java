@@ -121,8 +121,8 @@ public final class Graphics3D {
 		int redSize = 8;
 		int greenSize = 8;
 		int blueSize = 8;
-		int alphaSize = 0;
-		int depthSize = 32;
+		int alphaSize = 8;
+		int depthSize = EGL10.EGL_DONT_CARE;
 		int stencilSize = EGL10.EGL_DONT_CARE;
 		int[] s_configAttribs = { EGL10.EGL_RED_SIZE, redSize, EGL10.EGL_GREEN_SIZE, greenSize, EGL10.EGL_BLUE_SIZE,
 				blueSize, EGL10.EGL_ALPHA_SIZE, alphaSize, EGL10.EGL_DEPTH_SIZE, depthSize, EGL10.EGL_STENCIL_SIZE,

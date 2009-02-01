@@ -26,6 +26,7 @@ public class NIOHelperSE {
                 swapBuffer.put(srcBuffer);
                 swapBuffer.rewind();
             }
+            srcBuffer.rewind();
             return swapBuffer;
         } else if (buffer instanceof IntBuffer) {
             IntBuffer srcBuffer =  ((IntBuffer)buffer);
@@ -39,6 +40,7 @@ public class NIOHelperSE {
                 swapBuffer.put(srcBuffer);
                 swapBuffer.rewind();
             }
+            srcBuffer.rewind();
             return swapBuffer;
         } else if (buffer instanceof FloatBuffer) {
             FloatBuffer srcBuffer =  ((FloatBuffer)buffer);
@@ -52,6 +54,7 @@ public class NIOHelperSE {
                 swapBuffer.put(srcBuffer);
                 swapBuffer.rewind();
             }
+            srcBuffer.rewind();
             return swapBuffer;
         } else {
             return buffer;
