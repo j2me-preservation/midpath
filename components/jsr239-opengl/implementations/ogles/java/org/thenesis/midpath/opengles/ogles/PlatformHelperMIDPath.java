@@ -4,6 +4,8 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 import org.thenesis.midpath.ui.toolkit.virtual.VirtualGraphics;
 
@@ -66,15 +68,17 @@ public class PlatformHelperMIDPath extends PlatformHelper {
         VirtualGraphics imageGraphics = (VirtualGraphics) g;
         int width = getGraphicsWidth(imageGraphics);
         int height = getGraphicsHeight(imageGraphics);
-        System.out.println("[DEBUG]NativeELG10: drawColorBufferToGraphics(): width="+ width + " height=" + height);
+        //System.out.println("[DEBUG]NativeELG10: drawColorBufferToGraphics(): width="+ width + " height=" + height);
+        //System.out.println("[DEBUG]NativeELG10: drawColorBufferToGraphics(): clipX="+ imageGraphics.getTranslateX() + " clipY=" + imageGraphics.getTranslateY());
         // int width = GameMap.getGraphicsAccess().getGraphicsWidth((Graphics)g);
         // int height =GameMap.getGraphicsAccess().getGraphicsHeight((Graphics)g);
 
-        int[] gData = imageGraphics.getSurface().data;
+        //int[] gData = imageGraphics.getSurface().data;
         // System.out.println("[DEBUG]NativeELG10: drawColorBufferToGraphics(): width*height="
         // + (width*height) + " gData.length=" + gData.length);
 
         byte[] data = new byte[width * height * 4];
+        int[] imgData = new int[width * height];
         ByteBuffer buffer = ByteBuffer.wrap(data);
         gl.glReadPixels(0, 0, width, height, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, buffer);
 
@@ -100,11 +104,15 @@ public class PlatformHelperMIDPath extends PlatformHelper {
                 int lcB = data[dstLoIndex + 2] & 0xFF;
                 int lcA = data[dstLoIndex + 3] & 0xFF;
 
-                gData[hiIndex] = (lcA << 24) | (lcR << 16) | (lcG << 8) | lcB;
-                gData[loIndex] = (hcA << 24) | (hcR << 16) | (hcG << 8) | hcB;
+                imgData[hiIndex] = (lcA << 24) | (lcR << 16) | (lcG << 8) | lcB;
+                imgData[loIndex] = (hcA << 24) | (hcR << 16) | (hcG << 8) | hcB;
 
             }
         }
+        
+        Image img = Image.createRGBImage(imgData, width, height, false);
+        imageGraphics.drawImage(img, 0, 0, Graphics.TOP | Graphics.LEFT);
+        
 
         // Pixel:
         // 0 0 ffffffff ffffffff

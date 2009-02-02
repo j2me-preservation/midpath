@@ -111,12 +111,13 @@ public final class Graphics3D {
 		// Create EGL context
 		this.egl = (EGL10) EGLContext.getEGL();
 		this.eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+		EGL_ASSERT(eglDisplay != EGL10.EGL_NO_DISPLAY);
 
 		int[] major_minor = new int[2];
-		egl.eglInitialize(eglDisplay, major_minor);
+		EGL_ASSERT(egl.eglInitialize(eglDisplay, major_minor));
 
 		int[] num_config = new int[1];
-		egl.eglGetConfigs(eglDisplay, null, 0, num_config);
+		EGL_ASSERT(egl.eglGetConfigs(eglDisplay, null, 0, num_config));
 
 		int redSize = 8;
 		int greenSize = 8;
@@ -129,10 +130,11 @@ public final class Graphics3D {
 				stencilSize, EGL10.EGL_NONE };
 
 		EGLConfig[] eglConfigs = new EGLConfig[num_config[0]];
-		egl.eglChooseConfig(eglDisplay, s_configAttribs, eglConfigs, eglConfigs.length, num_config);
+		EGL_ASSERT(egl.eglChooseConfig(eglDisplay, s_configAttribs, eglConfigs, eglConfigs.length, num_config));
 		this.eglConfig = eglConfigs[0];
 
 		this.eglContext = egl.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, null);
+		EGL_ASSERT(eglContext != EGL10.EGL_NO_CONTEXT);
 		this.gl = (GL10) eglContext.getGL();
 
 		/*
@@ -141,7 +143,8 @@ public final class Graphics3D {
 
 		// Create an offscreen surface
 		EGLSurface tmpSurface = egl.eglCreatePbufferSurface(eglDisplay, eglConfig, null);
-		egl.eglMakeCurrent(eglDisplay, tmpSurface, tmpSurface, eglContext);
+		EGL_ASSERT(tmpSurface != EGL10.EGL_NO_SURFACE);
+		EGL_ASSERT(egl.eglMakeCurrent(eglDisplay, tmpSurface, tmpSurface, eglContext));
 		// Get parameters from the GL instance
 		int[] params = new int[2];
 		gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_UNITS, params, 0);
@@ -155,8 +158,8 @@ public final class Graphics3D {
 		gl.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, params, 0);
 		maxTextureSize = params[0];
 		// Destroy the offscreen surface
-		egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
-		egl.eglDestroySurface(eglDisplay, tmpSurface);
+		EGL_ASSERT(egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT));
+		EGL_ASSERT(egl.eglDestroySurface(eglDisplay, tmpSurface));
 
 	}
 
@@ -204,14 +207,27 @@ public final class Graphics3D {
 		if (target != renderTarget) {
 			renderTarget = target;
 			this.eglWindowSurface = egl.eglCreateWindowSurface(eglDisplay, eglConfig, target, null);
+			EGL_ASSERT(eglWindowSurface != EGL10.EGL_NO_SURFACE);
 		}
 
 		// Make the context current on this thread
-		egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext);
+		EGL_ASSERT(egl.eglMakeCurrent(eglDisplay, eglWindowSurface, eglWindowSurface, eglContext));
 
 		// Wait before any rendering operation
-		egl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, target);
+		EGL_ASSERT(egl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, target));
+		
+		int[] w = new int[1];
+		EGL_ASSERT(egl.eglQuerySurface(eglDisplay, eglWindowSurface, EGL10.EGL_WIDTH, w));
+        int[] h = new int[1];
+        EGL_ASSERT(egl.eglQuerySurface(eglDisplay, eglWindowSurface, EGL10.EGL_HEIGHT, h));
+        setViewport(0, 0, w[0],  h[0]);
 
+	}
+	
+	private static void EGL_ASSERT(boolean val) {
+	    if (!val) {
+	        throw new IllegalStateException();
+	    }
 	}
 
 	public Object getTarget() {
@@ -220,9 +236,9 @@ public final class Graphics3D {
 
 	public void releaseTarget() {
 		if (targetBound) {
-			egl.eglWaitGL();
+		    EGL_ASSERT(egl.eglWaitGL());
 			// Release the context
-			egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+			EGL_ASSERT(egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT));
 			targetBound = false;
 		}
 	}
