@@ -46,6 +46,9 @@ public class VirtualToolkit extends UIToolkit {
 	private VirtualSurface rootSurface;
 	private VirtualGraphics rootPeer;
 	private VirtualBackend backend;
+	
+	private GenericEventMapper eventMapper = new GenericEventMapper();
+    private VirtualBackendEventListener listener = new VirtualBackendEventListener(eventMapper);
 
 	public VirtualToolkit() {
 	}
@@ -57,15 +60,23 @@ public class VirtualToolkit extends UIToolkit {
 			System.out.println("[DEBUG] VirtualToolkit.initialize(): backendName: " + backendName);
 		}
 		
+		
+		//Copy MIDPath config in the backend config
+        ConfigurationProperties properties = Configuration.getAllProperties();
+        org.thenesis.microbackend.ui.Configuration backendConfig = new org.thenesis.microbackend.ui.Configuration();
+        for (int i = 0; i < properties.size(); i++) {
+            backendConfig.addParameter(properties.getKeyAt(i), properties.getValueAt(i));
+        }
+		
 		// Create the backend
-		UIBackend b = UIBackendFactory.createBackend(backendName);
+		UIBackend b = UIBackendFactory.createBackend(backendName, backendConfig, listener);
 		if (b == null) {
 			System.out.println("[WARNING] Backend '" + backendName + "' was not found. Switching to NULL backend...");
 			b = new NullBackend();
 		}
 		
 		// Wrap it
-		backend = new VirtualBackendImpl(b, w, h);
+		backend = new VirtualBackendImpl(b,eventMapper, w, h);
 		try {
 			backend.open();
 		} catch (IOException e) {
@@ -172,23 +183,13 @@ public class VirtualToolkit extends UIToolkit {
 class VirtualBackendImpl implements VirtualBackend {
 
 	private VirtualSurface rootVirtualSurface;
-	private GenericEventMapper eventMapper = new GenericEventMapper();
-	private VirtualBackendEventListener listener = new VirtualBackendEventListener(eventMapper);
+	private EventMapper eventMapper;
 	private UIBackend backend;
-	
 
-	public VirtualBackendImpl(UIBackend backend, int w, int h) {
+	public VirtualBackendImpl(UIBackend backend, GenericEventMapper eventMapper, int w, int h) {
 		this.backend = backend;
+		this.eventMapper = eventMapper;
 		rootVirtualSurface = new VirtualSurfaceImpl(w, h);
-		
-		//Copy MIDPath config in the backend config
-		ConfigurationProperties properties = Configuration.getAllProperties();
-		org.thenesis.microbackend.ui.Configuration backendConfig = new org.thenesis.microbackend.ui.Configuration();
-		for (int i = 0; i < properties.size(); i++) {
-			backendConfig.addParameter(properties.getKeyAt(i), properties.getValueAt(i));
-		}
-		backend.setBackendEventListener(listener);
-		backend.configure(backendConfig, w, h);
 	}
 
 	public EventMapper getEventMapper() {
