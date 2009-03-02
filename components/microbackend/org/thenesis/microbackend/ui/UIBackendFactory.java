@@ -166,8 +166,8 @@ public class UIBackendFactory {
         }
 
         // Get requested screen size
-        int w = backendConfig.getIntParameter("org.thenesis.lwuit.microbackend.screenWidth", 100);
-        int h = backendConfig.getIntParameter("org.thenesis.lwuit.microbackend.screenHeight", 100);
+        int w = backendConfig.getIntParameter("org.thenesis.microbackend.ui.screenWidth", 100);
+        int h = backendConfig.getIntParameter("org.thenesis.microbackend.ui.screenHeight", 100);
 
         backend.configure(backendConfig, w, h);
         backend.setBackendEventListener(listener);

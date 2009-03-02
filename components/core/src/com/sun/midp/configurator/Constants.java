@@ -572,8 +572,8 @@ public class Constants {
 	static {
 
 		// Default values: w=176, h=210
-		int width = Configuration.getPositiveIntProperty("org.thenesis.lwuit.microbackend.screenWidth", 176);
-		int height = Configuration.getPositiveIntProperty("org.thenesis.lwuit.microbackend.screenHeight", 210);
+		int width = Configuration.getPositiveIntProperty("org.thenesis.microbackend.ui.screenWidth", 176);
+		int height = Configuration.getPositiveIntProperty("org.thenesis.microbackend.ui.screenHeight", 210);
 		
 		GAMECANVAS_FULLWIDTH = width;
 		GAMECANVAS_FULLHEIGHT = height;
