@@ -30,6 +30,12 @@ import java.io.InputStream;
 
 import javax.microedition.lcdui.game.Sprite;
 
+import org.thenesis.microbackend.ui.graphics.VirtualImage;
+import org.thenesis.microbackend.ui.graphics.VirtualToolkit;
+import org.thenesis.midpath.ui.UIToolkit;
+
+import com.sun.midp.main.BaseMIDletSuiteLauncher;
+
 /**
  * The <code>Image</code> class is used to hold graphical image
  * data. <code>Image</code>
@@ -249,29 +255,44 @@ import javax.microedition.lcdui.game.Sprite;
  */
 
 public class Image {
-	/**
-	 * Width of the image in pixels.
-	 */
-	protected int imgWidth;
+    
+    /**
+     * Valid transforms possible are 0 - 7
+     */
+    protected static final int INVALID_TRANSFORM_BITS = 0xFFFFFFF8;
 
-	/**
-	 * Height of the image in pixels.
-	 */
-	protected int imgHeight;
-
-	/**
-	 * <code>ImageData</code> instance associated with this <code>Image</code>.
-	 */
-	//protected final ImageData imageData;
-	/**
-	 * Valid transforms possible are 0 - 7
-	 */
-	protected static final int INVALID_TRANSFORM_BITS = 0xFFFFFFF8;
-
-	/**
-	 * Transform swap axis bit is the 3 bit
-	 */
-	protected static final int TRANSFORM_SWAP_AXIS = 4;
+    /**
+     * Transform swap axis bit is the 3 bit
+     */
+    protected static final int TRANSFORM_SWAP_AXIS = 4;
+	
+    private VirtualToolkit toolkit = UIToolkit.getToolkit().getVirtualToolkit();
+    
+	VirtualImage virtualImage;
+	
+	private Image(int width, int height) {
+	    virtualImage = toolkit.createImage(width, height);
+	}
+	
+	private Image(Image img) {
+        virtualImage = toolkit.createImage(img.virtualImage);
+    }
+	
+	private Image(byte[] imageData, int imageOffset, int imageLength) {
+        virtualImage = toolkit.createImage(imageData, imageOffset, imageLength);
+    }
+	
+	private Image(Image image, int x, int y, int width, int height, int transform) {
+	    virtualImage = toolkit.createImage(image.virtualImage, x, y, width, height, transform);
+    }
+	
+	private Image(InputStream stream) throws IOException {
+	    virtualImage = toolkit.createImage(stream);
+	}
+	
+	private Image(int rgb[], int width, int height, boolean processAlpha) {
+	    virtualImage = toolkit.createRGBImage(rgb, width, height, processAlpha);
+	}
 
 	/**
 	 * Creates a new, mutable image for off-screen drawing. Every pixel
@@ -290,7 +311,7 @@ public class Image {
 			throw new IllegalArgumentException();
 		}
 
-		return UIToolkit.getToolkit().createImage(width, height);
+		return new Image(width, height);
 
 		// SYNC NOTE: Not accessing any shared data, no locking necessary
 		//return new Image(ImageDataFactory.getImageDataFactory().
@@ -336,7 +357,7 @@ public class Image {
 		}
 		
 		if (source.isMutable()) {
-			return UIToolkit.getToolkit().createImage(source);
+			return new Image(source);
 		} else {
 			return source;
 		}
@@ -367,8 +388,13 @@ public class Image {
 		if (name == null) {
 			throw new java.lang.NullPointerException();
 		}
-		
-		return UIToolkit.getToolkit().createImage(name);
+	        
+	    // Load the image from the MIDlet classloader.
+        // FIXME Use a better mechanism (?)
+        InputStream is = BaseMIDletSuiteLauncher.getResourceAsStream(name);
+        //System.out.println("[DEBUG] UIToolkit.createImage(String name): " + is.read());
+        return createImage(is);
+	
 	}
 
 	/**
@@ -420,11 +446,8 @@ public class Image {
 			throw new ArrayIndexOutOfBoundsException();
 		}
 
-		try {
-			return UIToolkit.getToolkit().createImage(imageData, imageOffset, imageLength);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e.getMessage());
-		}
+		return new Image(imageData, imageOffset, imageLength);
+		
 
 		//        return new Image(ImageDataFactory.getImageDataFactory().
 		//                         createImmutableImageData(imageData, 
@@ -521,7 +544,7 @@ public class Image {
 
 		if (x == 0 && y == 0 && width == image.getWidth() && height == image.getHeight()
 				&& transform == Sprite.TRANS_NONE) {
-			return UIToolkit.getToolkit().createImage(image);
+			return new Image(image);
 			//return createImage(image);
 		} else {
 			//            return 
@@ -530,14 +553,8 @@ public class Image {
 			//                                                 x, y, 
 			//                                                 width, height, 
 			//                                                 transform));
-			// TODO
-			//return null;
-			try {
-				return UIToolkit.getToolkit().createImage(image, x, y, width, height, transform);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
+			return new Image(image, x, y, width, height, transform);
+			
 		}
 	}
 
@@ -563,7 +580,7 @@ public class Image {
 			throw new java.lang.NullPointerException();
 		}
 
-		return UIToolkit.getToolkit().createImage(stream);
+		return new Image(stream);
 
 		//        try {
 		//            return new Image(ImageDataFactory.getImageDataFactory().
@@ -645,7 +662,7 @@ public class Image {
 			throw new ArrayIndexOutOfBoundsException();
 		}
 
-		return UIToolkit.getToolkit().createImage(rgb, width, height, processAlpha);
+		return new Image(rgb, width, height, processAlpha);
 
 		//        return new Image(ImageDataFactory.getImageDataFactory().
 		//                         createImmutableImageData(rgb, 
@@ -700,7 +717,7 @@ public class Image {
 	 * @return width of the image
 	 */
 	public int getWidth() {
-		return imgWidth;
+		return virtualImage.getWidth();
 	}
 
 	/**
@@ -709,7 +726,7 @@ public class Image {
 	 * @return height of the image
 	 */
 	public int getHeight() {
-		return imgHeight;
+		return virtualImage.getHeight();
 	}
 
 	/**
@@ -721,12 +738,13 @@ public class Image {
 	 * <code>false</code> otherwise
 	 */
 	public boolean isMutable() {
-		//return imageData.isMutable();
-		return false;
+		return virtualImage.isMutable();
 	}
 
 	// JAVADOC COMMENT ELIDED
-	public native void getRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height);
+	public void getRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height) {
+	    virtualImage.getRGB(rgbData, offset, scanlength, x, y, width, height);
+	}
 
 	/**
 	 * Returns <code>ImageData</code> associated with this 
@@ -751,8 +769,7 @@ public class Image {
 	 * @see Graphics
 	 */
 	protected boolean render(Graphics g, int x, int y, int anchor) {
-		//System.out.println("[DEBUG] Image.render(): not implemented yet");
-		return true;
+		return virtualImage.render(g.virtualGraphics, x, y, anchor);
 	}
 
 	/**
@@ -787,7 +804,7 @@ public class Image {
 	protected boolean renderRegion(Graphics g, int x_src, int y_src, int width, int height, int transform, int x_dest,
 			int y_dest, int anchor) {
 		//System.out.println("[DEBUG] Image.renderRegion(): not implemented yet");
-		return true;
+		return virtualImage.renderRegion(g.virtualGraphics, x_src, y_src, width, height, transform, x_dest, y_dest, anchor);
 	}
 
 	/**
@@ -823,9 +840,11 @@ public class Image {
 	//        this.height    = imageData.getHeight();
 	//    }
 
-	protected Image() {
+	private Image() {
 		//this.imageData = null;
 		//this.width     = imageData.getWidth();
 		//this.height    = imageData.getHeight();
 	}
+
+    
 }

@@ -49,17 +49,9 @@ public interface VirtualImage {
     public void getRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height);
 
     public boolean render(VirtualGraphics g, int x, int y, int anchor);
-
-    public VirtualSurface transform(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform);
-
-    public VirtualSurface rotate(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform);
-
-    /**
-     * In place mirror transformation.
-     * 
-     * @param srcImage
-     */
-    public void mirror(VirtualSurface srcSurface, int x_src, int y_src, int width, int height);
+    
+    public boolean renderRegion(VirtualGraphics g, int x_src, int y_src, int width, int height, int transform, int x_dest, int y_dest,
+            int anchor);
 
     public boolean isMutable();
 

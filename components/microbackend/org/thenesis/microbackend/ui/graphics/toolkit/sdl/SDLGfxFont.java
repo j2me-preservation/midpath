@@ -15,33 +15,33 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
  */
-package org.thenesis.midpath.ui.toolkit.sdl;
+package org.thenesis.microbackend.ui.graphics.toolkit.sdl;
 
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.FontPeer;
-import javax.microedition.lcdui.Graphics;
+import org.thenesis.microbackend.ui.Logging;
+import org.thenesis.microbackend.ui.graphics.VirtualFont;
+import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
 
+import sdljava.video.SDLSurface;
 import sdljavax.gfx.SDLGfx;
 
-import com.sun.midp.log.Logging;
 
-public class SDLGfxFontPeer implements FontPeer {
+public class SDLGfxFont implements VirtualFont {
 
 	// SDLGfx font: 8x8 pixels
 	private int FONT_SIZE = 8;
 	private int inset = 0;
 	private int size;
 
-	SDLGfxFontPeer(int face, int style, int size) {
+	SDLGfxFont(int face, int style, int size) {
 
 		this.size = size;
 		
 		switch (size) {
-		case Font.SIZE_LARGE:
+		case VirtualFont.SIZE_LARGE:
 			inset = 12;
-		case Font.SIZE_MEDIUM:
+		case VirtualFont.SIZE_MEDIUM:
 			inset = 8;
-		case Font.SIZE_SMALL:
+		case VirtualFont.SIZE_SMALL:
 			inset = 6;
 		}
 	}
@@ -59,7 +59,7 @@ public class SDLGfxFontPeer implements FontPeer {
 	}
 
 	public int getFace() {
-		return Font.FACE_MONOSPACE;
+		return VirtualFont.FACE_MONOSPACE;
 	}
 
 	public int getHeight() {
@@ -71,7 +71,7 @@ public class SDLGfxFontPeer implements FontPeer {
 	}
 
 	public int getStyle() {
-		return Font.STYLE_PLAIN;
+		return VirtualFont.STYLE_PLAIN;
 	}
 
 	public boolean isBold() {
@@ -98,28 +98,29 @@ public class SDLGfxFontPeer implements FontPeer {
 		return len * FONT_SIZE;
 	}
 
-	public void render(Graphics g, String str, int x, int y, int anchor) {
+	public void render(VirtualGraphics g, String str, int x, int y, int anchor) {
 		x += g.getTranslateX();
 		y += g.getTranslateY();
 
-		if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
+		if ((anchor & VirtualGraphics.BOTTOM) == VirtualGraphics.BOTTOM) {
 			y -= getHeight() - 1;
 		}
 
-		if ((anchor & Graphics.RIGHT) == Graphics.RIGHT) {
+		if ((anchor & VirtualGraphics.RIGHT) == VirtualGraphics.RIGHT) {
 			x -= stringWidth(str) - 1;
-		} else if ((anchor & Graphics.HCENTER) == Graphics.HCENTER) {
+		} else if ((anchor & VirtualGraphics.HCENTER) == VirtualGraphics.HCENTER) {
 			x -= stringWidth(str) / 2 - 1;
 		}
 		
 		y += inset / 2;
 
-		SDLGraphics sdlg = ((SDLGraphics) g);
-		SDLGfx.stringColor(sdlg.getSurface(), x, y, str, sdlg.sdlGfxColor); //0xffff00ffL
+		SDLGraphics sdlGraphics = ((SDLGraphics) g);
+		SDLSurface sdlSurface = ((SDLImage)sdlGraphics.getImage()).sdlSurface;
+		SDLGfx.stringColor(sdlSurface, x, y, str, sdlGraphics.sdlGfxColor); //0xffff00ffL
 
 		if (Logging.TRACE_ENABLED)
 			System.out.println("SDLGraphics.drawString(): " + str + " x=" + x + " y=" + y + " color="
-				+ Integer.toHexString((int)sdlg.sdlColor));
+				+ Integer.toHexString((int)sdlGraphics.sdlColor));
 		
 	}
 

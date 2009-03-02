@@ -29,99 +29,103 @@ import org.thenesis.microbackend.ui.UIBackendFactory;
 import org.thenesis.microbackend.ui.graphics.toolkit.pure.PureToolkit;
 
 public abstract class VirtualToolkit {
-    
+
     protected Configuration backendConfig;
     protected BackendEventListener listener;
+    protected UIBackend backend;
+    protected VirtualFont defaultFont;
     
-    private UIBackend backend;
-    private BaseImageDecoder imageDecoder = new BaseImageDecoder();
+    private BaseImageDecoder imageDecoder;
 
     protected VirtualToolkit() {
     }
 
-    public static VirtualToolkit createToolkit(Configuration backendConfig, BackendEventListener listener) { 
-       VirtualToolkit toolkit = new PureToolkit();
-       toolkit.configure(backendConfig, listener);
-       return toolkit;
+    public static VirtualToolkit createToolkit(Configuration backendConfig, BackendEventListener listener) {
+        VirtualToolkit toolkit = new PureToolkit();
+        toolkit.configure(backendConfig, listener);
+        return toolkit;
     }
-    
+
     protected void configure(Configuration backendConfig, BackendEventListener listener) {
         this.backendConfig = backendConfig;
         this.listener = listener;
     }
 
     public void initialize(Object m) {
+
+        imageDecoder = new BaseImageDecoder(this);
+
         backend = UIBackendFactory.createBackend(m, backendConfig, listener);
-        
+
         int w = backend.getWidth();
         int h = backend.getHeight();
-       
+
         try {
             backend.open();
         } catch (IOException e) {
             Logging.log("VirtualToolkit: Can't open '" + backend.getClass().getName() + "' backend", Logging.ERROR);
             e.printStackTrace();
         }
-        
+
         initializeRoot(w, h);
     }
-    
+
     /**
      * Initializes the root Surface and Graphics
+     * 
      * @param rootWidth
      * @param rootHeight
      */
     protected abstract void initializeRoot(int rootWidth, int rootHeight);
 
     public abstract VirtualGraphics getRootGraphics();
-    
-    public abstract VirtualSurface getRootSurface();
 
-    public void flushGraphics(int x, int y, long width, long height) {
-        backend.updateARGBPixels(getRootSurface().getData(), x, y, (int) width, (int) height);
-    }
+    public abstract void flushGraphics(int x, int y, long width, long height);
 
     public abstract VirtualFont createFont(int face, int style, int size);
 
-    public abstract VirtualFont getDefaultFont();
+    public VirtualFont getDefaultFont() {
+        if (defaultFont == null) {
+            defaultFont = createFont(VirtualFont.FACE_MONOSPACE, VirtualFont.STYLE_PLAIN, VirtualFont.SIZE_SMALL);
+        }
+        return defaultFont;
+    }
 
-// 
-//    public int getWidth() {
-//        return backend.getWidth();
-//    }
-//
-//    public int getHeight() {
-//        return backend.getHeight();
-//    }
+    public int getWidth() {
+        return backend.getWidth();
+    }
+
+    public int getHeight() {
+        return backend.getHeight();
+    }
 
     UIBackend getBackend() {
         return backend;
     }
 
-    public abstract VirtualSurface createSurface(int w, int h);
-
     public void close() {
         backend.close();
     }
-    
-    public abstract VirtualImage createImage(int w, int h);
-    
-    public abstract VirtualImage createRGBImage(int[] rgb, int width, int height, boolean processAlpha);
-    
-    protected abstract VirtualImage createImage(VirtualSurface surface);
 
-    public VirtualImage createImage(InputStream stream) {
-        try {
-            VirtualSurface surface = imageDecoder.decode(stream);
-            return createImage(surface);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public abstract VirtualImage createImage(int w, int h);
+
+    public abstract VirtualImage createRGBImage(int[] rgb, int width, int height, boolean processAlpha);
+
+    public abstract VirtualImage createImage(VirtualImage image);
+
+    public abstract VirtualImage createImage(VirtualImage image, int x, int y, int width, int height, int transform);
+
+    public VirtualImage createImage(InputStream stream) throws IOException {
+        VirtualImage surface = imageDecoder.decode(stream);
+        return createImage(surface);
     }
-    
+
     public VirtualImage createImage(byte[] imageData, int imageOffset, int imageLength) {
-        return createImage(new ByteArrayInputStream(imageData, imageOffset, imageLength));
+        try {
+            return createImage(new ByteArrayInputStream(imageData, imageOffset, imageLength));
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Can't create image");
+        }
     }
 
 }

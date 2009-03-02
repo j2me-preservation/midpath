@@ -15,13 +15,14 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
  */
-package org.thenesis.midpath.ui.toolkit.sdl;
+package org.thenesis.microbackend.ui.graphics.toolkit.sdl;
 
 import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.FontPeer;
 import javax.microedition.lcdui.Graphics;
 
-import com.sun.midp.log.Logging;
+import org.thenesis.microbackend.ui.Logging;
+import org.thenesis.microbackend.ui.graphics.VirtualFont;
+import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
 
 import sdljava.SDLException;
 import sdljava.ttf.SDLTTF;
@@ -31,7 +32,7 @@ import sdljava.video.SDLRect;
 import sdljava.video.SDLSurface;
 import sdljava.video.SDLVideo;
 
-public class SDLTtfFontPeer implements FontPeer {
+public class SDLTtfFontPeer implements VirtualFont {
 
 	private int face;
 	private int style;
@@ -200,7 +201,7 @@ public class SDLTtfFontPeer implements FontPeer {
 		//return charsWidth(str.toCharArray(), offset, len);
 	}
 
-	public void render(Graphics g, String str, int x, int y, int anchor) {
+	public void render(VirtualGraphics g, String str, int x, int y, int anchor) {
 		x += g.getTranslateX();
 		y += g.getTranslateY();
 
@@ -217,18 +218,19 @@ public class SDLTtfFontPeer implements FontPeer {
 		}
 
 		// Render font now
-		SDLGraphics sdlg = ((SDLGraphics)g);
+		SDLGraphics sdlGraphics = ((SDLGraphics)g);
+		SDLSurface sdlSurface = ((SDLImage)sdlGraphics.getImage()).sdlSurface;
 		
 		if (Logging.TRACE_ENABLED)
 			System.out.println("[DEBUG] SDLTtfFontPeer.render(): " + str + " x=" + x + " y=" + y + " color="
-				+ Integer.toHexString((int)sdlg.sdlColor));
+				+ Integer.toHexString((int)sdlGraphics.sdlColor));
 		try {
-			SDLColor color = SDLVideo.getRGBA((int)sdlg.sdlColor, sdlg.getSurface().getFormat());
+			SDLColor color = SDLVideo.getRGBA((int)sdlGraphics.sdlColor, sdlSurface.getFormat());
 			
 			// FIXME Doesn't work with renderTextSolid... Why ?
 			SDLSurface ttfSurface = ttfFont.renderTextBlended(str, color);
 		
-			ttfSurface.blitSurface(sdlg.getSurface(), new SDLRect(x, y, 0, 0));
+			ttfSurface.blitSurface(sdlSurface, new SDLRect(x, y, 0, 0));
 		} catch (SDLException e) {
 			e.printStackTrace();
 		}

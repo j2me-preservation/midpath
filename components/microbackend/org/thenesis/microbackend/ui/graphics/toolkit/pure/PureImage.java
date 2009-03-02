@@ -21,11 +21,10 @@ import org.thenesis.microbackend.ui.Logging;
 import org.thenesis.microbackend.ui.graphics.Rectangle;
 import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
 import org.thenesis.microbackend.ui.graphics.VirtualImage;
-import org.thenesis.microbackend.ui.graphics.VirtualSurface;
 
 public class PureImage implements VirtualImage {
 
-    VirtualSurface surface;
+    int[] pixels;
     private boolean isMutable = false;
     private int imgWidth;
     private int imgHeight;
@@ -33,7 +32,7 @@ public class PureImage implements VirtualImage {
     //protected Image img;
 
     public PureImage(int w, int h) {
-        surface = createSurface(w, h);
+        pixels = createPixels(w, h);
         imgWidth = w;
         imgHeight = h;
         isMutable = true;
@@ -44,8 +43,8 @@ public class PureImage implements VirtualImage {
         this.imgHeight = h;
     }
 
-    private VirtualSurface createSurface(int w, int h) {
-        return new PureSurface(w, h);
+    private int[] createPixels(int w, int h) {
+        return new int[w * h];
     }
 
     public PureImage(int[] rgb, int width, int height, boolean processAlpha) { //throws IOException {
@@ -53,22 +52,21 @@ public class PureImage implements VirtualImage {
         this.imgWidth = width;
         this.imgHeight = height;
 
-        surface = createSurface(width, height);
-        int[] surfaceData = surface.getData();
+        pixels = createPixels(width, height);
 
         // P(a, b) = rgb[a + b * width];
         int size = width * height;
         if (processAlpha) {
             for (int i = 0; i < size; i++) {
                 if ((rgb[i] & 0xFF000000) != 0xFF000000)
-                    surfaceData[i] = rgb[i] & 0x00FFFFFF;
+                    pixels[i] = rgb[i] & 0x00FFFFFF;
                 else {
-                    surfaceData[i] = rgb[i];
+                    pixels[i] = rgb[i];
                 }
             }
         } else {
             for (int i = 0; i < size; i++) {
-                surfaceData[i] = rgb[i] | 0xFF000000;
+                pixels[i] = rgb[i] | 0xFF000000;
             }
         }
 
@@ -76,12 +74,12 @@ public class PureImage implements VirtualImage {
 
     }
 
-    public PureImage(PureImage srcImage) {
+    public PureImage(VirtualImage srcImage) {
 
-        surface = createSurface(srcImage.getWidth(), srcImage.getHeight());
+        pixels = createPixels(srcImage.getWidth(), srcImage.getHeight());
 
-        int[] srcData = srcImage.surface.getData();
-        int[] destData = surface.getData();
+        int[] srcData = ((PureImage)srcImage).pixels;
+        int[] destData = pixels;
 
         System.arraycopy(srcData, 0, destData, 0, srcData.length);
 
@@ -89,33 +87,32 @@ public class PureImage implements VirtualImage {
         isMutable = false;
 
     }
+    
+    PureImage(VirtualImage srcImage, int x, int y, int width, int height, int transform) {
+        VirtualImage dstImage = transform((PureImage)srcImage, x, y, width, height, transform);
+        setDimensions(dstImage.getWidth(), dstImage.getHeight());
+        isMutable = false;
+    }
 
     /**
      * Create a VirtualImage from a pre-existing surface (doesn't copy it)
      * 
-     * @param surface
+     * @param pixels
      */
-    PureImage(VirtualSurface surface) {
-        this.surface = surface;
-        setDimensions(surface.getWidth(), surface.getHeight());
+    PureImage(PureImage image) {
+        this.pixels = image.pixels;
+        setDimensions(image.getWidth(), image.getHeight());
         isMutable = false;
     }
 
-    PureImage(VirtualSurface srcSurface, int x, int y, int width, int height, int transform) {
+    PureImage(PureImage srcImage, int x, int y, int width, int height, int transform) {
 
-        surface = transform(srcSurface, x, y, width, height, transform);
-        setDimensions(surface.getWidth(), surface.getHeight());
-
+       
         if (Logging.TRACE_ENABLED)
             System.out
                     .println("[DEBUG] VirtualImage.<init>(Image image, int x, int y, int width, int height, int transform): not implemented yet");
 
     }
-
-    //	public VirtualImage(Image image, int x, int y, int width, int height, int transform) {
-    //		this(((VirtualImage) image).surface, x, y, width, height, transform);
-    //		isMutable = false;
-    //	}
 
     /* (non-Javadoc)
      * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#getRGB(int[], int, int, int, int, int, int)
@@ -134,12 +131,11 @@ public class PureImage implements VirtualImage {
             return;
         }
         
-        int[] surfaceData = surface.getData();
 
         for (int b = y; b < y + height; b++) {
             for (int a = x; a < x + width; a++) {
                 //System.out.println("[DEBUG]VirtualImage.getRGB(): a=" + a + "  b=" + b);
-                rgbData[offset + (a - x) + (b - y) * scanlength] = surfaceData[a + b * scanlength];
+                rgbData[offset + (a - x) + (b - y) * scanlength] = pixels[a + b * scanlength];
                 //rgbData[offset + (a - x) + (b - y) * scanlength] = P(a, b);
             }
         }
@@ -160,34 +156,34 @@ public class PureImage implements VirtualImage {
         x += g.getTranslateX();
         y += g.getTranslateY();
 
-        if (x_src < 0 || y_src < 0 || (x_src + width) > surface.getWidth() || (y_src + height) > surface.getHeight())
+        if (x_src < 0 || y_src < 0 || (x_src + width) > getWidth() || (y_src + height) > getHeight())
             return false;
 
         if ((anchor & VirtualGraphics.BOTTOM) == VirtualGraphics.BOTTOM) {
-            y -= surface.getHeight();
+            y -= getHeight();
         } else if ((anchor & VirtualGraphics.VCENTER) == VirtualGraphics.VCENTER) {
-            y -= surface.getHeight() / 2;
+            y -= getHeight() / 2;
         }
 
         if ((anchor & VirtualGraphics.RIGHT) == VirtualGraphics.RIGHT) {
-            x -= surface.getWidth();
+            x -= getWidth();
         } else if ((anchor & VirtualGraphics.HCENTER) == VirtualGraphics.HCENTER) {
-            x -= surface.getWidth() / 2;
+            x -= getWidth() / 2;
         }
 
         if (Logging.TRACE_ENABLED)
-            System.out.println("[DEBUG]VirtualImage.render2(): x=" + x + " y=" + y + " width=" + surface.getWidth() + " height="
-                    + surface.getHeight());
+            System.out.println("[DEBUG]VirtualImage.render2(): x=" + x + " y=" + y + " width=" + getWidth() + " height="
+                    + getHeight());
 
         PureGraphics vg = (PureGraphics) g;
-        Rectangle clipRect = vg.clipRectangle;
-        VirtualSurface destSurface = vg.getSurface();
+        Rectangle clipRect = vg.getClipRectangle();
+        PureImage destSurface = (PureImage) vg.getImage();
         int dstSurfaceWidth = destSurface.getWidth();
-        int[] dstSurfaceData = destSurface.getData();
+        int[] dstSurfaceData = destSurface.pixels;
         
-        int srcSurfaceWidth = surface.getWidth();
-        int srcSurfaceHeight = surface.getHeight();
-        int[] srcSurfaceData = surface.getData();
+        int srcSurfaceWidth = getWidth();
+        int srcSurfaceHeight = getHeight();
+        int[] srcSurfaceData = pixels;
 
         //		for (int iy = y_src; iy < (y_src + height); iy++, y++) {
         //			for (int ix = x_src; ix < (x_src + width); ix++, x++) {
@@ -254,7 +250,7 @@ public class PureImage implements VirtualImage {
 
     }
 
-    protected boolean renderRegion(VirtualGraphics g, int x_src, int y_src, int width, int height, int transform, int x_dest, int y_dest,
+    public boolean renderRegion(VirtualGraphics g, int x_src, int y_src, int width, int height, int transform, int x_dest, int y_dest,
             int anchor) {
 
         x_src += g.getTranslateX();
@@ -267,8 +263,7 @@ public class PureImage implements VirtualImage {
         if (transform == TRANS_NONE) {
             render(g, x_src, y_src, width, height, x_dest, y_dest, anchor);
         } else {
-            VirtualSurface transformedSurface = transform(this.surface, x_src, y_src, width, height, transform);
-            VirtualImage transformedImage = new PureImage(transformedSurface);
+            VirtualImage transformedImage = transform(this, x_src, y_src, width, height, transform);
             g.drawImage(transformedImage, x_dest, y_dest, anchor);
         }
 
@@ -277,11 +272,11 @@ public class PureImage implements VirtualImage {
 
     }
 
-    private void copy(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, VirtualSurface destSurface, int x_dest,
+    private void copy(PureImage srcSurface, int x_src, int y_src, int width, int height, PureImage destSurface, int x_dest,
             int y_dest) {
         
-        int[] srcSurfaceData = srcSurface.getData();
-        int[] dstSurfaceData = destSurface.getData();
+        int[] srcSurfaceData = srcSurface.pixels;
+        int[] dstSurfaceData = destSurface.pixels;
         int srcSurfaceWidth = srcSurface.getWidth();
         int dstSurfaceWidth = destSurface.getWidth();
         
@@ -300,8 +295,8 @@ public class PureImage implements VirtualImage {
     /* (non-Javadoc)
      * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#transform(org.thenesis.microbackend.ui.graphics.VirtualSurface, int, int, int, int, int)
      */
-    public VirtualSurface transform(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform) {
-
+    public VirtualImage transform(VirtualImage srcSurface, int x_src, int y_src, int width, int height, int transform) {
+        
         switch (transform) {
 
         case TRANS_ROT90:
@@ -309,15 +304,15 @@ public class PureImage implements VirtualImage {
         case TRANS_ROT270:
             return rotate(srcSurface, x_src, y_src, width, height, transform);
         case TRANS_MIRROR:
-            VirtualSurface destSurface = createSurface(width, height);
-            copy(srcSurface, x_src, y_src, width, height, destSurface, 0, 0);
+            PureImage destSurface = new PureImage(width, height);
+            copy((PureImage) srcSurface, x_src, y_src, width, height, destSurface, 0, 0);
             mirror(destSurface, 0, 0, width, height);
             return destSurface;
         case TRANS_MIRROR_ROT90:
         case TRANS_MIRROR_ROT180:
         case TRANS_MIRROR_ROT270:
-            destSurface = createSurface(width, height);
-            copy(srcSurface, x_src, y_src, width, height, destSurface, 0, 0);
+            destSurface = new PureImage(width, height);
+            copy((PureImage) srcSurface, x_src, y_src, width, height, destSurface, 0, 0);
             mirror(destSurface, 0, 0, width, height);
             return rotate(destSurface, 0, 0, width, height, transform);
         }
@@ -328,15 +323,14 @@ public class PureImage implements VirtualImage {
     /* (non-Javadoc)
      * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#rotate(org.thenesis.microbackend.ui.graphics.VirtualSurface, int, int, int, int, int)
      */
-    public VirtualSurface rotate(VirtualSurface srcSurface, int x_src, int y_src, int width, int height, int transform) {
+    public VirtualImage rotate(VirtualImage srcSurface, int x_src, int y_src, int width, int height, int transform) {
         switch (transform) {
         case TRANS_MIRROR_ROT90:
         case TRANS_ROT90:
         {
-            VirtualSurface destSurface = createSurface(height, width);
-            
-            int[] srcSurfaceData = srcSurface.getData();
-            int[] dstSurfaceData = destSurface.getData();
+            PureImage destSurface = new PureImage(height, width);
+            int[] srcSurfaceData = ((PureImage)srcSurface).pixels;
+            int[] dstSurfaceData = destSurface.pixels;
             int srcSurfaceWidth = srcSurface.getWidth();
 
             int srcOffset = y_src * srcSurfaceWidth + x_src;
@@ -353,10 +347,9 @@ public class PureImage implements VirtualImage {
         }
         case TRANS_MIRROR_ROT180:
         case TRANS_ROT180: {
-
-            VirtualSurface destSurface = createSurface(width, height);
-            int[] srcSurfaceData = srcSurface.getData();
-            int[] dstSurfaceData = destSurface.getData();
+            PureImage destSurface = new PureImage(height, width);
+            int[] srcSurfaceData = ((PureImage)srcSurface).pixels;
+            int[] dstSurfaceData = destSurface.pixels;
             int srcSurfaceWidth = srcSurface.getWidth();
 
             int srcOffset = y_src * srcSurfaceWidth + x_src;
@@ -369,15 +362,15 @@ public class PureImage implements VirtualImage {
                     dstSurfaceData[destPosition - x] = srcSurfaceData[srcPosition + x];
                 }
             }
-
+            
             return destSurface;
         }
         case TRANS_MIRROR_ROT270:
         case TRANS_ROT270:
         {
-            VirtualSurface destSurface = createSurface(height, width);
-            int[] srcSurfaceData = srcSurface.getData();
-            int[] dstSurfaceData = destSurface.getData();
+            PureImage destSurface = new PureImage(height, width);
+            int[] srcSurfaceData = ((PureImage)srcSurface).pixels;
+            int[] dstSurfaceData = destSurface.pixels;
             int srcSurfaceWidth = srcSurface.getWidth();
 
             int srcOffset = y_src * srcSurfaceWidth + x_src;
@@ -401,10 +394,10 @@ public class PureImage implements VirtualImage {
     /* (non-Javadoc)
      * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#mirror(org.thenesis.microbackend.ui.graphics.VirtualSurface, int, int, int, int)
      */
-    public void mirror(VirtualSurface srcSurface, int x_src, int y_src, int width, int height) {
+    public void mirror(VirtualImage srcImage, int x_src, int y_src, int width, int height) {
 
-        int[] buffer = srcSurface.getData();
-        int srcSurfaceWidth = srcSurface.getWidth();
+        int[] buffer = ((PureImage)srcImage).pixels;
+        int srcSurfaceWidth = srcImage.getWidth();
         int offset = y_src * srcSurfaceWidth + x_src;
 
         for (int y = 0; y < height; y++) {
@@ -449,9 +442,9 @@ public class PureImage implements VirtualImage {
                 throw new NullPointerException();
             }
 
-            PureGraphics g = new PureGraphics(this.surface);
+            PureGraphics g = new PureGraphics(this);
             //g.img = img;
-            g.setDimensions(this.surface.getWidth(), this.surface.getHeight());
+            g.setDimensions(this.getWidth(), this.getHeight());
             g.reset();
 
             // construct and return a new ImageGraphics

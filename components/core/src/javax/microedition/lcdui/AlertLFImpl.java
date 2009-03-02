@@ -30,6 +30,8 @@ package javax.microedition.lcdui;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.thenesis.midpath.ui.UIToolkit;
+
 import com.sun.midp.chameleon.skins.AlertSkin;
 import com.sun.midp.chameleon.skins.resources.AlertResources;
 import com.sun.midp.i18n.Resource;

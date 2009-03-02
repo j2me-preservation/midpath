@@ -15,23 +15,28 @@ public class BaseImageDecoder {
         PngImage.setProgressiveDisplay(false);
     }
     
-    public VirtualSurface decode(InputStream is) throws IOException {
+    private VirtualToolkit toolkit;
+    
+    public BaseImageDecoder(VirtualToolkit toolkit) {
+        this.toolkit = toolkit;
+    }
+    
+    public VirtualImage decode(InputStream is) throws IOException {
 
         // Read PNG image from file
         PngImage png = new PngImage(is);
 
         final int pngWidth = png.getWidth();
         int pngHeight = png.getHeight();
-        PngSurface surface = new PngSurface(pngWidth, pngHeight);
-        final int[] surfaceData = surface.getData();
-        png.setBuffer(surfaceData);
+        final int[] pngData = new int[pngWidth * pngHeight];
+        png.setBuffer(pngData);
 
         png.startProduction(new ImageConsumer() {
             private ColorModel cm;
 
             public void imageComplete(int status) {
-                for (int i = 0; i < surfaceData.length; i++) {
-                    surfaceData[i] = cm.getRGB(surfaceData[i]);
+                for (int i = 0; i < pngData.length; i++) {
+                    pngData[i] = cm.getRGB(pngData[i]);
                     //if (surface.data[i] != 0xFF000000) {
                     //    System.out.print(Integer.toHexString(surface.data[i]) + " ");
                     //}
@@ -63,42 +68,9 @@ public class BaseImageDecoder {
             System.out.println("[DEBUG] BaseImageDecoder.<init>(InputStream stream): errors while loading ? " + png.hasErrors());
         }
         
-        return surface;
+        return toolkit.createRGBImage(pngData, pngWidth, pngHeight, true);
 
     }
     
-    private class PngSurface implements VirtualSurface {
-
-        private int[] data;
-        private int width;
-        private int height;
-        
-        public PngSurface(int w, int h) {
-            this.width = w;
-            this.height = h;
-            data = new int[w*h];
-        }
-        
-        public int[] getData() {
-            return data;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public void lock() {
-            // Do nothing
-        }
-
-        public void unlock() {
-            // Do nothing
-        }
-        
-    }
 
 }

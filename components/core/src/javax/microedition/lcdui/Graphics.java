@@ -25,6 +25,10 @@
 
 package javax.microedition.lcdui;
 
+import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
+import org.thenesis.microbackend.ui.graphics.VirtualToolkit;
+import org.thenesis.midpath.ui.UIToolkit;
+
 
 /**
  * Provides simple 2D geometric rendering capability.
@@ -522,6 +526,7 @@ public class Graphics {
      * <P>Value <code>1</code> is assigned to <code>DOTTED</code>.</P>
      */
     public static final int DOTTED = 1;
+    
 
     /**
      * Create a Graphics object
@@ -538,6 +543,9 @@ public class Graphics {
      * @param h the height of this Graphics object
      */
     void setDimensions(int w, int h) {
+        virtualGraphics.setDimensions(w, h);
+        
+        // Local state copy
         maxWidth  = (short) (w & 0x7fff);
         maxHeight = (short) (h & 0x7fff);
     }
@@ -567,6 +575,9 @@ public class Graphics {
      * @see #getTranslateY()
      */
     public synchronized void translate(int x, int y) {
+        virtualGraphics.translate(x, y);
+        
+        // Local state copy
         transX += x;
         transY += y;
     }
@@ -660,7 +671,10 @@ public class Graphics {
             || (blue < 0)  || (blue > 255)) {
             throw new IllegalArgumentException("Value out of range");
         }
+        
+        virtualGraphics.setColor(red, green, blue);
 
+        // Local state copy
         rgbColor = (red << 16) | (green << 8) | blue;
         gray = grayVal(red, green, blue);
         pixel = getPixel(rgbColor, gray, false);
@@ -685,7 +699,10 @@ public class Graphics {
             int red   = (RGB >> 16) & 0xff;
             int green = (RGB >> 8)  & 0xff;
             int blue  = (RGB)  & 0xff;
+            
+            virtualGraphics.setColor(RGB);
 
+            // Local state copy
             rgbColor = RGB & 0x00ffffff;
             gray = grayVal(red, green, blue);
             pixel = getPixel(rgbColor, gray, false);
@@ -707,7 +724,10 @@ public class Graphics {
         if ((value < 0) || (value > 255)) {
             throw new IllegalArgumentException("Gray value out of range");
         }
+        
+        virtualGraphics.setGrayScale(value);
 
+        // Local state copy
         if (pixel == -1 || gray != value) {
             rgbColor = (value << 16) | (value << 8) | value;
             gray = value;
@@ -844,7 +864,11 @@ public class Graphics {
      * @see #setClip(int, int, int, int)
      */
     public synchronized void clipRect(int x, int y, int width, int height) {
-
+        
+        virtualGraphics.clipRect(x, y, width, height);
+        
+        /* Local state copy */
+        
         int translatedX1, translatedY1;
         int translatedX2, translatedY2;
 
@@ -951,6 +975,10 @@ public class Graphics {
      * @see #clipRect(int, int, int, int)
      */
     public synchronized void setClip(int x, int y, int width, int height) {
+        
+        virtualGraphics.setClip(x, y, width, height);
+        
+        /* Local state copy */
 
         int translatedX1, translatedY1;
         int translatedX2, translatedY2;
@@ -1057,8 +1085,7 @@ public class Graphics {
      * @param y2 the y coordinate of the end of the line
      */
     public void drawLine(int x1, int y1, int x2, int y2) {
-        // TODO 
-        System.out.println("Graphics.drawLine(): not yet implemented");
+        virtualGraphics.drawLine(x1, y1, x2, y2);
     }
 
     /**
@@ -1072,9 +1099,7 @@ public class Graphics {
      * @see #drawRect(int, int, int, int)
      */
     public void fillRect(int x, int y, int width, int height) {
-        // TODO 
-        System.out.println("Graphics.fillRect(): not yet implemented : x=" + x + " y1=" + y + " width=" + width + " height= "+ height);
-        
+        virtualGraphics.fillRect(x, y, width, height);
     }
  
     /**
@@ -1091,8 +1116,7 @@ public class Graphics {
      * @see #fillRect(int, int, int, int)
      */
     public void drawRect(int x, int y, int width, int height) {
-        // TODO 
-        System.out.println("Graphics.drawRect(): not yet implemented");
+        virtualGraphics.drawRect(x, y, width, height);
     }
 
     /**
@@ -1113,8 +1137,7 @@ public class Graphics {
      */
     public void drawRoundRect(int x, int y, int width, int height,
                                      int arcWidth, int arcHeight) {
-        // TODO 
-        System.out.println("Graphics.drawRoundRect(): not yet implemented");
+        virtualGraphics.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
     }
  
     /**
@@ -1132,8 +1155,7 @@ public class Graphics {
      */
     public void fillRoundRect(int x, int y, int width, int height,
                                      int arcWidth, int arcHeight) {
-        // TODO 
-        System.out.println("Graphics.fillRoundRect(): not yet implemented");
+        virtualGraphics.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
     }
                           
     /**
@@ -1184,8 +1206,7 @@ public class Graphics {
      */
     public void fillArc(int x, int y, int width, int height,
                                int startAngle, int arcAngle) {
-        // TODO 
-        System.out.println("Graphics.fillArc(): not yet implemented");
+        virtualGraphics.fillArc(x, y, width, height, startAngle, arcAngle);
     }
 
     /**
@@ -1232,8 +1253,7 @@ public class Graphics {
      */
     public void drawArc(int x, int y, int width, int height,
                                int startAngle, int arcAngle) {
-            // TODO 
-            System.out.println("Graphics.drawArc(): not yet implemented");
+        virtualGraphics.drawArc(x, y, width, height, startAngle, arcAngle);
     }
 
     /**
@@ -1250,8 +1270,7 @@ public class Graphics {
      */
     public void drawString(java.lang.String str,
                                   int x, int y, int anchor) {
-            // TODO 
-            System.out.println("Graphics.drawString(): not yet implemented");
+        virtualGraphics.drawString(str, x, y, anchor);
     }
 
     /**
@@ -1581,8 +1600,7 @@ public class Graphics {
     public void fillTriangle(int x1, int y1, 
                                     int x2, int y2,
                                     int x3, int y3) {
-        	// TODO 
-        	System.out.println("Graphics.fillTriangle(): not yet implemented");
+        virtualGraphics.fillTriangle(x1, y1, x2, y2, x3, y3);
         
     }
 
@@ -1604,8 +1622,7 @@ public class Graphics {
     protected void doCopyArea(int x_src, int y_src, 
                                    int width, int height, 
                                    int x_dest, int y_dest, int anchor) {
-    	// TODO 
-    	System.out.println("Graphics.doCopyArea(): not yet implemented");
+        virtualGraphics.copyArea(x_src, y_src, width, height, x_dest, y_dest, anchor);
     }
 
     /**
@@ -1705,9 +1722,7 @@ public class Graphics {
     public void drawRGB(int[] rgbData, int offset, int scanlength,
                                int x, int y, int width, int height,
                                boolean processAlpha) {
-    	
-    	// TODO 
-    	System.out.println("Graphics.drawRGB(): not yet implemented");
+        virtualGraphics.drawRGB(rgbData, offset, scanlength, x, y, width, height, processAlpha);
     }
 
     /**
@@ -1727,9 +1742,8 @@ public class Graphics {
      *
      */
     public int getDisplayColor(int color) {
-    	// TODO 
-    	System.out.println("Graphics.getDisplayColor(): not yet implemented");
-    	return 0x000000;
+    	// TODO Support monochrome screen
+    	return (color & 0x00FFFFFF);
     }
 
 
@@ -1783,6 +1797,8 @@ public class Graphics {
      */
     protected Image img;
 
+    VirtualGraphics virtualGraphics;
+
     /**
      * Retrieve the Graphics context for the given Image
      *
@@ -1797,7 +1813,8 @@ public class Graphics {
 
         //Graphics g = new Graphics();
         //Graphics g = SDLToolkit.getToolkit().createGraphics(img.getWidth(), img.getHeight());
-        Graphics g = UIToolkit.getToolkit().createGraphics(img);
+        Graphics g = new Graphics();
+        g.virtualGraphics = img.virtualImage.getGraphics();
         g.img = img;
         g.setDimensions(img.getWidth(), img.getHeight());
         g.reset();
@@ -1820,10 +1837,11 @@ public class Graphics {
      */
     static Graphics getScreenGraphics(int displayId, int width, int height) {
 
-        //Graphics g = new Graphics();
-    	Graphics g =  UIToolkit.getToolkit().getRootGraphics();
+        Graphics g = new Graphics();
+    	VirtualGraphics vg =  UIToolkit.getToolkit().getVirtualToolkit().getRootGraphics();
+    	
         g.displayId = displayId;
-        
+        g.virtualGraphics = vg;
         g.img = null;
         g.setDimensions(width, height);
         g.reset();
@@ -1850,6 +1868,10 @@ public class Graphics {
      * @param y2 The lower right y coordinate
      */
     void reset(int x1, int y1, int x2, int y2) {
+        
+        virtualGraphics.reset(x1, y1, x2, y2);
+        
+        // Local state copy
         resetGC();
         transX = transY = 0;
         setClip(x1, y1, x2 - x1, y2 - y1);
@@ -1873,6 +1895,10 @@ public class Graphics {
      * this function.
      */
     void resetGC() {
+        
+        virtualGraphics.resetGC();
+        
+        // Local state copy
         currentFont = Font.getDefaultFont();
         style       = SOLID;
         rgbColor    = gray = 0;
@@ -1893,6 +1919,11 @@ public class Graphics {
      */
     void preserveMIDPRuntimeGC(int systemX, int systemY, int systemW,
                                int systemH) {
+        
+        virtualGraphics.preserveRuntimeGC(systemX, systemY, systemW, systemH);
+        
+        /* Local state copy */
+        
         runtimeClipEnforce = true;
         clipRect(systemX, systemY, systemW, systemH);
 
@@ -1920,6 +1951,11 @@ public class Graphics {
      * - Restore the original translation
      */
     void restoreMIDPRuntimeGC() {
+        
+        virtualGraphics.restoreRuntimeGC();
+        
+        /* Local state copy */
+        
         runtimeClipEnforce = false;
         translate(ax-getTranslateX(), ay-getTranslateY());
     }
@@ -1946,9 +1982,11 @@ public class Graphics {
      * @return int
      */
     protected int getPixel(int rgb, int gray, boolean isGray) {
-    	// TODO 
-    	System.out.println("Graphics.getPixel: not yet implemented : " + Integer.toHexString(rgb));
-    	return 0x000000;
+        if (isGray) {
+            return (gray << 16) | (gray << 8) | gray;
+        } else {
+            return rgb;
+        }
     }
 
 	/**

@@ -17,55 +17,50 @@
  */
 package org.thenesis.microbackend.ui.graphics.toolkit.pure;
 
+import java.io.IOException;
+
 import org.thenesis.microbackend.ui.graphics.VirtualFont;
 import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
 import org.thenesis.microbackend.ui.graphics.VirtualImage;
-import org.thenesis.microbackend.ui.graphics.VirtualSurface;
 import org.thenesis.microbackend.ui.graphics.VirtualToolkit;
 
 public class PureToolkit extends VirtualToolkit {
 
-    private VirtualSurface rootSurface;
-    private PureGraphics rootPeer;
-    private VirtualFont defaultFont;
+    private PureImage rootImage;
+    private PureGraphics rootGraphics;
+    static PureFont mediumFont = new Font_CodingFontTobi_regular_16(); //Font_Crisp_regular_16();
 
     public PureToolkit() {
     }
 
     public void initializeRoot(int rootWidth, int rootHeight) {
-        rootSurface = new PureSurface(rootWidth, rootHeight);
-        rootPeer = new PureGraphics(rootSurface);
-        rootPeer.setDimensions(rootWidth, rootHeight);
-        rootPeer.reset();
+        rootImage = new PureImage(rootWidth, rootHeight);
+        rootGraphics = new PureGraphics(rootImage);
+        rootGraphics.setDimensions(rootWidth, rootHeight);
+        rootGraphics.reset();
     }
 
     public VirtualGraphics getRootGraphics() {
-        return rootPeer;
+        return rootGraphics;
     }
 
     public VirtualFont createFont(int face, int style, int size) {
-        return new PureFont(face, style, size);
-    }
-
-    public VirtualFont getDefaultFont() {
-        if (defaultFont == null) {
-            defaultFont = createFont(VirtualFont.FACE_MONOSPACE, VirtualFont.STYLE_PLAIN, VirtualFont.SIZE_LARGE);
+        
+        switch (size) {
+//        case VirtualFont.SIZE_LARGE:
+//            return smallFont;
+//        case VirtualFont.SIZE_MEDIUM:
+//            return smallFont;
+//        case VirtualFont.SIZE_SMALL:
+//            return smallFont;
+        default:
+            return mediumFont;
         }
-        return defaultFont;
+        
     }
-
-//    public void setDefaultFont(VirtualFont f) {
-//        if (f != null) {
-//            defaultFont = f;
-//        }
-//    }
-
-    public VirtualSurface getRootSurface() {
-        return rootSurface;
-    }
-
-    public VirtualSurface createSurface(int w, int h) {
-        return new PureSurface(w, h);
+    
+    public void flushGraphics(int x, int y, long width, long height) {
+        backend.updateARGBPixels(rootImage.pixels, x, y, (int) width, (int) height);
     }
 
     public VirtualImage createImage(int w, int h) {
@@ -75,10 +70,13 @@ public class PureToolkit extends VirtualToolkit {
     public VirtualImage createRGBImage(int[] rgb, int width, int height, boolean processAlpha) {
         return new PureImage(rgb, width, height, processAlpha);
     }
-
-    protected VirtualImage createImage(VirtualSurface surface) {
-        return new PureImage(surface);
+    
+    public VirtualImage createImage(VirtualImage image, int x, int y, int width, int height, int transform) {
+        return new PureImage(image, x, y, width, height, transform);
     }
-
+    
+    public VirtualImage createImage(VirtualImage image) {
+        return new PureImage(image);
+    }
 
 }

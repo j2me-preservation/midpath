@@ -19,7 +19,9 @@ package org.thenesis.microbackend.ui.awt;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Panel;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -27,7 +29,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
+import java.awt.image.MemoryImageSource;
 import java.io.IOException;
 
 import org.thenesis.microbackend.ui.BackendEventListener;
@@ -37,7 +39,9 @@ import org.thenesis.microbackend.ui.UIBackend;
 public abstract class AbstractAWTBackend implements UIBackend {
 
     Panel panel;
-    protected BufferedImage screenImage;
+    protected Image screenImage;
+    protected MemoryImageSource memorySource;
+    protected int[] pixels;
 
     int canvasWidth;
     int canvasHeight;
@@ -90,16 +94,21 @@ public abstract class AbstractAWTBackend implements UIBackend {
         return canvasHeight;
     }
 
-    public void updateARGBPixels(int[] argbPixels, int x, int y, int width, int heigth) {
-
-        int w = canvasWidth;
-        int h = canvasHeight;
+    public void updateARGBPixels(int[] argbPixels, int x, int y, int width, int height) {
 
         if (screenImage == null) {
-            screenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+            pixels = new int[canvasWidth * canvasHeight];
+            memorySource = new MemoryImageSource(canvasWidth, canvasHeight, pixels, 0, canvasWidth);
+            memorySource.setAnimated(true);
+            screenImage = Toolkit.getDefaultToolkit().createImage(memorySource);
         }
+        
+        for (int i = 0; i < height; i++) {
+            int offset = (y + i) * canvasWidth + x;
+            System.arraycopy(argbPixels, offset, pixels, offset, width);
+        }
+        memorySource.newPixels(x, y, width, height);
 
-        screenImage.setRGB(0, 0, w, h, argbPixels, 0, w);
         panel.repaint();
     }
 

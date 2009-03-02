@@ -25,6 +25,9 @@
 
 package javax.microedition.lcdui;
 
+import org.thenesis.microbackend.ui.graphics.VirtualFont;
+import org.thenesis.midpath.ui.UIToolkit;
+
 
 /**
  * The <code>Font</code> class represents fonts and font
@@ -74,7 +77,7 @@ package javax.microedition.lcdui;
  * @since MIDP 1.0
  */
 
-public final class Font { //implements FontPeer {
+public final class Font { //implements virtualFont {
 
 	/**
 	 * The plain style constant. This may be combined with the
@@ -284,8 +287,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public int getStyle() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.getStyle();
+		if (virtualFont != null) {
+			return virtualFont.getStyle();
 		}
 		return style;
 	};
@@ -298,8 +301,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public int getSize() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.getSize();
+		if (virtualFont != null) {
+			return virtualFont.getSize();
 		}
 		return size;
 	}
@@ -312,8 +315,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public int getFace() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.getFace();
+		if (virtualFont != null) {
+			return virtualFont.getFace();
 		}
 		return face;
 	}
@@ -325,8 +328,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public boolean isPlain() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.isPlain();
+		if (virtualFont != null) {
+			return virtualFont.isPlain();
 		}
 		return style == STYLE_PLAIN;
 	}
@@ -338,8 +341,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public boolean isBold() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.isBold();
+		if (virtualFont != null) {
+			return virtualFont.isBold();
 		}
 		return (style & STYLE_BOLD) == STYLE_BOLD;
 	}
@@ -351,8 +354,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public boolean isItalic() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.isItalic();
+		if (virtualFont != null) {
+			return virtualFont.isItalic();
 		}
 		return (style & STYLE_ITALIC) == STYLE_ITALIC;
 	}
@@ -363,8 +366,8 @@ public final class Font { //implements FontPeer {
 	 * @return <code>true</code> if font is underlined
 	 */
 	public boolean isUnderlined() {
-		if (fontPeer != null) {
-			return fontPeer.isUnderlined();
+		if (virtualFont != null) {
+			return virtualFont.isUnderlined();
 		}
 		// SYNC NOTE: return of atomic value, no locking necessary
 		return (style & STYLE_UNDERLINED) == STYLE_UNDERLINED;
@@ -381,8 +384,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public int getHeight() {
 //		 SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.getHeight();
+		if (virtualFont != null) {
+			return virtualFont.getHeight();
 		}
 		return height;
 	}
@@ -395,8 +398,8 @@ public final class Font { //implements FontPeer {
 	 */
 	public int getBaselinePosition() {
 		// SYNC NOTE: return of atomic value, no locking necessary
-		if (fontPeer != null) {
-			return fontPeer.getBaselinePosition();
+		if (virtualFont != null) {
+			return virtualFont.getBaselinePosition();
 		}
 		return baseline;
 	}
@@ -412,8 +415,8 @@ public final class Font { //implements FontPeer {
 	 * @return the total advance width (a non-negative value)
 	 */
 	public int charWidth(char ch) {
-		if (fontPeer != null) {
-			return fontPeer.charWidth(ch);
+		if (virtualFont != null) {
+			return virtualFont.charWidth(ch);
 		}
 		return 0;
 	}
@@ -445,8 +448,8 @@ public final class Font { //implements FontPeer {
 	 * @throws NullPointerException if <code>ch</code> is <code>null</code>
 	 */
 	public int charsWidth(char[] ch, int offset, int length) {
-		if (fontPeer != null) {
-			return fontPeer.charsWidth(ch, offset, length);
+		if (virtualFont != null) {
+			return virtualFont.charsWidth(ch, offset, length);
 		}
 		return 0;
 	}
@@ -465,8 +468,8 @@ public final class Font { //implements FontPeer {
 	 * @throws NullPointerException if <code>str</code> is <code>null</code>
 	 */
 	public int stringWidth(String str) {
-		if (fontPeer != null) {
-			return fontPeer.stringWidth(str);
+		if (virtualFont != null) {
+			return virtualFont.stringWidth(str);
 		}
 		return 0;
 	}
@@ -499,8 +502,8 @@ public final class Font { //implements FontPeer {
 	 * @throws NullPointerException if <code>str</code> is <code>null</code>
 	 */
 	public int substringWidth(String str, int offset, int len) {
-		if (fontPeer != null) {
-			return fontPeer.substringWidth(str, offset, len);
+		if (virtualFont != null) {
+			return virtualFont.substringWidth(str, offset, len);
 		}
 		return 0;
 	}
@@ -518,7 +521,7 @@ public final class Font { //implements FontPeer {
 	/** The height of this Font */
 	private int height;
 	
-	private FontPeer fontPeer;
+	private VirtualFont virtualFont;
 
 	/**
 	 * The "default" font, constructed from the 'system' face,
@@ -540,11 +543,8 @@ public final class Font { //implements FontPeer {
 	 * @param inp_size The point size to initialize the native Font
 	 */
 	private void init(int inp_face, int inp_style, int inp_size) {
-		fontPeer = UIToolkit.getToolkit().createFontPeer(inp_face, inp_style, inp_size);
+	    virtualFont = UIToolkit.getToolkit().getVirtualToolkit().createFont(inp_face, inp_style, inp_size);
 		//System.out.println("[DEBUG]Font.init(): not yet implemented");
 	}
 
-	public FontPeer getFontPeer() {
-		return fontPeer;
-	}
 }

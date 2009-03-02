@@ -15,17 +15,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA 
  */
-package org.thenesis.midpath.ui.toolkit.sdl;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+package org.thenesis.microbackend.ui.graphics.toolkit.sdl;
 
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 
-import com.sun.midp.log.Logging;
+import org.thenesis.microbackend.ui.Logging;
+import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
+import org.thenesis.microbackend.ui.graphics.VirtualImage;
+import org.thenesis.microbackend.ui.sdl.SDLBackend;
 
 import sdljava.SDLException;
 import sdljava.video.SDLPixelFormat;
@@ -34,38 +32,23 @@ import sdljava.video.SDLSurface;
 import sdljava.video.SDLVideo;
 import sdljavax.gfx.SDLGfx;
 
-public class SDLImage extends Image {
+
+public class SDLImage implements VirtualImage {
 
 	SDLSurface sdlSurface;
 	private boolean isMutable = false;
+    private int imgWidth;
+    private int imgHeight;
 
 	public SDLImage(int w, int h) {
 		try {
-			sdlSurface = ((SDLToolkit)SDLToolkit.getToolkit()).createSDLSurface(w, h);
+			sdlSurface = SDLBackend.createRGBSurface(w, h);
 			imgWidth = w;
 			imgHeight = h;
 			isMutable = true;
 		} catch (SDLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public SDLImage(byte[] imageData, int imageOffset, int imageLength) throws IOException {
-		this(new ByteArrayInputStream(imageData, imageOffset, imageLength));
-	}
-
-	public SDLImage(InputStream stream) throws IOException {
-		try {
-			sdlSurface = sdljava.image.SDLImage.load(stream);
-			//System.out.println("[DEBUG] SDLImage.<init>() : " + sdlSurface);
-			//System.out.println("[DEBUG] SDLImage.<init>(): ColorKey : " + sdlSurface);
-			imgWidth = sdlSurface.getWidth();
-			imgHeight = sdlSurface.getHeight();
-			isMutable = false;
-		} catch (SDLException e) {
-			throw new IOException(e.getMessage());
-		}
-
 	}
 
 	public SDLImage(int[] rgb, int width, int height, boolean processAlpha) { //throws IOException {
@@ -113,6 +96,10 @@ public class SDLImage extends Image {
 			e.printStackTrace();
 		}
 	}
+	
+	public SDLImage(SDLSurface rootARGBSurface) {
+        // TODO Auto-generated constructor stub
+    }
 
 	SDLImage(SDLSurface srcSurface, int x, int y, int width, int height, int transform) {
 		try {
@@ -159,12 +146,8 @@ public class SDLImage extends Image {
 
 	}
 
-	public SDLImage(Image image, int x, int y, int width, int height, int transform) {
-		this(((SDLImage) image).sdlSurface, x, y, width, height, transform);
-		isMutable = false;
-	}
 
-	private SDLSurface cropSurface(SDLSurface srcSurface, int x, int y, int width, int height) throws SDLException {
+    private SDLSurface cropSurface(SDLSurface srcSurface, int x, int y, int width, int height) throws SDLException {
 
 		// Create surface compatible with display surface
 		long flags = srcSurface.getFlags();
@@ -278,7 +261,7 @@ public class SDLImage extends Image {
 
 	}
 
-	public boolean render(Graphics g, int x, int y, int anchor) {
+	public boolean render(VirtualGraphics g, int x, int y, int anchor) {
 
 		x += g.getTranslateX();
 		y += g.getTranslateY();
@@ -300,7 +283,7 @@ public class SDLImage extends Image {
 		}
 
 		//SDLSurface rootSurface = SDLToolkit.getToolkit().getRootGraphics().getSurface();
-		SDLSurface rootSurface = ((SDLGraphics) g).getSurface();
+		SDLSurface rootSurface = ((SDLGraphics)g).getSDLImage().sdlSurface;
 		SDLRect dstRect = new SDLRect(x, y, sdlSurface.getWidth(), sdlSurface.getHeight());
 
 		try {
@@ -315,9 +298,10 @@ public class SDLImage extends Image {
 		return true;
 	}
 
-	protected boolean renderRegion(Graphics g, int x_src, int y_src, int width, int height, int transform, int x_dest,
+	public boolean renderRegion(VirtualGraphics g, int x_src, int y_src, int width, int height, int transform, int x_dest,
 			int y_dest, int anchor) {
 
+	    
 		x_src += g.getTranslateX();
 		y_src += g.getTranslateY();
 		x_dest += g.getTranslateX();
@@ -340,7 +324,7 @@ public class SDLImage extends Image {
 				x_dest -= width / 2 - 1;
 			}
 
-			SDLSurface destSurface = ((SDLGraphics) g).getSurface();
+			SDLSurface destSurface = ((SDLGraphics)g).getSDLImage().sdlSurface;
 			SDLRect srcRect = new SDLRect(x_src, y_src, width, height);
 			SDLRect dstRect = new SDLRect(x_dest, y_dest, width, height);
 
@@ -354,7 +338,7 @@ public class SDLImage extends Image {
 			//System.out.println("[DEBUG] SDLImage.renderRegion(): ColorKeyBlit : " + Long.toHexString(sdlSurface.getFormat().getColorKey()));
 			//System.out.println("[DEBUG] SDLImage.renderRegion(): ColorKeyBlit : " + sdlSurface.isColorKeyBlit());
 
-			SDLImage transformedImage = new SDLImage(this, x_src, y_src, width, height, transform);
+			SDLImage transformedImage = new SDLImage(this.sdlSurface, x_src, y_src, width, height, transform);
 
 			if ((anchor & Graphics.BOTTOM) == Graphics.BOTTOM) {
 				y_dest -= transformedImage.getHeight() - 1;
@@ -369,7 +353,7 @@ public class SDLImage extends Image {
 			}
 
 			//SDLSurface destSurface = SDLToolkit.getToolkit().getRootGraphics().getSurface();
-			SDLSurface destSurface = ((SDLGraphics) g).getSurface();
+			SDLSurface destSurface = ((SDLGraphics)g).getSDLImage().sdlSurface;
 			SDLRect dstRect = new SDLRect(x_dest, y_dest, transformedImage.getWidth(), transformedImage.getHeight());
 
 			try {
@@ -386,5 +370,44 @@ public class SDLImage extends Image {
 	public boolean isMutable() {
 		return isMutable;
 	}
+	
+	/* (non-Javadoc)
+     * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#getGraphics()
+     */
+    public VirtualGraphics getGraphics() {
+        if (isMutable()) {
+
+            if (null == this) {
+                throw new NullPointerException();
+            }
+
+            SDLGraphics g = new SDLGraphics(this);
+            //g.img = img;
+            g.setDimensions(this.getWidth(), this.getHeight());
+            g.reset();
+
+            // construct and return a new ImageGraphics
+            // object that uses the Image img as the 
+            // destination.
+            return g;
+        } else {
+            // SYNC NOTE: Not accessing any shared data, no locking necessary
+            throw new IllegalStateException();
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#getWidth()
+     */
+    public int getWidth() {
+        return imgWidth;
+    }
+
+    /* (non-Javadoc)
+     * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#getHeight()
+     */
+    public int getHeight() {
+        return imgHeight;
+    }
 
 }

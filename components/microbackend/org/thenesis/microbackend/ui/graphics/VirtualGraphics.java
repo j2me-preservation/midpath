@@ -1,7 +1,5 @@
 package org.thenesis.microbackend.ui.graphics;
 
-import org.thenesis.microbackend.ui.graphics.toolkit.pure.PureImage;
-
 public interface VirtualGraphics {
 
     // Image blending mode. TODO: replace BLEND by ADD and SUB.
@@ -72,8 +70,8 @@ public interface VirtualGraphics {
      * <P>Value <code>1</code> is assigned to <code>DOTTED</code>.</P>
      */
     public static final int DOTTED = 1;
-
-    public VirtualSurface getSurface();
+    
+    public void setDimensions(int w, int h);
 
     public void setColor(int red, int green, int blue);
 
@@ -84,8 +82,6 @@ public interface VirtualGraphics {
     public void drawString(String str, int x, int y, int anchor);
 
     public void setClip(int x, int y, int width, int height);
-
-    public void clipRect(int x, int y, int width, int height);
 
     /**
      * Intersects the current clip with the specified rectangle.
@@ -100,7 +96,24 @@ public interface VirtualGraphics {
      * @param height the height of the rectangle to intersect the clip with
      * @see #setClip(int, int, int, int)
      */
-    public void clipRectInternal(int x, int y, int width, int height);
+    public void clipRect(int x, int y, int width, int height);
+    
+    /**
+     * Preserve runtime GC.
+     * @param systemX The system upper left x coordinate
+     * @param systemY The system upper left y coordinate
+     * @param systemW The system width of the rectangle
+     * @param systemH The system height of the rectangle
+     */
+    public void preserveRuntimeGC(int systemX, int systemY, int systemW, int systemH);
+    
+    /**
+     * Restore the runtime GC.
+     * - Release the internal runtime clip values by
+     * unsetting the variable.
+     * - Restore the original translation
+     */
+    public void restoreRuntimeGC();
 
     /**
      * Translates the origin of the graphics context to the point
@@ -148,6 +161,8 @@ public interface VirtualGraphics {
     public int getColor();
     
     public void setFont(VirtualFont font);
+    
+    public VirtualFont getFont();
 
     /**
      * Gets the X offset of the current clipping area, relative
@@ -301,7 +316,24 @@ public interface VirtualGraphics {
      * @throws IllegalArgumentException if the region to be copied exceeds
      * the bounds of the source image
      */
-    public void drawRegion(PureImage src, int x_src, int y_src, int width, int height, int transform, int x_dest, int y_dest, int anchor);
+    public void drawRegion(VirtualImage src, int x_src, int y_src, int width, int height, int transform, int x_dest, int y_dest, int anchor);
+    
+    /**
+     * Native implementation of CopyArea method.
+     *
+     * @param x_src  the x coordinate of upper left corner of source area
+     * @param y_src  the y coordinate of upper left corner of source area
+     * @param width  the width of the source area
+     * @param height the height of the source area
+     * @param x_dest the x coordinate of the destination anchor point
+     * @param y_dest the y coordinate of the destination anchor point
+     * @param anchor the anchor point for positioning the region within
+     *        the destination image
+     *
+     * @throws IllegalArgumentException if the region to be copied exceeds
+     * the bounds of the source image
+     */
+    public void copyArea(int x_src, int y_src, int width, int height, int x_dest, int y_dest, int anchor);
 
     /**
      * Fills the specified triangle will the current color.  The lines
@@ -319,10 +351,31 @@ public interface VirtualGraphics {
     public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 
     /**
+     * Reset this Graphics context with the given coordinates
+     *
+     * @param x1 The upper left x coordinate
+     * @param y1 The upper left y coordinate
+     * @param x2 The lower right x coordinate
+     * @param y2 The lower right y coordinate
+     */
+    public void reset(int x1, int y1, int x2, int y2);
+    
+    /**
      * Reset this Graphics context to its default dimensions
      * (same as reset(0, 0, maxWidth, maxHeight)
      */
     public void reset();
+    
+    /**
+     * Reset the Graphic context with all items related
+     * to machine independent context. 
+     * There is no translation and clipping involve 
+     * since different implementations may map it
+     * directly or not.
+     * Only Font, Style, and Color are reset in
+     * this function.
+     */
+    public void resetGC();
 
     //--------------------------------------------------------------------------
     // ------

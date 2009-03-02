@@ -31,6 +31,8 @@ import java.io.InputStream;
 
 import javax.microedition.midlet.MIDlet;
 
+import org.thenesis.midpath.ui.UIToolkit;
+
 import com.sun.midp.chameleon.CGraphicsQ;
 import com.sun.midp.chameleon.ChamDisplayTunnel;
 import com.sun.midp.chameleon.MIDPWindow;

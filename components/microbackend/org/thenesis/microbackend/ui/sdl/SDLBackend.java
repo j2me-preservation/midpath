@@ -47,7 +47,9 @@ public class SDLBackend implements UIBackend {
     public static final int BITS_PER_PIXEL_16 = 16;
 
     private SDLSurface screenSurface;
+
     private SDLSurface rootARGBSurface;
+
     private SDLEventThread eventThread;
 
     private int canvasWidth;
@@ -120,8 +122,7 @@ public class SDLBackend implements UIBackend {
         try {
             SDLMain.init(SDLMain.SDL_INIT_VIDEO);
             screenSurface = SDLVideo.setVideoMode(canvasWidth, canvasHeight, bitsPerPixel, flags);
-            rootARGBSurface = SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, canvasWidth, canvasHeight, 32, 0x00ff0000L, 0x0000ff00L,
-                0x000000ffL, 0xff000000L);
+            rootARGBSurface = createRGBSurface(canvasWidth, canvasHeight);
             if (Logging.TRACE_ENABLED)
                 System.out.println("[DEBUG] Toolkit.initialize(): VideoSurface: " + rootARGBSurface);
             eventThread = new SDLEventThread();
@@ -133,6 +134,18 @@ public class SDLBackend implements UIBackend {
     }
 
     /* Internals */
+
+    public SDLSurface getRootARGBSurface() {
+        return rootARGBSurface;
+    }
+    
+    public SDLSurface getScreenSurface() {
+        return screenSurface;
+    }
+
+    public static SDLSurface createRGBSurface(int width, int height) throws SDLException {
+        return SDLVideo.createRGBSurface(SDLVideo.SDL_SWSURFACE, width, height, 32, 0x00ff0000L, 0x0000ff00L, 0x000000ffL, 0xff000000L);
+    }
 
     public class SDLEventThread implements Runnable {
 

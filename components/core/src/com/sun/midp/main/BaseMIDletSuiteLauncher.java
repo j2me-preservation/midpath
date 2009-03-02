@@ -28,8 +28,9 @@ package com.sun.midp.main;
 import java.io.InputStream;
 
 import javax.microedition.lcdui.DisplayEventHandlerImpl;
-import javax.microedition.lcdui.UIToolkit;
 import javax.microedition.midlet.MIDlet;
+
+import org.thenesis.midpath.ui.UIToolkit;
 
 import com.sun.midp.configurator.Constants;
 import com.sun.midp.events.EventQueue;
