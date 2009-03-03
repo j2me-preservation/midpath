@@ -103,6 +103,26 @@ public abstract class AbstractAWTBackend implements UIBackend {
             screenImage = Toolkit.getDefaultToolkit().createImage(memorySource);
         }
         
+        // Clipping
+        if (x < 0) {
+            x = 0;
+        }
+        if  (x >= canvasWidth) {
+            return;
+        }
+        if (y < 0) {
+            y = 0;
+        }
+        if  (y >= canvasHeight) {
+            return;
+        }
+        if (x + width > canvasWidth) {
+            width = canvasWidth - x;
+        }
+        if (y + height > canvasHeight) {
+            height = canvasHeight - y;
+        }
+        
         for (int i = 0; i < height; i++) {
             int offset = (y + i) * canvasWidth + x;
             System.arraycopy(argbPixels, offset, pixels, offset, width);
