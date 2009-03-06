@@ -28,6 +28,7 @@ public class PureImage implements VirtualImage {
     private boolean isMutable = false;
     private int imgWidth;
     private int imgHeight;
+    boolean fullAlphaBlending = true;
 
     //protected Image img;
 
@@ -57,11 +58,17 @@ public class PureImage implements VirtualImage {
         // P(a, b) = rgb[a + b * width];
         int size = width * height;
         if (processAlpha) {
-            for (int i = 0; i < size; i++) {
-                if ((rgb[i] & 0xFF000000) != 0xFF000000)
-                    pixels[i] = rgb[i] & 0x00FFFFFF;
-                else {
+            if (fullAlphaBlending) {
+                for (int i = 0; i < size; i++) {
                     pixels[i] = rgb[i];
+                }
+            } else {
+                for (int i = 0; i < size; i++) {
+                    if ((rgb[i] & 0xFF000000) != 0xFF000000)
+                        pixels[i] = rgb[i] & 0x00FFFFFF;
+                    else {
+                        pixels[i] = rgb[i];
+                    }
                 }
             }
         } else {
@@ -105,14 +112,6 @@ public class PureImage implements VirtualImage {
         isMutable = false;
     }
 
-    PureImage(PureImage srcImage, int x, int y, int width, int height, int transform) {
-
-       
-        if (Logging.TRACE_ENABLED)
-            System.out
-                    .println("[DEBUG] VirtualImage.<init>(Image image, int x, int y, int width, int height, int transform): not implemented yet");
-
-    }
 
     /* (non-Javadoc)
      * @see org.thenesis.microbackend.ui.graphics.VirtualImageInterface#getRGB(int[], int, int, int, int, int, int)
@@ -135,7 +134,7 @@ public class PureImage implements VirtualImage {
         for (int b = y; b < y + height; b++) {
             for (int a = x; a < x + width; a++) {
                 //System.out.println("[DEBUG]VirtualImage.getRGB(): a=" + a + "  b=" + b);
-                rgbData[offset + (a - x) + (b - y) * scanlength] = pixels[a + b * scanlength];
+                rgbData[offset + (a - x) + (b - y) * scanlength] = pixels[a + b * imgWidth];
                 //rgbData[offset + (a - x) + (b - y) * scanlength] = P(a, b);
             }
         }
@@ -222,17 +221,46 @@ public class PureImage implements VirtualImage {
         symax = dymax - y + y_src;
 
         int w = sxmax - sxmin + 1, h = symax - symin + 1;
-        for (int ry = 0; ry < h; ry++) {
-            int srcPosition = (symin + ry) * srcSurfaceWidth + sxmin;
-            int dstPosition = (dymin + ry) * dstSurfaceWidth + dxmin;
-            int length = w;
-            for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
-                // TODO support transparent pixels
-                //System.out.println("[DEBUG]VirtualImage.render(): " + (i + dstPosition));
-                if (((srcSurfaceData[i + srcPosition]) & 0xFF000000) == 0xFF000000)
-                    dstSurfaceData[i + dstPosition] = srcSurfaceData[i + srcPosition];
+        
+        if (fullAlphaBlending) {
+            for (int ry = 0; ry < h; ry++) {
+                int srcPosition = (symin + ry) * srcSurfaceWidth + sxmin;
+                int dstPosition = (dymin + ry) * dstSurfaceWidth + dxmin;
+                int length = w;
+                for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+                    // Source.
+                    int srcColor = srcSurfaceData[i + srcPosition];
+                    int sa = (srcColor >> 24) & 0xFF;
+                    int sr = (srcColor >> 16) & 0xFF;
+                    int sg = (srcColor >> 8) & 0xFF;
+                    int sb = srcColor & 0xFF;
+
+                    // Destination.
+                    int dstColor = dstSurfaceData[i + dstPosition];
+                    int dr = (dstColor >> 16) & 0xFF;
+                    int dg = (dstColor >> 8) & 0xFF;
+                    int db = dstColor & 0xFF;
+
+                    // Alpha blending
+                    int factor = 0x00010000 / 255;
+                    dr = ((sa * sr + (0xff - sa) * dr) * factor) >> 16;
+                    dg = ((sa * sg + (0xff - sa) * dg) * factor) >> 16;
+                    db = ((sa * sb + (0xff - sa) * db) * factor) >> 16;
+                    dstSurfaceData[i + dstPosition] = (((dr << 16) + (dg << 8) + db) | 0xFF000000);
+                }
             }
-        }
+        } else {
+            for (int ry = 0; ry < h; ry++) {
+                int srcPosition = (symin + ry) * srcSurfaceWidth + sxmin;
+                int dstPosition = (dymin + ry) * dstSurfaceWidth + dxmin;
+                int length = w;
+                for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+                    if (((srcSurfaceData[i + srcPosition]) & 0xFF000000) == 0xFF000000) {
+                        dstSurfaceData[i + dstPosition] = srcSurfaceData[i + srcPosition];
+                    }
+                }
+            }
+        }  
 
         return true;
     }

@@ -203,17 +203,17 @@ public class SDLBackend implements UIBackend {
             if (event.getState() == SDLPressedState.PRESSED) {
                 if (Logging.TRACE_ENABLED)
                     System.out.println("[DEBUG] SDLEventThread.processEvent(): MOUSE_PRESSED");
-                listener.mousePressed(event.getX(), event.getY(), 0);
+                listener.pointerPressed(event.getX(), event.getY(), 0);
             } else {
                 if (Logging.TRACE_ENABLED)
                     System.out.println("[DEBUG] SDLEventThread.processEvent(): MOUSE_RELEASED");
-                listener.mouseReleased(event.getX(), event.getY(), 0);
+                listener.pointerReleased(event.getX(), event.getY(), 0);
             }
 
         }
 
         public void processEvent(SDLMouseMotionEvent event) {
-            listener.mouseMoved(event.getX(), event.getY(), 0);
+            listener.pointerMoved(event.getX(), event.getY(), 0);
         }
 
         public void processEvent(SDLKeyboardEvent event) {

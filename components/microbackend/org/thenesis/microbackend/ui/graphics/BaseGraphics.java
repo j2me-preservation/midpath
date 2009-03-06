@@ -1639,22 +1639,24 @@ public abstract class BaseGraphics implements VirtualGraphics {
      * @see org.thenesis.microbackend.ui.graphics.VirtualGraphicsInterface#drawRoundRect(int, int, int, int, int, int)
      */
     public void drawRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
+        
+        drawRect(x, y, w, h);
 
-        // Vertical lines
-        drawLine(x, y + arcHeight / 2, x, y + h - arcHeight / 2);
-        drawLine(x + w + 1, y + arcHeight / 2, x + w + 1, y + h - arcHeight / 2);
-
-        // Horizontal lines
-        drawLine(x + arcWidth / 2, y, x + w - arcWidth / 2, y);
-        drawLine(x + arcWidth / 2, y + h + 1, x + w - arcWidth / 2, y + h + 1);
-
-        // Rounded corners
-        drawArc(x, y, arcWidth, arcHeight, 90, 90); // top left
-        drawArc(x + w - arcWidth, y, arcWidth, arcHeight, 0, 90); // top right
-        drawArc(x, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom
-        // left
-        drawArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom
-        // right
+//        // Vertical lines
+//        drawLine(x, y + arcHeight / 2, x, y + h - arcHeight / 2);
+//        drawLine(x + w + 1, y + arcHeight / 2, x + w + 1, y + h - arcHeight / 2);
+//
+//        // Horizontal lines
+//        drawLine(x + arcWidth / 2, y, x + w - arcWidth / 2, y);
+//        drawLine(x + arcWidth / 2, y + h + 1, x + w - arcWidth / 2, y + h + 1);
+//
+//        // Rounded corners
+//        drawArc(x, y, arcWidth, arcHeight, 90, 90); // top left
+//        drawArc(x + w - arcWidth, y, arcWidth, arcHeight, 0, 90); // top right
+//        drawArc(x, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom
+//        // left
+//        drawArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom
+//        // right
 
     }
 
@@ -1662,19 +1664,21 @@ public abstract class BaseGraphics implements VirtualGraphics {
      * @see org.thenesis.microbackend.ui.graphics.VirtualGraphicsInterface#fillRoundRect(int, int, int, int, int, int)
      */
     public void fillRoundRect(int x, int y, int w, int h, int arcWidth, int arcHeight) {
+        
+        fillRect(x, y, w, h);
 
-        fillRect(x, y + arcHeight / 2, w + 1, h - arcHeight + 1); // center
-        fillRect(x + arcWidth / 2, y, w - arcWidth, arcHeight); // top middle
-        fillRect(x + arcWidth / 2, y + h - arcHeight, w - arcWidth, arcHeight); // bottom
-        // middle
-
-        // Rounded corners
-        fillArc(x, y, arcWidth, arcHeight, 90, 90); // top left
-        fillArc(x + w - arcWidth, y, arcWidth, arcHeight, 0, 90); // top right
-        fillArc(x, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom
-        // left
-        fillArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom
-        // right
+//        fillRect(x, y + arcHeight / 2, w + 1, h - arcHeight + 1); // center
+//        fillRect(x + arcWidth / 2, y, w - arcWidth, arcHeight); // top middle
+//        fillRect(x + arcWidth / 2, y + h - arcHeight, w - arcWidth, arcHeight); // bottom
+//        // middle
+//
+//        // Rounded corners
+//        fillArc(x, y, arcWidth, arcHeight, 90, 90); // top left
+//        fillArc(x + w - arcWidth, y, arcWidth, arcHeight, 0, 90); // top right
+//        fillArc(x, y + h - arcHeight, arcWidth, arcHeight, 180, 90); // bottom
+//        // left
+//        fillArc(x + w - arcWidth, y + h - arcHeight, arcWidth, arcHeight, 270, 90); // bottom
+//        // right
 
     }
     

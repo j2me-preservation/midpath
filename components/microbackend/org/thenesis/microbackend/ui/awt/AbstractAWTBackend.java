@@ -160,21 +160,22 @@ public abstract class AbstractAWTBackend implements UIBackend {
         }
 
         public void mouseDragged(MouseEvent e) {
+            listener.pointerMoved(e.getX(), e.getY(), e.getModifiers());
         }
 
         public void mousePressed(MouseEvent e) {
             //System.out.println("[DEBUG] AWTBackend.mousePressed()");
-            listener.mousePressed(e.getX(), e.getY(), e.getModifiers());
+            listener.pointerPressed(e.getX(), e.getY(), e.getModifiers());
         }
 
         public void mouseReleased(MouseEvent e) {
             //System.out.println("[DEBUG] AWTBackend.mouseReleased()");
-            listener.mouseReleased(e.getX(), e.getY(), e.getModifiers());
+            listener.pointerReleased(e.getX(), e.getY(), e.getModifiers());
         }
 
         public void mouseMoved(MouseEvent e) {
             //System.out.println("[DEBUG] AWTBackend.mouseMoved()");
-            listener.mouseMoved(e.getX(), e.getY(), e.getModifiers());
+            listener.pointerMoved(e.getX(), e.getY(), e.getModifiers());
         }
 
         public void windowClosing(WindowEvent e) {

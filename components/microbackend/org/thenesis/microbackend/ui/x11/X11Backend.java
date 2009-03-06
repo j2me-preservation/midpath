@@ -247,15 +247,15 @@ public class X11Backend implements UIBackend {
         private void firePointerPressureEvent(int x, int y, boolean pressed) {
             //System.out.println("[DEBUG] X11Backend.processPointerPressedEvent()");
             if (pressed) {
-                listener.mousePressed(x, y, 0);
+                listener.pointerPressed(x, y, 0);
             } else {
-                listener.mouseReleased(x, y, 0);
+                listener.pointerReleased(x, y, 0);
             }
         }
 
         private void fireMotionEvent(int x, int y) {
             //System.out.println("[DEBUG] SWTBackend.processPointerDraggedEvent()");
-            listener.mouseMoved(x, y, 0);
+            listener.pointerMoved(x, y, 0);
         }
 
         private void fireCloseEvent() {

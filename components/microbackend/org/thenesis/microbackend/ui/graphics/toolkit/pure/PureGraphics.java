@@ -297,15 +297,45 @@ public class PureGraphics extends BaseGraphics {
         int w = sxmax - sxmin, h = symax - symin;
 
         int[] surfaceData = ((PureImage) surfaceImage).pixels;
+        boolean fullAlphaBlending = ((PureImage) surfaceImage).fullAlphaBlending;
 
         if (processAlpha) {
-            for (int ry = 0; ry < h; ry++) {
-                int srcPosition = offset + (symin + ry) * scanlength + sxmin;
-                int dstPosition = (dymin + ry) * surfaceImage.getWidth() + dxmin;
-                int length = w;
-                for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
-                    if (((rgbData[i + srcPosition]) & 0xFF000000) == 0xFF000000)
-                        surfaceData[i + dstPosition] = rgbData[i + srcPosition];
+            if (fullAlphaBlending) {
+                for (int ry = 0; ry < h; ry++) {
+                    int srcPosition = offset + (symin + ry) * scanlength + sxmin;
+                    int dstPosition = (dymin + ry) * surfaceImage.getWidth() + dxmin;
+                    int length = w;
+                    for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+                        // Source.
+                        int srcColor = rgbData[i + srcPosition];
+                        int sa = (srcColor >> 24) & 0xFF;
+                        int sr = (srcColor >> 16) & 0xFF;
+                        int sg = (srcColor >> 8) & 0xFF;
+                        int sb = srcColor & 0xFF;
+
+                        // Destination.
+                        int dstColor = surfaceData[i + dstPosition];
+                        int dr = (dstColor >> 16) & 0xFF;
+                        int dg = (dstColor >> 8) & 0xFF;
+                        int db = dstColor & 0xFF;
+
+                        // Alpha blending
+                        int factor = 0x00010000 / 255;
+                        dr = ((sa * sr + (0xff - sa) * dr) * factor) >> 16;
+                        dg = ((sa * sg + (0xff - sa) * dg) * factor) >> 16;
+                        db = ((sa * sb + (0xff - sa) * db) * factor) >> 16;
+                        surfaceData[i + dstPosition] = (((dr << 16) + (dg << 8) + db) | 0xFF000000);
+                    }
+                }
+            } else {
+                for (int ry = 0; ry < h; ry++) {
+                    int srcPosition = offset + (symin + ry) * scanlength + sxmin;
+                    int dstPosition = (dymin + ry) * surfaceImage.getWidth() + dxmin;
+                    int length = w;
+                    for (int i = 0, sp = srcPosition, dp = dstPosition; i < length; i++, sp += 1, dp += 1) {
+                        if (((rgbData[i + srcPosition]) & 0xFF000000) == 0xFF000000)
+                            surfaceData[i + dstPosition] = rgbData[i + srcPosition];
+                    }
                 }
             }
         } else {

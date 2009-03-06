@@ -124,7 +124,7 @@ public abstract class VirtualToolkit {
         try {
             return createImage(new ByteArrayInputStream(imageData, imageOffset, imageLength));
         } catch (IOException e) {
-            throw new IllegalArgumentException("Can't create image");
+            throw new IllegalArgumentException("Can't create image: " + e.getMessage());
         }
     }
 

@@ -17,8 +17,6 @@
  */
 package org.thenesis.microbackend.ui.graphics.toolkit.pure;
 
-import java.io.IOException;
-
 import org.thenesis.microbackend.ui.graphics.VirtualFont;
 import org.thenesis.microbackend.ui.graphics.VirtualGraphics;
 import org.thenesis.microbackend.ui.graphics.VirtualImage;

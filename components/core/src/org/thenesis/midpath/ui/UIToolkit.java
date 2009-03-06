@@ -140,7 +140,7 @@ class PrivateBackendEventListener implements BackendEventListener {
         fireKeyEvent(false, keycode, c, modifiers);
     }
 
-    public void mouseMoved(int x, int y, int modifiers) {
+    public void pointerMoved(int x, int y, int modifiers) {
         if (Logging.TRACE_ENABLED)
             System.out.println("[DEBUG] VirtualBackendEventListener.mouseMoved(): drag enabled ? " + dragEnabled);
 
@@ -157,7 +157,7 @@ class PrivateBackendEventListener implements BackendEventListener {
 
     }
 
-    private void fireMouseEvent(boolean pressed, int x, int y, int modifiers) {
+    private void firePointerEvent(boolean pressed, int x, int y, int modifiers) {
         if (Logging.TRACE_ENABLED)
             System.out.println("[DEBUG] VirtualBackendEventListener.fireMouseEvent()");
 
@@ -179,12 +179,12 @@ class PrivateBackendEventListener implements BackendEventListener {
         EventQueue.getEventQueue().post(nativeEvent);
     }
 
-    public void mousePressed(int x, int y, int modifiers) {
-        fireMouseEvent(true, x, y, modifiers);
+    public void pointerPressed(int x, int y, int modifiers) {
+        firePointerEvent(true, x, y, modifiers);
     }
 
-    public void mouseReleased(int x, int y, int modifiers) {
-        fireMouseEvent(false, x, y, modifiers);
+    public void pointerReleased(int x, int y, int modifiers) {
+        firePointerEvent(false, x, y, modifiers);
     }
 
     public void windowClosed() {
