@@ -97,6 +97,7 @@ public class PureImage implements VirtualImage {
     
     PureImage(VirtualImage srcImage, int x, int y, int width, int height, int transform) {
         VirtualImage dstImage = transform((PureImage)srcImage, x, y, width, height, transform);
+        pixels = ((PureImage)dstImage).pixels;
         setDimensions(dstImage.getWidth(), dstImage.getHeight());
         isMutable = false;
     }
@@ -129,7 +130,6 @@ public class PureImage implements VirtualImage {
         if ((width <= 0) || (height <= 0)) {
             return;
         }
-        
 
         for (int b = y; b < y + height; b++) {
             for (int a = x; a < x + width; a++) {
