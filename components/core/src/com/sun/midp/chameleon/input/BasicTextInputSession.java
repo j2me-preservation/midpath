@@ -30,6 +30,8 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.TextField;
 
+import com.sun.midp.chameleon.input.VirtualKeyboardInputMode.VirtualKeyboardForm;
+
 /**
  * The BasicTextInputSession represents the relationship between the 
  * system's key input, the TextInputComponent, the available InputModes, 
@@ -299,9 +301,9 @@ public class BasicTextInputSession implements
      * character.
      * @param input text to commit
      */
-    public void commit(String input) {
+    public void commit(String input, boolean replace) {
         if (input != null && textComponent != null) {
-            textComponent.commit(input);
+            textComponent.commit(input, replace);
         }
     }
 
@@ -426,6 +428,13 @@ public class BasicTextInputSession implements
                 currentDisplay = textComponent.getDisplay();
                 previousScreen = currentDisplay.getCurrent();
                 currentDisplay.setCurrent(currentMode.getDisplayable());
+                
+                // Hack to get keyboard focus first
+                if (currentMode.getDisplayable() instanceof VirtualKeyboardForm) {
+                    VirtualKeyboardForm form = (VirtualKeyboardForm)currentMode.getDisplayable();
+                    currentDisplay.setCurrentItem(form.getFirstFocusableItem());
+                }
+                
                 stickyMode = oldMode;
             } else {
                 stickyMode = currentMode;
@@ -485,6 +494,10 @@ public class BasicTextInputSession implements
      */
     public int getAvailableSize() {
         return textComponent != null ? textComponent.getAvailableSize() : 0;
+    }
+    
+    public String getInitialText() {
+        return textComponent.getInitialText();
     }
 }
 

@@ -135,7 +135,7 @@ public class KeyboardInputMode implements InputMode {
             keyCode != Canvas.DOWN &&
             keyCode != Canvas.LEFT &&
             !longPress) {
-            mediator.commit("" + (char)keyCode);
+            mediator.commit("" + (char)keyCode, false);
         }
         return ret;
     }

@@ -570,7 +570,7 @@ public class SymbolInputMode implements InputMode {
         boolean committed = false;
         if (lastKey != KEYCODE_NONE) {
             committed = true;
-            mediator.commit(String.valueOf((char)lastKey));
+            mediator.commit(String.valueOf((char)lastKey), false);
         }
         lastKey = -1;
         return committed;

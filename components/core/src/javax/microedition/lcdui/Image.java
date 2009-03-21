@@ -392,7 +392,9 @@ public class Image {
 	    // Load the image from the MIDlet classloader.
         // FIXME Use a better mechanism (?)
         InputStream is = BaseMIDletSuiteLauncher.getResourceAsStream(name);
-        //System.out.println("[DEBUG] UIToolkit.createImage(String name): " + is.read());
+        if (is == null) {
+            throw new IOException("Resource " + name + " doesn't exist");
+        }
         return createImage(is);
 	
 	}

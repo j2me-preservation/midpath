@@ -889,7 +889,7 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 	 * and should result in any listeners being notified.
 	 * @param input text to commit 
 	 */
-	public void commit(String input) {
+	public void commit(String input, boolean replace) {
 		if (input == null) {
 			System.err.println("TextFieldLFImpl Warning: commited text is null!");
 			return;
@@ -903,23 +903,33 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 				DynamicCharacterArray in = tf.buffer;
 
 				TextCursor newCursor = new TextCursor(cursor);
-				for (int i = 0; i < input.length(); i++) {
-					TextCursor currentCursor = new TextCursor(newCursor);
-					String str = getDisplayString(in, input.charAt(i), tf.constraints, currentCursor, true);
-					in = new DynamicCharacterArray(str);
-					newCursor = currentCursor;
-				}
+				if (replace) {
+				    tf.setString(input.toString());
+                    cursor = newCursor;
+				} else {
+                    for (int i = 0; i < input.length(); i++) {
+                        TextCursor currentCursor = new TextCursor(newCursor);
+                        String str = getDisplayString(in, input.charAt(i), tf.constraints, currentCursor, true);
+                        in = new DynamicCharacterArray(str);
+                        newCursor = currentCursor;
+                    }
 
-				if (bufferedTheSameAsDisplayed(tf.constraints)) {
-					tf.setString(in.toString());
-					cursor = newCursor;
-				} else if (tf.buffer.length() < tf.getMaxSize()) {
-					tf.insert(input, cursor.index);
+                    if (bufferedTheSameAsDisplayed(tf.constraints)) {
+                        tf.setString(in.toString());
+                        cursor = newCursor;
+                    } else if (tf.buffer.length() < tf.getMaxSize()) {
+                        tf.insert(input, cursor.index);
+                    }
 				}
 			} catch (Exception ignore) {
 			}
+			
 			tf.notifyStateChanged();
 		}
+	}
+	
+	public String getInitialText() {
+	    return tf.getString();
 	}
 
 	/**

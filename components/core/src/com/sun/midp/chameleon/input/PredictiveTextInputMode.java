@@ -650,7 +650,7 @@ public class PredictiveTextInputMode implements InputMode {
                     log("           !need clear");
                     String str = nextState.substring(state.length());
                     log("           commiting " + str);
-                    mediator.commit(str);
+                    mediator.commit(str, false);
                 }
             }
             
@@ -677,7 +677,7 @@ public class PredictiveTextInputMode implements InputMode {
             log("clearing " + lastState + ": " + lastState.length() + " chars");
             mediator.clear(lastState.length());
             log("         commiting "+ nextState);
-            mediator.commit(nextState);
+            mediator.commit(nextState, false);
             log("[resendAll] <<<<");
         }
     }

@@ -67,7 +67,7 @@ public interface TextInputComponent {
      *
      * @param input String needs to be commited
      */
-    public void commit(String input);
+    public void commit(String input, boolean replace);
     
     /**
      * This is a notification from the input session that the selected
@@ -95,4 +95,6 @@ public interface TextInputComponent {
      * @return true if keu code is Clear one, false otherwise
      */
     public boolean isClearKey(int keyCode);
+    
+    public String getInitialText();
 }
