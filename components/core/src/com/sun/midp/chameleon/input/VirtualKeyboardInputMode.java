@@ -31,7 +31,6 @@ import javax.microedition.lcdui.TextField;
 import org.thenesis.microbackend.ui.Logging;
 import org.thenesis.microbackend.ui.graphics.VirtualKeyboard;
 
-import com.sun.midp.chameleon.skins.ScreenSkin;
 import com.sun.midp.chameleon.skins.TextFieldSkin;
 import com.sun.midp.lcdui.Text;
 import com.sun.midp.lcdui.TextCursor;
@@ -48,6 +47,8 @@ public class VirtualKeyboardInputMode implements InputMode {
     /** Symbol table */
     protected final VirtualKeyboardForm keyboardForm = new VirtualKeyboardForm("Keyboard");
 
+    private int constraints;
+    
     /**
      * This method is called to determine if this InputMode supports the given
      * text input constraints. The semantics of the constraints value are
@@ -63,14 +64,16 @@ public class VirtualKeyboardInputMode implements InputMode {
      *         constraints, as defined in the MIDP TextField API
      */
     public boolean supportsConstraints(int constraints) {
-        switch (constraints & TextField.CONSTRAINT_MASK) {
-        case TextField.NUMERIC:
-        case TextField.DECIMAL:
-        case TextField.PHONENUMBER:
-            return false;
-        default:
-            return true;
-        }
+//        switch (constraints & TextField.CONSTRAINT_MASK) {
+//        case TextField.NUMERIC:
+//        case TextField.DECIMAL:
+//        case TextField.PHONENUMBER:
+//            return false;
+//        default:
+//            return true;
+//        }
+        
+        return true;
     }
 
     /**
@@ -117,6 +120,7 @@ public class VirtualKeyboardInputMode implements InputMode {
     public void beginInput(InputModeMediator mediator, String inputSubset, int constraints) {
         validateState(false);
         this.mediator = mediator;
+        this.constraints = constraints;
         keyboardForm.getTextfield().setText(mediator.getInitialText());
     }
 
@@ -240,9 +244,25 @@ public class VirtualKeyboardInputMode implements InputMode {
         mediator.inputModeCompleted();
     }
 
-    /** this mode is not set as default. So the map is initialoized by false */
-    private static final boolean[][] isMap = new boolean[TextInputSession.INPUT_SUBSETS.length][TextInputSession.MAX_CONSTRAINTS];
-
+    /** input subset x constraint map */
+    //private static final boolean[][] isMap = new boolean[TextInputSession.INPUT_SUBSETS.length][TextInputSession.MAX_CONSTRAINTS];
+    private static final boolean[][] isMap = {
+        // |ANY|EMAILADDR|NUMERIC|PHONENUMBER|URL|DECIMAL
+        { false, false, false, false, false, false }, // IS_FULLWIDTH_DIGITS
+        { false, false, false, false, false, false }, // IS_FULLWIDTH_LATIN  
+        { true,  true,  false, false, true,  false }, // IS_HALFWIDTH_KATAKANA
+        { true,  true,  false, false, true,  false }, // IS_HANJA          
+        { true,  true,  false, false, true,  false }, // IS_KANJI           
+        { false, false, false, false, false, false }, // IS_LATIN           
+        { false, false, false, false, false, false }, // IS_LATIN_DIGITS    
+        { true,  true,  false, false, true,  false }, // IS_SIMPLIFIED_HANZI
+        { true,  true,  false, false, true,  false }, // IS_TRADITIONAL_HANZI
+        { false, false, false, false, false, false }, // MIDP_UPPERCASE_LATIN
+        { false, false, false, false, false, false }, // MIDP_LOWERCASE_LATIN
+        { true,  true,  false, false, true,  false }  // NULL
+    };
+    
+    
     /**
      * Returns the map specifying this input mode is proper one for the
      * particular pair of input subset and constraint. The form of the map is
@@ -305,12 +325,12 @@ public class VirtualKeyboardInputMode implements InputMode {
             if (key >= 0) {
                 //System.out.println("key " + key);
                 switch (key) {
-                //case 10: // Enter
-                //    completeInputMode(true);
-                //    break;
-                case 24: // Cancel
-                    //completeInputMode(false);
-                    break;
+//                case 10: // Enter
+//                    completeInputMode(true);
+//                    break;
+//                case 24: // Cancel
+//                    completeInputMode(false);
+//                    break;
                 case 8: // Backspace
                     textField.delete(1);
                     break;
@@ -342,20 +362,18 @@ public class VirtualKeyboardInputMode implements InputMode {
 
         class InternalTextField extends CustomItem {
 
-            private static final int INSET = 2;
-            private static final int SCROLL_SPACE = 8;
-
+            private static final int INSET = 1;
             private int minWidth;
             private int minHeight;
             private StringBuffer buffer;
             private Font font;
-            TextInfo info = new TextInfo(4);
-            TextCursor cursor;
+            private TextInfo info = new TextInfo(4);
+            private TextCursor cursor;
 
             protected InternalTextField(String label) {
                 super(label);
                 font = Font.getDefaultFont();
-                minWidth = VirtualKeyboardForm.this.getWidth() * 3 / 4; //  160; //font.charWidth('A') * 20;
+                minWidth = VirtualKeyboardForm.this.getWidth() * 9 / 10; //  160; //font.charWidth('A') * 20;
                 minHeight = (VirtualKeyboardForm.this.getHeight() - VirtualKeyboard.HEIGHT) / 2; //font.getHeight() + INSET;
                 buffer = new StringBuffer(20);
                 cursor = new TextCursor(buffer.length());
@@ -381,14 +399,25 @@ public class VirtualKeyboardInputMode implements InputMode {
 
                 g.setColor(0xFF000000);
                 g.drawRect(0, 0, w, h);
-                g.drawLine(1, 1, w - 1, 1);
-                g.drawLine(1, 1, 1, h - 1);
+                g.drawLine(INSET, INSET, w - INSET, INSET);
+                g.drawLine(INSET, INSET, INSET, h - INSET);
 
                 int offset = 0; // Buggy ?
                 int offsetXY = 4;
                 int options = Text.NORMAL;
                 
-                String str = buffer.toString();
+                String str;
+                if ((constraints & TextField.PASSWORD) == TextField.PASSWORD) {
+                    int length = buffer.length();
+                    StringBuffer sb = new StringBuffer(length);
+                    for (int i = 0; i < length; i++) {
+                        sb.append('*');
+                    }
+                    str = sb.toString();
+                } else {
+                    str = buffer.toString();
+                }
+                
                 info.isModified = true;
                 //cursor.index = str.length();
                 Text.updateTextInfo(str, font, w - offsetXY, h - offsetXY, offset, options, cursor, info);

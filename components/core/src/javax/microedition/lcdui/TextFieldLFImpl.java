@@ -42,6 +42,7 @@ import com.sun.midp.chameleon.layers.PTILayer;
 import com.sun.midp.chameleon.skins.ScreenSkin;
 import com.sun.midp.chameleon.skins.TextFieldSkin;
 import com.sun.midp.chameleon.skins.resources.TextFieldResources;
+import com.sun.midp.configurator.Constants;
 import com.sun.midp.lcdui.DynamicCharacterArray;
 import com.sun.midp.lcdui.EventConstants;
 import com.sun.midp.lcdui.PhoneDial;
@@ -80,7 +81,7 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 	protected SubMenuCommand inputMenu;
 
 	/** The TextInputMediator which handles translating key presses */
-	protected static TextInputSession inputSession;
+	protected static BasicTextInputSession inputSession;
 
 	/** The PopupLayer that represents open state of this ChoiceGroup POPUP. */
 	protected static PTILayer pt_popup;
@@ -1022,8 +1023,8 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 			if (systemKeyCode == EventConstants.SYSTEM_KEY_SEND) {
 				if ((getConstraints() & TextField.CONSTRAINT_MASK) == TextField.PHONENUMBER) {
 					PhoneDial.call(tf.getString());
+					return;
 				}
-				return;
 			}
 
 			if (!editable) {
@@ -1101,6 +1102,13 @@ class TextFieldLFImpl extends ItemLFImpl implements TextFieldLF, TextInputCompon
 
 		cancelTimerKey(keyCode);
 	}
+	
+	void uCallPointerPressed(int x, int y) {
+        // IMPL_NOTE: handle select action
+	    if (inputSession.isVirtualKeyboardAutoEnabled()) {
+	        inputSession.processKey(Constants.KEYCODE_SELECT, false);
+	    }
+    }
 
 	/**
 	 * Handle a key repeated event 

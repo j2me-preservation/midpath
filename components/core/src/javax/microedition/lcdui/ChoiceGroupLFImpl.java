@@ -494,6 +494,70 @@ class ChoiceGroupLFImpl extends ItemLFImpl implements ChoiceGroupLF {
             form.uCallItemStateChanged(cg);
         }
     }
+    
+    /**
+     * Called by the system to signal a pointer press
+     *
+     * @param x the x coordinate of the pointer down
+     * @param y the y coordinate of the pointer down
+     *
+     * @see #getInteractionModes
+     */
+    void uCallPointerPressed(int x, int y) {
+        itemWasPressed = true;
+        int i = getIndexByPointer(x, y);
+        if (i >= 0) {
+            hilightedIndex = pendingIndex = i;
+            hasFocusWhenPressed = cg.cgElements[hilightedIndex].selected; 
+            if (cg.choiceType == Choice.IMPLICIT) {               
+                setSelectedIndex(hilightedIndex, true);
+            }
+            uRequestPaint();
+            //            getCurrentDisplay().serviceRepaints(cg.owner.getLF()); //make the change shown immediately for better user experience
+        }
+
+    }
+    
+//    void uCallPointerPressed(int x, int y) { ;
+//        int index = getIndexByPointer(x, y);
+//        if (index != -1) {
+//            if (index == lGetSelectedIndex()) {
+//                setSelectedIndex(index, false);
+//            } else {
+//                setSelectedIndex(index, true);
+//            }
+//            uRequestPaint();
+//        }
+//        
+//    }
+    
+    /**
+     * Get the index of choice item contains the pointer 
+     * @param x the x coordinate of the pointer
+     * @param y the y coordinate of the pointer
+     * @return the index of choice item
+     */      
+    int getIndexByPointer(int x, int y) {
+
+        int id = -1;
+        if (cg.numOfEls > 0) {
+            //if pointer was dragged outside the item.
+            if (contentBounds[X] <= x &&
+                x <= contentBounds[X] + contentBounds[WIDTH] &&
+                contentBounds[Y] <= y &&
+                y <= contentBounds[Y] + contentBounds[HEIGHT]) { 
+                int visY = contentBounds[Y];
+                for (int i = 0; i < cg.numOfEls; i++) {
+                    visY += elHeights[i];
+                    if (visY >= y) {
+                        id = i;
+                        break;
+                    }
+                }
+            }
+        }
+        return id;
+    }
 
     /**
      * Get the total element height of this CGroup
@@ -867,7 +931,9 @@ class ChoiceGroupLFImpl extends ItemLFImpl implements ChoiceGroupLF {
      * The currently highlighted index of this ChoiceGroup (-1 by default)
      */
     int hilightedIndex = -1;
-
+    
+    int pendingIndex = -1;
+    
     /**
      * Stores the x-location of where the choice element content 
      * would begin.
@@ -886,4 +952,6 @@ class ChoiceGroupLFImpl extends ItemLFImpl implements ChoiceGroupLF {
      * in lCallTraverseOut().
      */
     boolean traversedIn;
+    
+    boolean hasFocusWhenPressed; // = false
 }
