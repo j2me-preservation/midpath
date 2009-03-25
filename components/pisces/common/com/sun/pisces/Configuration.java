@@ -28,7 +28,7 @@ package com.sun.pisces;
 import java.util.HashMap;
 import java.util.Map;
 
-final class Configuration {
+public final class Configuration {
     private static final Map configuration;
     
     static {

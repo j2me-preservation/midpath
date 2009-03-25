@@ -57,12 +57,12 @@ public abstract class GraphicsSurfaceDestination implements SurfaceDestination {
             return;
         }
         
-        if (ps instanceof NativeSurface) {
-            NativeSurface ns = (NativeSurface)ps;
-            drawRGBImpl(ns.getData(), srcY * srcW + srcX, srcW, dstX, dstY, 
-                    width, height, opacity);
-            return;
-        }
+//        if (ps instanceof NativeSurface) {
+//            NativeSurface ns = (NativeSurface)ps;
+//            drawRGBImpl(ns.getData(), srcY * srcW + srcX, srcW, dstX, dstY, 
+//                    width, height, opacity);
+//            return;
+//        }
 
         int size = width * height;
         int[] srcRGB = new int[size];
