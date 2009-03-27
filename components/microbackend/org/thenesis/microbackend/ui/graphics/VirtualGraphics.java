@@ -381,11 +381,6 @@ public interface VirtualGraphics {
     // ------
     // Line.
     //--------------------------------------------------------------------------
-    // ------
-    public void drawHLine(int x0, int x1, int y);
-
-    public void drawVLine(int y0, int y1, int x);
-
     /**
      * Draws a line from point (x0, y0) to point (x1, y1).
      */
