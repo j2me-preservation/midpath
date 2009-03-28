@@ -4,7 +4,6 @@ CFLAGS = $(JNI_INCLUDE)
 LDFLAGS =
 
 SOURCES = JAbstractSurface.c \
-		  JPiscesGCISurface.c \
 		  PiscesBlit.c \
 		  PiscesPipelines.c \
 		  PiscesTransform.c \

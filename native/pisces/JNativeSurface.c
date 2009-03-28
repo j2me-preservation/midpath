@@ -47,8 +47,6 @@ JNIEXPORT void JNICALL
 Java_com_sun_pisces_NativeSurface_initialize(JNIEnv* env, jobject objectHandle,
         jint dataType, jint width, jint height) {
 
-    printf("[DEBUG]Java_com_sun_pisces_NativeSurface_initialize: Hello\n");
-
     AbstractSurface* surface;
 
     if (surface_initialize(env, objectHandle)

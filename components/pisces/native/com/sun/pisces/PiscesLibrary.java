@@ -26,6 +26,8 @@
 
 package com.sun.pisces;
 
+import com.sun.cldchi.jvm.JVM;
+
 final class PiscesLibrary {
     private static boolean loaded;
     
@@ -34,7 +36,8 @@ final class PiscesLibrary {
     
     public static synchronized void load() {
         if (!loaded) {
-            System.loadLibrary("pisces");
+            //System.loadLibrary("midpath-pisces");
+            JVM.loadLibrary("libmidpath-pisces.so");
             loaded = true;
         }
     }
