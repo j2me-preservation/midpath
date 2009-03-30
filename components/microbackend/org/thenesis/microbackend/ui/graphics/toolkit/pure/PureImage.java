@@ -28,7 +28,7 @@ public class PureImage implements VirtualImage {
     private boolean isMutable = false;
     private int imgWidth;
     private int imgHeight;
-    boolean fullAlphaBlending = true;
+    boolean fullAlphaBlending = false;
 
     //protected Image img;
 
@@ -97,7 +97,7 @@ public class PureImage implements VirtualImage {
     
     PureImage(VirtualImage srcImage, int x, int y, int width, int height, int transform) {
         VirtualImage dstImage = transform((PureImage)srcImage, x, y, width, height, transform);
-        pixels = ((PureImage)dstImage).pixels;
+        pixels = ((PureImage)dstImage).pixels;  
         setDimensions(dstImage.getWidth(), dstImage.getHeight());
         isMutable = false;
     }

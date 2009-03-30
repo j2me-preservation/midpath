@@ -2,14 +2,6 @@ package org.thenesis.microbackend.ui.graphics;
 
 public interface VirtualGraphics {
 
-    // Image blending mode. TODO: replace BLEND by ADD and SUB.
-    public static final int BLEND = 1;
-    // Image blending mode. TODO: replace BLEND by ADD and SUB.
-    public static final int LOGIC = 2;
-    // Image blending mode. TODO: replace BLEND by ADD and SUB.
-    public static final int REPLACE = 0;
-    public static final int MAX_CIRCLE_RADIUS = 16384;
-    public static final int MAX_ELLIPSE_RADIUS = 16384;
     /**
      * Constant for centering text and images horizontally
      * around the anchor point
