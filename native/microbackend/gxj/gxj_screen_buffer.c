@@ -31,6 +31,8 @@
 
 #include "gxj_screen_buffer.h"
 
+gxj_screen_buffer gxj_system_screen_buffer;
+
 /**
  * Initialize screen buffer for a screen with specified demension,
  * allocate memory for pixel data.
@@ -40,15 +42,15 @@
  * @return ALL_OK if successful, OUT_OF_MEMORY in the case of
  *   not enough memory to allocate the buffer
  */
-MIDPError gxj_init_screen_buffer(int width, int height) {
-    MIDPError stat = ALL_OK;
+GXJError gxj_init_screen_buffer(int width, int height) {
+	GXJError stat = ALL_OK;
     int size = sizeof(gxj_pixel_type) * width * height;
     gxj_system_screen_buffer.width = width;
     gxj_system_screen_buffer.height = height;
     gxj_system_screen_buffer.alphaData = NULL;
 
     gxj_system_screen_buffer.pixelData =
-        (gxj_pixel_type *)midpMalloc(size);
+        (gxj_pixel_type *)GXJ_malloc(size);
     if (gxj_system_screen_buffer.pixelData != NULL) {
         memset(gxj_system_screen_buffer.pixelData, 0, size);
     } else {
@@ -67,7 +69,7 @@ MIDPError gxj_init_screen_buffer(int width, int height) {
  * @return ALL_OK if successful, OUT_OF_MEMORY in the case of
  *   not enough memory to reallocate the buffer
  */
-MIDPError gxj_resize_screen_buffer(int width, int height) {
+GXJError gxj_resize_screen_buffer(int width, int height) {
 
     if (gxj_system_screen_buffer.pixelData != NULL) {
         if (gxj_system_screen_buffer.width == width &&
@@ -123,7 +125,7 @@ static void reformat_plain_data(
     src = dst = data;
 
     if (width < height) {
-        char *buf = (char *)midpMalloc(width_bytes);
+        char *buf = (char *)GXJ_malloc(width_bytes);
         src += (width-1) * width_bytes;
         dst += (width-1) * height_bytes;
         for (i = width; i > 0 ; i--) {
@@ -140,7 +142,7 @@ static void reformat_plain_data(
             src -= width_bytes;
             dst -= height_bytes;
         }
-        midpFree(buf);
+        GXJ_free(buf);
     } else if (width > height) {
         for (i = 0; i < height; i++) {
             memcpy(dst, src, height_bytes);
@@ -197,11 +199,11 @@ void gxj_rotate_screen_buffer(jboolean keepContent) {
 /** Free memory allocated for screen buffer */
 void gxj_free_screen_buffer() {
     if (gxj_system_screen_buffer.pixelData != NULL) {
-        midpFree(gxj_system_screen_buffer.pixelData);
+        GXJ_free(gxj_system_screen_buffer.pixelData);
         gxj_system_screen_buffer.pixelData = NULL;
     }
     if (gxj_system_screen_buffer.alphaData != NULL) {
-        midpFree(gxj_system_screen_buffer.alphaData);
+    	GXJ_free(gxj_system_screen_buffer.alphaData);
         gxj_system_screen_buffer.alphaData = NULL;
     }
 }

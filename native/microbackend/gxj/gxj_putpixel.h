@@ -74,7 +74,7 @@ typedef struct _gxj_screen_buffer {
  * Each port must define one system screen buffer
  * from where pixels are copied to physical screen.
  */
-gxj_screen_buffer gxj_system_screen_buffer;
+extern gxj_screen_buffer gxj_system_screen_buffer;
 
 /**
  * @name Accessing pixel colors

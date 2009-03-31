@@ -35,11 +35,12 @@
  */
 
 #include "gxj_putpixel.h"
-//#include <midp_global_status.h>
+#include "gxj_util.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /**
  * IMPL_NOTE: Each port must define one system screen buffer
@@ -61,7 +62,7 @@ extern "C" {
  * @return ALL_OK if successful, OUT_OF_MEMORY in the case of
  *   not enough memory to allocate the buffer
  */
-MIDPError gxj_init_screen_buffer(int width, int height);
+GXJError gxj_init_screen_buffer(int width, int height);
 
 /**
  * Resizes screen buffer to fit new screen geometry.
@@ -76,7 +77,7 @@ MIDPError gxj_init_screen_buffer(int width, int height);
  * @return ALL_OK if successful, OUT_OF_MEMORY in the case of
  *   not enough memory to reallocate the buffer
  */
-MIDPError gxj_resize_screen_buffer(int width, int height);
+GXJError gxj_resize_screen_buffer(int width, int height);
 
 /** Reset pixel data of screen buffer to zero */
 void gxj_reset_screen_buffer();
