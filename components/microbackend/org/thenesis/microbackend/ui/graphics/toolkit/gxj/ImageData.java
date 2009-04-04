@@ -31,6 +31,10 @@ package org.thenesis.microbackend.ui.graphics.toolkit.gxj;
  * on putpixel graphics library and stores data on Java heap.
  */
 final class ImageData implements AbstractImageData {
+    
+    private static final int STRATEGY_JAVA_BUFFER = 1;
+    private static final int STRATEGY_NATIVE_BUFFER = 2;
+    private final int strategy = STRATEGY_NATIVE_BUFFER;
 
     /**
      * The width, height of this Image
@@ -94,8 +98,13 @@ final class ImageData implements AbstractImageData {
         initImageData(width, height, isMutable, allocateAlpha);
 
         if (clearPixelData) {
-            for (int i = 0; i < pixelData.length; i++) {
-                pixelData[i] = (byte)0xFF;
+            if (strategy == STRATEGY_JAVA_BUFFER) {
+                for (int i = 0; i < pixelData.length; i++) {
+                    pixelData[i] = (byte) 0xFF;
+                }
+
+            } else {
+                clearNativePixelData();
             }
         }
     }
@@ -108,21 +117,21 @@ final class ImageData implements AbstractImageData {
      * @param height The height of the <code>ImageData </code> to be created.
      * @param isMutable true to create mutable <code>ImageData</code>,
      *                  false to create immutable <code>ImageData</code>
-     * @param pixelData byte array that contains pixel data for the 
+     * @param srcPixelData byte array that contains pixel data for the 
      *                  <code>ImageData</code>.
      */
     ImageData(int width, int height, boolean isMutable,
-              byte[] pixelData) {
-        this.width = width;
-        this.height = height;
-        this.isMutable = isMutable;
+            ImageData src) {
+        
+        initImageData(width, height, isMutable, false);
 
-        int length = width * height * 2;
-        byte[] newPixelData = new byte[length];
-        System.arraycopy(pixelData, 0, newPixelData, 0, length);
-
-        this.pixelData = newPixelData;
-
+        if (strategy == STRATEGY_JAVA_BUFFER) {
+            int length = width * height * 2;
+            byte[] srcPixelData = src.pixelData;
+            System.arraycopy(srcPixelData, 0, pixelData, 0, length);
+        } else {
+            fillNativePixelData(src);
+        }
         
     }
 
@@ -143,13 +152,16 @@ final class ImageData implements AbstractImageData {
         this.width = width;
         this.height = height;
         this.isMutable = isMutable;
-
-        pixelData = new byte[width * height * 2];
-
-        if (allocateAlpha) {
-            alphaData = new byte[width * height];
+    
+        if (strategy == STRATEGY_JAVA_BUFFER) {
+            pixelData = new byte[width * height * 2];
+            if (allocateAlpha) {
+                alphaData = new byte[width * height];
+            } else {
+                alphaData = null;
+            }
         } else {
-            alphaData = null;
+            allocateNativeData(width, height, allocateAlpha);
         }
     }
 
@@ -214,17 +226,37 @@ final class ImageData implements AbstractImageData {
      * Removes alpha data information 
      */
     public void removeAlpha() {
-        alphaData = null;
-    }
-
-    /**
-     * Gets pixel data associated with this <code> ImageData</code> instance.
-     * @return byte arra that represents pixel data associated with this
-     *         <code>ImageData</code> instance.
-     */
-    byte[] getPixelData() {
-        return pixelData;
+        if (strategy == STRATEGY_JAVA_BUFFER) {
+            alphaData = null;
+        } else {
+            // TODO
+            throw new UnsupportedOperationException();
+        }
     }
     
+    public void finalize() {
+        if (strategy == STRATEGY_NATIVE_BUFFER) {
+            freeNativeData();
+        }
+    }
+
+//    /**
+//     * Gets pixel data associated with this <code> ImageData</code> instance.
+//     * @return byte arra that represents pixel data associated with this
+//     *         <code>ImageData</code> instance.
+//     */
+//    byte[] getPixelData() {
+//        return pixelData;
+//    }
+    
     static native void initFieldIDs();
+    
+    private native void allocateNativeData(int w, int h, boolean allocateAlpha);
+    
+    private native void freeNativeData();
+    
+    private native void fillNativePixelData(ImageData src);
+    
+    private native void clearNativePixelData();
+    
 }

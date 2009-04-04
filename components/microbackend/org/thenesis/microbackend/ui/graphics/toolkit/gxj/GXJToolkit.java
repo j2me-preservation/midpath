@@ -34,7 +34,7 @@ public class GXJToolkit extends VirtualToolkit {
     }
 
     public void initializeRoot(int rootWidth, int rootHeight) {
-        JVM.loadLibrary("libmidpath-gxj.so");
+        JVM.loadLibrary("libmicrobackend-gxj.so");
         ImageData.initFieldIDs();
         GXJGraphics.initFieldIDs();
         
