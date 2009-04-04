@@ -16,6 +16,18 @@ extern "C" {
  */
 JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_initFieldIDs(JNIEnv *env, jclass cls);
 
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_allocateNativeData
+  (JNIEnv *env, jobject imageData, jint width, jint height, jboolean allocateAlpha);
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_freeNativeData
+  (JNIEnv *env, jobject imageData);
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_fillNativePixelData
+  (JNIEnv *env, jobject dstImageData, jobject srcImageData);
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_clearNativePixelData
+  (JNIEnv *env, jobject imageData);
+
 /*
  * Class:     org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData
  * Method:    getRGB

@@ -254,7 +254,7 @@ void imgj_get_argb(const gxj_screen_buffer *sbuf,
                    img_native_error_codes * errorPtr) {
 
 
-    if (sbuf->pixelByteArray != NULL) {
+    if (sbuf->pixelData != NULL) {
         PIXEL *srcPixelData = (PIXEL *) sbuf->pixelData;
         ALPHA *srcAlphaData = (ALPHA *) sbuf->alphaData;
         int srcWidth = sbuf->width;
@@ -765,7 +765,7 @@ JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_Im
     gxj_screen_buffer screen_buffer;
     gxj_screen_buffer *sbuf = getScreenBufferFromImageData(env, imageData, &screen_buffer);
 
-    if (sbuf->pixelByteArray != NULL) {
+    if (sbuf->pixelData != NULL) {
         int i;
         int len = (*env)->GetArrayLength(env, argbIntArray);
         int width = sbuf->width;

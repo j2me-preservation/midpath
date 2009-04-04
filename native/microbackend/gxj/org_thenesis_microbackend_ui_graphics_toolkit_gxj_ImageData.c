@@ -32,6 +32,7 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 #include <jni.h>
 //#include <sni.h>
 //#include <midpError.h>
@@ -86,6 +87,58 @@ JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_Im
     imageData_alphaData_Id = (*env)->GetFieldID(env, cls, "alphaData", "[B");
     imageData_nativePixelData_Id = (*env)->GetFieldID(env, cls, "nativePixelData", "I");
     imageData_nativeAlphaData_Id = (*env)->GetFieldID(env, cls, "nativeAlphaData", "I");
+}
+
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_allocateNativeData
+  (JNIEnv *env, jobject imageData, jint width, jint height, jboolean allocateAlpha) {
+
+	jint length = width * height * 2;
+	jbyte *addr = GXJ_malloc(length);
+	(*env)->SetIntField(env, imageData, imageData_nativePixelData_Id, (int)addr);
+
+	if (allocateAlpha == JNI_TRUE) {
+		length = width * height;
+		addr = GXJ_malloc(length);
+		(*env)->SetIntField(env, imageData, imageData_nativeAlphaData_Id, (int)addr);
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_freeNativeData
+  (JNIEnv *env, jobject imageData) {
+
+	jbyte *pixelData = (jbyte *) (*env)->GetIntField(env, imageData, imageData_nativePixelData_Id);
+	jbyte *alphaData = (jbyte *) (*env)->GetIntField(env, imageData, imageData_nativeAlphaData_Id);
+
+	if (pixelData != NULL) {
+		GXJ_free(pixelData);
+	}
+	if (alphaData != NULL) {
+		GXJ_free(alphaData);
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_fillNativePixelData
+  (JNIEnv *env, jobject dstImageData, jobject srcImageData) {
+
+	jint width = (*env)->GetIntField(env, dstImageData, imageData_width_Id);
+	jint height = (*env)->GetIntField(env, dstImageData, imageData_height_Id);
+	int length = width * height * 2;
+
+	jbyte *dstData = (jbyte *) (*env)->GetIntField(env, dstImageData, imageData_nativePixelData_Id);
+	jbyte *srcData = (jbyte *) (*env)->GetIntField(env, srcImageData, imageData_nativePixelData_Id);
+	memcpy(dstData, srcData, length);
+}
+
+JNIEXPORT void JNICALL Java_org_thenesis_microbackend_ui_graphics_toolkit_gxj_ImageData_clearNativePixelData
+  (JNIEnv *env, jobject imageData) {
+
+	jint width = (*env)->GetIntField(env, imageData, imageData_width_Id);
+	jint height = (*env)->GetIntField(env, imageData, imageData_height_Id);
+	int length = width * height * 2;
+
+	jbyte *data = (jbyte *) (*env)->GetIntField(env, imageData, imageData_nativePixelData_Id);
+	memset(data, 0xFF, length);
 }
 
 /**

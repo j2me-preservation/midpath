@@ -25,6 +25,7 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h>
 #include "midp_logging.h"
 
 
@@ -53,7 +54,12 @@
  */
 void
 reportToLog(int severity, int channelID, char* message, ...) {
-    printf("%s", message);
+	va_list ap;
+	va_start(ap, message);
+	vprintf(message, ap);
+	va_end(ap);
+
+    //printf("%s", message);
 }
 
 
