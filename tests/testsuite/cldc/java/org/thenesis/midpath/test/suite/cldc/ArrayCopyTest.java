@@ -56,23 +56,33 @@ public class ArrayCopyTest implements Testlet {
 	}
 
 	public void test(TestHarness harness) {
-		int[] x, y;
+		int[] x, y, d;
 
 		x = new int[5];
-		y = new int[5];
+	    y = new int[5];
+        d = new int[5]; 
 		fill(x);
+        fill(d);
 
-		harness.checkPoint("System.arraycopy: Copying integer array");
+	    harness.checkPoint("System.arraycopy: Copying integer array");
 		harness.check(copy(x, 0, y, 0, x.length), null);
 		int[] one = { 0, 1, 2, 3, 4 };
 		check(harness, y, one);
 
 		harness.check(copy(x, 1, y, 0, x.length - 1), null);
-		harness.check(copy(x, 0, y, x.length - 1, 1), null);
+	    harness.check(copy(x, 0, y, x.length - 1, 1), null);
 		int[] two = { 1, 2, 3, 4, 0 };
 		check(harness, y, two);
 
-		harness.checkPoint("System.arraycopy: Incompatible arrays");
+        harness.checkPoint("System.arraycopy: destination same as source");
+        harness.check(copy(d, 1, d, 2, 1), null);
+        int[] three = { 0, 1, 1, 3, 4 };
+        check(harness, d, three);
+        Object[] dArray = new Object[5];
+        harness.check(copy(dArray, 1, dArray, 2, 1), null);
+        harness.check(dArray[1], dArray[2]);
+        
+        harness.checkPoint("System.arraycopy: Incompatible arrays");
 
 		Object[] z = new Object[5];
 		harness.check(copy(x, 0, z, 0, x.length), "caught ArrayStoreException");
